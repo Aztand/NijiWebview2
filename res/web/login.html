@@ -1,0 +1,113 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>你的日记</title>
+    <style>
+        body{
+            margin: 0;
+            display: grid;
+            grid-template-columns: 30% 70%;
+            width: 100%;
+            height: 100%;
+
+        }
+        #background {
+            background-image: url("bg.png");
+            background-repeat: no-repeat;
+            background-size:cover;
+            width: 100%;
+            height: 100%;
+        }
+        #loginColumn {
+            background-color:whitesmoke;
+            display: flex;
+        }
+        #logo {
+            width: 188px;
+            height: 188px;
+            display: block;
+            padding: 20px;
+            margin: auto;
+        }
+        #loginBox{
+            display: block;
+            margin: auto;
+        }
+        #loginForm{
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: auto;
+            margin-bottom: auto;
+            padding: 30px;
+        }
+        .text-input{
+            outline: none;
+            border: none;
+            border-radius: 16px;
+            padding-inline: 30px;
+            font-size: xx-large;
+            font-family: "等线";
+            width: 500px;
+            height: 80px;
+        }
+        .input-holder{
+            padding: 20px;
+        }
+        #login-button{
+            width: 500px;
+            height: 80px;
+            outline: none;
+            border: none;
+            border-radius: 16px;
+            text-align: center;
+            font-size: xx-large;
+            font-family: "等线";
+            padding: 20px;
+            background-color:#87b4d3;
+            color: white;
+        }
+        #wrong-tip{
+            color: red;
+            text-align: right;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+        <div id="background"></div>
+        <div id="loginColumn">
+            <div id="loginBox">
+                <img id="logo" src="logo.png">
+                <div id="loginForm">
+                    <div class="input-holder">
+                        <input class="text-input" id="email-input" type="email" placeholder="邮箱" autofocus>
+                    </div>
+                    <div class="input-holder">
+                        <input class="text-input" id="password-input" type="password" placeholder="密码">
+                        <p id="wrong-tip" hidden>账号或密码错误！</p>
+                    </div>
+                    <div class="input-holder" style="margin-top: 50px;">
+                        <button id="login-button">登录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script>
+        document.getElementById("login-button").addEventListener("click", login);
+        function login() {
+            document.getElementById("wrong-tip").hidden = true;
+            email = document.getElementById("email-input").value;
+            password = document.getElementById("password-input").value;
+            if(email && password){
+                i = aardio.login(email,password);
+                if(i == "login fail"){
+                document.getElementById("wrong-tip").hidden = false;
+                }
+            }
+            else{
+                document.getElementById("wrong-tip").hidden = false;
+            }
+        }
+    </script>
+</body>
+</html>

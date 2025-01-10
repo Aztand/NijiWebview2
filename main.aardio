@@ -1,0 +1,254 @@
+import win.ui;
+import web.view;
+import web.rest.jsonLiteClient;
+import web.json;
+//import wsock.tcp.asynHttpServer;
+import console;
+import time;
+import string.chineseNumber;
+/*DSG{{*/
+mainForm = win.form(text="你的日记";right=757;bottom=467;edge=1;maximize=1)
+mainForm.add()
+/*}}*/
+
+http = web.rest.jsonLiteClient();
+wb = web.view(mainForm);
+loginGo = "";
+
+zh = string.chineseNumber(); 
+daytoweek = function(inputnum){
+	weekDic = {"天","一","二","三","四","五","六"};
+	outputweek = weekDic[inputnum + 1];
+	return outputweek; 
+}
+
+addSelfCard = function(tableIndex){
+	
+	//检测列表是否需要添加新月份
+	if(time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").month != nowMonth){
+		nowMonth = time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").month;
+		wb.xcall("addMonthText",zh.number(nowMonth) + "月");
+	}
+	
+	//创建日记列表卡片
+	cardDay = time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").day;
+	cardWeek = "星期" + daytoweek(time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").dayofweek);
+	cardWriteTime = tostring(time(diaryResponse["diaries"][tableIndex]['ts']),"%H:%M");
+	if(diaryResponse["diaries"][tableIndex]['title'] != ""){
+    	if(string.len(diaryResponse["diaries"][tableIndex]['title'])>10)
+       		cardTitle = string.left(diaryResponse["diaries"][tableIndex]['title'],10,true) + "...";
+    	else
+       		cardTitle = diaryResponse["diaries"][tableIndex]['title']; 
+	}
+	else {
+   		cardTitle = diaryResponse["diaries"][tableIndex]['createddate'];
+	}
+	
+	//卡片上日记预览文字
+	if(string.len(string.trim(diaryResponse["diaries"][tableIndex]['content']))>10)
+   		cardSimple = string.replace(string.left(string.trim(diaryResponse["diaries"][tableIndex]['content']),10,true) + "...","\n","");
+	else
+    	cardSimple = string.replace(string.trim(diaryResponse["diaries"][tableIndex]['content']),"\n","");
+    	
+    //根据性别改变卡片样式
+	if(diaryResponse["diaries"][tableIndex]['space'] == 'girl')
+    	cardClass = 'diary-card card-girl';
+	else
+    	cardClass = 'diary-card card-boy';
+    	
+	cardOwner = 'self';
+	cardDiaryids = diaryResponse["diaries"][tableIndex]['id'];
+	
+	wb.xcall("addDiaryCard",{
+    	cardDay = cardDay;
+    	cardWeek = cardWeek;
+    	cardWriteTime = cardWriteTime;
+    	cardTitle = cardTitle;
+    	cardSimple = cardSimple;
+    	cardClass = cardClass;
+    	cardOwner = cardOwner;
+    	cardUserID = userID;
+    	cardDiaryids = cardDiaryids	
+	});
+}
+
+addPairedCard = function(tableIndex){
+	
+	//检测列表是否需要添加新月份
+	if(time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d").month != nowMonth){
+		nowMonth = time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d").month;
+		wb.xcall("addMonthText",zh.number(nowMonth) + "月");
+	}
+	
+	//创建日记列表卡片
+	cardDay = time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d").day;
+	cardWeek = "星期" + daytoweek(time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d").dayofweek);
+	cardWriteTime = tostring(time(diaryResponse["diaries_paired"][tableIndex]['ts']),"%H:%M");
+	if(diaryResponse["diaries_paired"][tableIndex]['title'] != ""){
+    	if(string.len(diaryResponse["diaries_paired"][tableIndex]['title'])>10)
+       		cardTitle = string.left(diaryResponse["diaries_paired"][tableIndex]['title'],10,true) + "...";
+    	else
+       		cardTitle = diaryResponse["diaries_paired"][tableIndex]['title']; 
+	}
+	else {
+   		cardTitle = diaryResponse["diaries_paired"][tableIndex]['createddate'];
+	}
+	
+	//卡片上日记预览文字
+	if(string.len(string.trim(diaryResponse["diaries_paired"][tableIndex]['content']))>10)
+   		cardSimple = string.replace(string.left(string.trim(diaryResponse["diaries_paired"][tableIndex]['content']),10,true) + "...","\n","");
+	else
+    	cardSimple = string.replace(string.trim(diaryResponse["diaries_paired"][tableIndex]['content']),"\n","");
+    	
+    //根据性别改变卡片样式
+	if(diaryResponse["diaries_paired"][tableIndex]['space'] == 'girl')
+    	cardClass = 'diary-card card-girl';
+	else
+    	cardClass = 'diary-card card-boy';
+    	
+	cardOwner = 'paired';
+	cardDiaryids = diaryResponse["diaries_paired"][tableIndex]['id'];
+	wb.xcall("addDiaryCard",{
+    	cardDay = cardDay;
+    	cardWeek = cardWeek;
+    	cardWriteTime = cardWriteTime;
+    	cardTitle = cardTitle;
+    	cardSimple = cardSimple;
+    	cardClass = cardClass;
+    	cardOwner = cardOwner;
+    	cardUserID = pairedID;
+    	cardDiaryids = cardDiaryids	
+	});
+}
+
+
+v2sync = function(){
+	diaryResponse = http.api("https://nideriji.cn/api/v2/sync/").post(
+    		user_config_ts = 0,
+    		diaries_ts = 0,
+    		readmark_ts = 0,
+    		images_ts = 0
+    );
+
+	i = 1;
+	j = 1;
+	nowMonth = 0;
+	
+	userID = diaryResponse["user_config"]["userid"];
+	pairedID = diaryResponse["user_config"]["paired_user_config"]["userid"];
+	
+	wb.xcall("setUserColor",diaryResponse["user_config"]["role"]);
+	
+	while(i <= diaryResponse["user_config"]["diary_count"] and j <= diaryResponse["user_config"]["paired_user_config"]["diary_count"]){
+		iDate = time(diaryResponse["diaries"][i]["createddate"],"%Y-%m-%d");
+		jDate = time(diaryResponse["diaries_paired"][j]["createddate"],"%Y-%m-%d");
+		
+		if(iDate >= jDate){
+			addSelfCard(i);
+			i++;
+		}
+		else{
+			addPairedCard(j);
+			j++;
+		}
+	}
+	
+	while(i <= table.len(diaryResponse["diaries"])){
+		addSelfCard(i);
+		i++;
+	}
+
+	while(j <= table.len(diaryResponse["diaries_paired"])){
+		addPairedCard(j);
+		j++;
+	}
+
+}
+
+wb.external = {
+	login = function(email,password){
+		loginResponse = http.api("https://nideriji.cn/api/login/").post(
+			email = email,
+			password = password
+		);
+		if(!loginResponse){
+			wb.doScript('document.getElementById("wrong-tip").hidden = false;');
+		}
+		elseif(loginResponse["error"] != 0) {
+			wb.doScript('document.getElementById("wrong-tip").hidden = false;');
+		}
+		else{
+			loginGo = 1;
+			http.addHeaders = {
+				["auth"] = "token " ++ loginResponse.token;
+    			["user-agent"] = "OhApp/3.0 Platform/Android";
+    		}
+		}	
+	};	
+	
+	msgbox = function(msg){
+		mainForm.msgbox(msg);
+	}
+	
+
+	writeDiary = function(dateText,titleText,contentText){
+		saveResponse = http.api("https://nideriji.cn/api/write/").post(
+			title = titleText,
+			content = contentText,
+			date = dateText
+		);
+		if(saveResponse){
+			return "Success"; 	
+		}
+		else {
+			return "error"; 
+		}
+	}
+	
+	getDiary = function(ownerID,diaryID){
+		getAllResponse = http.api("https://nideriji.cn/api/diary/all_by_ids/" ++ ownerID ++ "/").post(
+			diary_ids = diaryID
+		);
+		if(getAllResponse["diaries"][1]){
+			return web.json.stringify(getAllResponse["diaries"][1],true);
+		}
+		else {
+			return "error";
+		} 
+		
+	}
+	
+};//wb.external结束
+
+
+loginIntvalID = mainForm.setInterval( 
+	function(){
+		if(loginGo != 0){
+			wb.go("/res/web/index.html");
+			v2sync();
+			mainForm.clearInterval(loginIntvalID);
+		}
+	},200
+)
+
+
+
+
+
+
+wb.go("/res/web/login.html");
+wb.focus();
+mainForm.show();
+
+/*测试便捷代码，记得删
+			loginGo = 1;
+			http.addHeaders = {
+				["auth"] = "token 你的token";
+    			["user-agent"] = "OhApp/3.0 Platform/Android";
+    		}
+
+
+
+//————————————————————*/
+
+return win.loopMessage();
