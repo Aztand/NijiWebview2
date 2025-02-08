@@ -3,194 +3,342 @@
     <meta charset="utf-8">
     <title>你的日记</title>
     <style>
-        body{
-            margin-left: 0px;
-            margin-right: 0px;
-            margin-top: 0;
-            margin-bottom: 0;
+        /* ===== 基础变量 ===== */
+        :root {
+            /* 颜色 */
+            --color-primary-boy: #4988b4;
+            --color-primary-girl: #ff7074;
+            --color-bg-page: whitesmoke;
+            --color-bg-element: white;
+            --color-shadow-light: #cccccc;
+            --color-shadow-medium: #bbbbbb;
+            --color-shadow-dark: #dddddd;
+            --color-border: #000000;
+            --color-float-btn: #4988b4;
+    
+            /* 间距 (1rem=16px) */
+            --space-xxs: 0.25rem;  /* 4px */
+            --space-xs: 0.5rem;    /* 8px */
+            --space-sm: 0.75rem;   /* 12px */
+            --space-md: 1rem;      /* 16px */
+            --space-lg: 1.5rem;    /* 24px */
+            --space-xl: 2rem;      /* 32px */
+            --space-xxl: 2.5rem;   /* 40px */
+    
+            /* 圆角 */
+            --radius-sm: 8px;
+            --radius-md: 24px;
+            --radius-lg: 32px;
+    
+            /* 字号 */
+            --text-xs: 0.875rem;   /* 14px */
+            --text-sm: 1rem;       /* 16px */
+            --text-md: 1.25rem;    /* 20px */
+            --text-lg: 1.5rem;     /* 24px */
+            --text-xl: 2.5rem;     /* 40px */
+    
+            /* 图片路径 */
+            --img-logo: url("logo.png");
+            --img-treehole: url("treehole.png");
+            --img-write-selected: url("write-selected.png");
+            --img-new: url("new.png");
+            --img-save: url("save.png");
+            --img-delete: url("delete.png");
+        }
+    
+        /* ===== 基础样式 ===== */
+        body {
+            margin: 0;
             display: grid;
             grid-template-columns: 10% 25% 65%;
-            width: 100%;
-            height: 100%;
-            background-color: whitesmoke;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--color-bg-page);
         }
-        .diary-card{
-            margin: 20px;
-            margin-left: 40px;
-            width: 90%;
-            height: 120px;
-            border-radius: 24px;
-            box-shadow: 1px 1px 10px #CCCCCC;
-            background-color: white;
-            display: grid;
-            grid-template-columns: 30% 70%;
+    
+        /* ===== 工具类 ===== */
+        .unselectable {
+            cursor: default;
+            user-select: none;
         }
-        .card-boy{
-            color: #4988b4;
-        }
-        .card-girl{
-            color: #ff7074;
-        }
-        .card-left{
-            display: grid;
-            grid-template-rows: 65% 35%;
-            padding: 15%;
-        }
-        .card-day{
-           margin: auto;
-           font-size: 48px;
-           cursor: default;
-           user-select: none;
-        }
-        .card-week{
-            width: auto;
-            margin: auto;
-           cursor: default;
-           user-select: none;
-        }
-        .card-right{
-            display: grid;
-            grid-template-rows: 30% 35% 35%;
-            padding: 10% 5% 0;
-            margin-left: -5%;
-        }
-        .card-time{
-            margin-top: -5px;
-           cursor: default;
-           user-select: none;
-        }
-        .card-title{
-            margin-top: -10px;
-            font-size: 20px;
-           cursor: default;
-           user-select: none;
-        }
-        .card-simple{
-            margin-top: -15px;
-            font-size: 20px;
-           cursor: default;
-           user-select: none;
-        }
-        .month-text{
-            margin-left: 40px;
-            font-size: 2.5em;
-        }
-        .icon-item{
-            margin: auto;
-        }
-        #left-navigation{
-            background-color: white;
-            box-shadow: 2px 0px 16px #DDDDDD;
+    
+        /* ===== 左侧导航栏 ===== */
+        #left-navigation {
+            background-color: var(--color-bg-element);
+            box-shadow: 2px 0px 16px var(--color-shadow-dark);
             width: 40%;
             display: block;
         }
-        #icon-list{
-            display: block;
-        }
-        .seperate-line{
-            border-bottom: solid black 1px;
-            width: 80%;
-            padding-top: 20%;
-            margin: auto;
-        }
-        #logo{
-            background-image: url("logo.png");
+    
+        #logo {
+            background-image: var(--img-logo);
             background-size: 100% 100%;
-            margin: auto;
             width: 80%;
+            margin: auto;
             padding-top: 80%;
         }
-        #treehole-logo{
-            background-image: url("treehole.png");
+    
+        #treehole-logo {
+            background-image: var(--img-treehole);
             background-size: 100% 100%;
             width: 80%;
             margin-left: 10%;
             padding-top: 80%;
             margin-top: 20%;
         }
-        #write-logo{
-            background-image: url("write-selected.png");
+    
+        #write-logo {
+            background-image: var(--img-write-selected);
             background-size: 100% 100%;
             width: 80%;
             margin-left: 10%;
             padding-top: 80%;
             margin-top: 50%;
         }
-
-        #diary-card-list{
-            margin-top: 20px;
-            margin-right: 20px;
-            padding-right: 20px;
-            margin-bottom: 20px;
+    
+        .seperate-line {
+            border-bottom: 1px solid var(--color-border);
+            width: 80%;
+            padding-top: 20%;
+            margin: auto;
+        }
+    
+        /* ===== 日记列表 ===== */
+        #diary-card-list {
+            margin-top: var(--space-lg);
+            margin-right: var(--space-md);
+            padding-right: var(--space-md);
+            margin-bottom: var(--space-lg);
             overflow-y: scroll;
             overflow-x: hidden;
         }
-        #write-page{
-            border-radius: 32px;
-            box-shadow: 2px 2px 16px #BBBBBB;
-            margin-top: 3%;
-            margin-left: 5%;
-            margin-right: 15%;
-            margin-bottom: 5%;
-            background-color: white;
+    
+        .month-text {
+            margin-left: var(--space-xxl);
+            font-size: var(--text-xl);
+        }
+    
+        /* ===== 日记卡片 ===== */
+        .diary-card {
+            margin: var(--space-lg);
+            margin-left: var(--space-xxl);
+            width: 90%;
+            height: 120px;
+            border-radius: var(--radius-md);
+            box-shadow: 1px 1px 10px var(--color-shadow-light);
+            background-color: var(--color-bg-element);
+            display: grid;
+            grid-template-columns: 30% 70%;
+        }
+    
+        .card-boy { color: var(--color-primary-boy); }
+        .card-girl { color: var(--color-primary-girl); }
+    
+        .card-left {
+            display: grid;
+            grid-template-rows: 65% 35%;
+            padding: 15%;
+        }
+    
+        .card-day {
+            margin: auto;
+            font-size: var(--text-xl);
+            cursor: default;
+            user-select: none;
+        }
+    
+        .card-week {
+            width: auto;
+            margin: auto;
+            cursor: default;
+            user-select: none;
+        }
+    
+        .card-right {
+            display: grid;
+            grid-template-rows: 30% 35% 35%;
+            padding: 10% 5% 0;
+            margin-left: -5%;
+        }
+    
+        .card-time {
+            margin-top: -5px;
+            cursor: default;
+            user-select: none;
+        }
+    
+        .card-title {
+            margin-top: -10px;
+            font-size: var(--text-md);
+            cursor: default;
+            user-select: none;
+        }
+    
+        .card-simple {
+            margin-top: -15px;
+            font-size: var(--text-md);
+            cursor: default;
+            user-select: none;
+        }
+    
+        /* ===== 写作页面 ===== */
+        #write-page {
+            border-radius: var(--radius-lg);
+            box-shadow: 2px 2px 16px var(--color-shadow-medium);
+            margin: 3% 5% 5% 15%;
             width: 70%;
             height: 90%;
+            background-color: var(--color-bg-element);
+            position: relative; /* 为绝对定位元素提供锚点 */
         }
-        #title-input{
-            font-size: xx-large;
+
+        /* 日期选择器容器 */
+        #date-picker-container {
+            position: absolute;
+            right: var(--space-xxl);
+            top: calc(var(--space-xl) + 8px); /* 与标题输入框对齐 */
+        }
+
+        #date-input {
+            font-size: var(--text-md); /* 与正文相同字号 */
+            font-family: inherit;
+            border: 1px solid var(--color-shadow-light);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xxs);
+            color: black;
+            background: var(--color-bg-element);
+            transition: all 0.2s;
+        }
+
+        #date-input:hover {
+            border-color: black;
+        }
+
+        #date-input:focus {
+            outline: 2px solid black;
+            border-color: transparent;
+        }
+
+        /* 新增不可编辑状态样式 */
+        #write-page[data-editable="false"] #title-input,
+        #write-page[data-editable="false"] #diary-input {
+            background-color: inherit; /* 保持原有背景 */
+            cursor: text; /* 保持文本光标 */
+            opacity: 1; /* 移除透明度变化 */
+        }
+        #title-input:disabled,
+        #diary-input:disabled {
+            background-image: none; /* 移除默认灰色背景 */
+        }
+
+        #title-input {
+            font-size: var(--text-xl);
             font-weight: bold;
-            margin-top: 30px;
-            margin-left: 60px;
+            margin-top: var(--space-xl);
+            margin-left: var(--space-xxl);
             width: 90%;
             height: 60px;
             border: none;
             outline: none;
-            
         }
-        #title-line{
+    
+        #title-line {
             height: 2px;
-            background-color: black;
+            background-color: var(--color-border);
             width: 90%;
             margin-left: 5%;
         }
-        #diary-input{
-            border: none;
-            font-size: 1.3em;
-            font-family: '等线';
-            margin-top: 30px;
-            margin-left: 60px;
-            height: 85%;
-            width: 88%;
-            outline: none;
+    
+        #diary-input {
+        border: none;
+        font-size: 1.5em; /* 增大字号 */
+        font-family: 'PingFang SC', -apple-system, sans-serif;
+        margin-top: var(--space-xl);
+        margin-left: var(--space-xxl);
+        height: 85%;
+        width: 88%;
+        outline: none;
+        font-weight: 100;
+        resize: none;
+        
+        /* 新增排版优化 */
+        line-height: 1.6;         /* 行高增加 */
+        letter-spacing: 0.03em;   /* 字间距微调 */
+        padding: 0.8rem 1.2rem;   /* 内边距优化 */
+        text-rendering: optimizeLegibility;
         }
-        #floatMenuBar{
+
+        /* 段落间距 */
+        #diary-input p {
+            margin-bottom: 1.2em;
+        }
+    
+        /* ===== 浮动按钮 ===== */
+        #floatMenuBar {
             width: 72px;
-            text-align: center; 
-            padding: 0; /* 移除内边距 */
-            position: fixed; /* 使用固定定位 */
-            bottom: 10%; /* 距离页面底部的距离 */
-            right: 10%; /* 距离页面右侧的距离 */
+            text-align: center;
+            padding: 0;
+            position: fixed;
+            bottom: 10%;
+            right: 10%;
         }
-        .floatMenuButton{
-            margin-top: 16px;
+    
+        .floatMenuButton {
+            margin-top: var(--space-md);
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background-color: #5abc86;
+            background-color: var(--color-float-btn);
             background-size: 70% 70%;
             background-repeat: no-repeat;
             background-position: center;
-            cursor: pointer;
+            transition: opacity 0.3s, visibility 0.3s;
         }
-        #newMenuButton{
-            background-image: url("new.png");
+
+        .floatMenuButton[hidden] {
+            opacity: 0 !important;
+            visibility: hidden;
         }
-        #saveMenuButton{
-            background-image: url("save.png");
+
+        #newMenuButton { 
+            background-image: var(--img-new); 
+            display: block !important; /* 强制覆盖其他样式 */
+            opacity: 1 !important;
+            visibility: visible !important;
         }
-        #deleteMenuButton{
-            background-image: url("delete.png");
+        #saveMenuButton {
+             background-image: var(--img-save); 
+             transition: opacity 0.3s ease;
         }
+        #deleteMenuButton { background-image: var(--img-delete); }
+
+        /*删除动画样式*/
+        .fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+
+        /* 旋转圆环动画 */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--color-float-btn);
+            animation: spin 1s linear infinite;
+            background-color: transparent;
+            box-sizing: border-box;
+        }
+
     </style>
 </head>
 <body>
@@ -219,8 +367,12 @@
         </div>
         -->
     </div>
+
     <div id="write-page">
-        <input id="title-input" type="text"  placeholder="日记标题">
+        <div id="date-picker-container">
+            <input id="date-input" type="date">
+        </div>
+        <input id="title-input" type="text" placeholder="日记标题">
         <div id="title-line"></div>
         <textarea id="diary-input" placeholder="请输入..."></textarea>
     </div>
@@ -232,175 +384,579 @@
         
     </div>
 
+    <!-- 修改模板字段匹配 -->
+    <template id="diary-card-template">
+        <div class="diary-card {{cardStyle}}" owner="{{cardOwner}}" id="{{cardDiaryids}}" data-user-id="{{cardUserID}}" data-created-date="{{createdDate}}">
+        <div class="card-left">
+            <div class="card-day">{{cardDay}}</div>
+            <div class="card-week">{{cardWeek}}</div>
+        </div>
+        <div class="card-right">
+            <div class="card-time">{{cardWriteTime}}</div>
+            <div class="card-title">{{cardTitle}}</div>
+            <div class="card-simple">{{cardSimple}}</div>
+        </div>
+        </div>
+    </template>
+
     <script>
+                // 添加状态管理对象
+        const DiaryState = {
+            hasUnsavedChanges() {
+                const writePage = document.getElementById('write-page');
 
-        window.setTextareaData = function(e){
-            document.getElementById('write-page').dataset.title = e;
+                // 如果当前不可编辑，直接返回false
+                if (writePage.dataset.ownerType !== 'self') return false;
+
+                const title = document.getElementById('title-input').value.trim();
+                const content = document.getElementById('diary-input').value.trim();
+                return title !== writePage.dataset.title || content !== writePage.dataset.content;
+            }
+        };
+
+        const _showSaveDialog = () => new Promise(resolve => {
+            const saveFirst = confirm("当前日记有未保存修改，是否保存？");
+            if (saveFirst) return resolve('save');
+            
+            const confirmDiscard = confirm("确定要放弃修改吗？");
+            resolve(confirmDiscard ? 'discard' : 'cancel');
+        });
+
+        const _handleSwitchError = (error) => {
+            console.error(`日记切换失败: ${error.stack}`);
+            alert(`操作失败：${error.message}`);
+        };
+        
+        const _handleDeleteSuccess = (deletedId) => {
+            const writePage = document.getElementById('write-page');
+            const deletedCard = document.getElementById(deletedId);
+            const cardList = document.getElementById('diary-card-list');
+            // 1. 查找下篇日记（DOM顺序即时间顺序）
+            const getNextDiary = () => {
+                if (!deletedCard) return null;
+                
+                // 先尝试找后续卡片（更早的日记）
+                let nextCard = deletedCard.nextElementSibling;
+                // 跳过月份标题（h1元素）
+                while(nextCard && nextCard.tagName !== 'DIV') {
+                    nextCard = nextCard.nextElementSibling;
+                }
+
+                // 没有后续则找前序卡片（更新的日记）
+                if (!nextCard) {
+                    nextCard = deletedCard.previousElementSibling;
+                    while(nextCard && nextCard.tagName !== 'DIV') {
+                        nextCard = nextCard.previousElementSibling;
+                    }
+                }
+                return nextCard;
+            };
+
+            // 2. 执行切换或清空
+            const nextCard = getNextDiary();
+            if (nextCard) {
+                nextCard.click(); // 触发点击切换
+            } else {
+                // 无其他日记时的处理
+                document.getElementById('title-input').value = '';
+                document.getElementById('diary-input').value = '';
+                document.getElementById('saveMenuButton').hidden = true;
+                document.getElementById('deleteMenuButton').hidden = true;
+            }
+
+
+            // 3. 显示操作反馈      这其实应该是第五步，但发现实际上要用户点击这个alert之后，才会开始删除卡片、月份，这会导致无法正确删除月份。
+            alert('日记已永久删除');
+
+
+            // 4. 移除被删卡片（带动画）
+            if (deletedCard) {
+                deletedCard.classList.add('fade-out');
+                setTimeout(() => deletedCard.remove(), 300);
+            }
+
+            // 5.清理名下没有日记卡片的所有月份标题
+            // 获取所有month-text元素
+            var monthTextElements = document.querySelectorAll('.month-text');
+            // 遍历month-text元素   用settimeout是因为那玩意儿播完淡出动画才消失……
+            setTimeout(() => monthTextElements.forEach(function(monthText) {
+            // 检查month-text元素后面是否紧跟了一个diary-card元素或者是否存在下一个兄弟元素
+            var nextElement = monthText.nextElementSibling;
+            console.log("cleaning");
+            if (!nextElement || !nextElement.classList.contains('diary-card')) {
+                // 如果后面没有紧跟diary-card或者没有下一个兄弟元素，则删除该month-text元素
+                monthText.remove();
+            }
+            }), 350);
+
+        };
+
+        const monthRegistry = new Map(); // { 'YYYY-MM': HTMLElement }
+
+        window.addMonthCard = (year, month) => {
+            const monthStr = `${year}年${parseInt(month)}月`;
+            const key = `${year}-${month.toString().padStart(2,'0')}`;
+            
+            if (monthRegistry.has(key)) return;
+
+            const element = document.createElement('h1');
+            element.className = 'month-text';
+            element.textContent = monthStr;
+            element.dataset.sortKey = key;
+            element.dataset.createdDate = getLastDayOfMonth(year,month);
+
+            // 倒序插入月份标题
+            const existing = [...document.querySelectorAll('.month-text')];
+            const insertPos = existing.find(el => el.dataset.sortKey < key);
+            const container = document.getElementById('diary-card-list');
+
+            insertPos ? container.insertBefore(element, insertPos) 
+                     : container.appendChild(element);
+
+            monthRegistry.set(key, element);
+        };
+
+        window.addDiaryCard = (data) => {
+            const dateStr = data.createdDate //|| new Date().toISOString().split('T')[0];
+            const dateObj = new Date(dateStr);
+            const key = `${dateObj.getFullYear()}-${(dateObj.getMonth()+1).toString().padStart(2,'0')}`;
+
+            // 确保月份存在
+            if (!monthRegistry.has(key)) {
+                window.addMonthCard(dateObj.getFullYear(), dateObj.getMonth()+1);
+            }
+
+            // 生成卡片
+            const template = document.getElementById('diary-card-template').innerHTML;
+            const html = Object.entries(data).reduce((acc, [k,v]) => 
+                acc.replace(new RegExp(`{{${k}}}`, 'g'), v), template);
+            
+            const card = document.createElement('div');
+            card.innerHTML = html;
+            const cardEl = card.firstElementChild;
+            cardEl.dataset.createdDate = dateStr;
+
+            // 插入到正确位置（倒序）
+            const siblings = [...document.getElementById('diary-card-list').children];
+            const insertPos = siblings.find(el => {
+                const elDate = el.dataset?.createdDate;
+                return elDate && new Date(elDate) < dateObj;
+            });
+
+            insertPos ? insertPos.before(cardEl) 
+                     : document.getElementById('diary-card-list').appendChild(cardEl);
+
+            // 更新最新日期
+            const currentDate = document.getElementById('date-input').value;
+            if (!currentDate || new Date(dateStr) > new Date(currentDate)) {
+                document.getElementById('date-input').value = dateStr;
+            }
+
+            if (shouldAutoLoadFirstDiary) {
+                shouldAutoLoadFirstDiary = false; // 立即置为false防止重复
+
+                // 直接使用传入参数加载日记
+                window.switchDiary({
+                    userId: data.cardUserID.toString(),
+                    diaryId: data.cardDiaryids.toString(),
+                    owner: data.cardOwner
+                });
+            }
+
+        };
+
+        function getLastDayOfMonth(year, month) {//辅助addMonthCard设置月份虚拟日期
+            // 设置下一个月的第一天
+            const nextMonth = new Date(year, month, 1);
+            // 减去一天得到当前月的最后一天
+            const lastDay = new Date(nextMonth - 1);
+            // 返回格式化的日期字符串
+            return `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
         }
 
-        window.setTitleData = function(e){
-            document.getElementById('write-page').dataset.content = e;
+        let shouldAutoLoadFirstDiary = true;
+
+        document.getElementById('diary-card-list').addEventListener('click', async (event) => {     //监听点击列表切换卡片
+            const card = event.target.closest('.diary-card');
+            if (!card) return;
+
+            // 从卡片元素获取关键数据
+            const diaryInfo = {
+                id: card.id,
+                diaryId: card.id,
+                userId: card.dataset.userId,
+                owner: card.getAttribute('owner') // 关键属性
+            };
+
+            if (!diaryInfo.owner) {
+                console.warn('卡片缺失owner属性:', card);
+                return;
+            }
+
+            try {
+                await window.switchDiary(diaryInfo);
+            } catch (error) {
+                const handleSwitchError = (error) => {
+                    console.error('切换失败:', error);
+                    alert(`操作出错: ${error.message}`);
+                };
+            }
+        });
+
+        // 监听输入变化
+        const diaryInput = document.getElementById('diary-input');
+        
+        diaryInput.addEventListener('input', function() {               //检测当前日记是否可编辑，以改变悬浮按钮显隐
+            const saveBtn = document.getElementById('saveMenuButton');
+            const writePage = document.getElementById('write-page');
+            
+            const hasContent = this.value.trim().length > 0;
+            const isEditable = writePage.dataset.editable === 'true';
+            
+            saveMenuButton.hidden = !isEditable;
+            saveMenuButton.style.opacity = hasContent ? 1 : 0.5;
+            saveMenuButton.disabled = !hasContent;
+        });
+
+        document.getElementById('newMenuButton').addEventListener('click', async () => {        //新建日记按钮（其实就是切换到今天）
+            // 检查是否存在当天日期日记
+            // 创建一个新的Date对象表示当前日期和时间
+            var currentDate = new Date();
+            var year = currentDate.getFullYear();
+            var month = currentDate.getMonth() + 1;
+            var day = currentDate.getDate();
+            // 将月份和日期格式化为两位数，如果它们小于10，则在前面添加0
+            month = month < 10 ? '0' + month : month;
+            day = day < 10 ? '0' + day : day;
+            // 构建格式化的当日日期字符串
+            var formattedDate = year + '-' + month + '-' + day;
+
+            var diaryCards = document.querySelectorAll('.diary-card');
+            // 遍历diary-card元素
+            diaryCards.forEach(function(diaryCard) {
+            if ( diaryCard.dataset.createdDate === formattedDate ) {//如果当天有日记
+                window.switchDiary({
+                    userId: diaryCard.dataset.userId,
+                    diaryId: diaryCard.id,
+                    owner: diaryCard.owner
+                });
+                return true;
+            }
+            });
+
+            //如果遍历完了都没有，那就只能新建空白日记了
+            const writePage = document.getElementById('write-page');
+            try {
+                // 保存检查流程
+                const isCurrentEditable = writePage.dataset.ownerType === 'self';
+                if (isCurrentEditable && DiaryState.hasUnsavedChanges()) {
+                    const choice = await _showSaveDialog();
+                    if (choice === 'cancel') return false;
+                    if (choice === 'save' && !await window.writeDiary()) return false;
+                }
+
+                // 执行切换
+                writePage.dataset.currentUserId = String(userId);  // 新增当前用户标记
+                writePage.dataset.currentDiaryId = ""; // 清空当前日记标识
+                writePage.dataset.ownerType = "self";        // 明确归属类型
+                const saveBtn = document.getElementById('saveMenuButton');
+                const deleteBtn = document.getElementById('deleteMenuButton');
+                // 更新界面
+                document.getElementById('title-input').value = '';
+                document.getElementById('diary-input').value = '';
+                document.getElementById('date-input').value = formattedDate;
+                // 设置编辑状态
+                const isEditable = true; 
+                writePage.dataset.editable = isEditable;
+                // 按钮全显示
+                document.getElementById('newMenuButton').hidden = false;
+                document.getElementById('saveMenuButton').hidden = false;
+                document.getElementById('deleteMenuButton').hidden = false;
+                // 解锁输入框
+                document.getElementById('diary-input').disabled = false;
+                document.getElementById('title-input').disabled = false;
+                // 更新缓存状态
+                writePage.dataset.title = "";
+                writePage.dataset.content = "";
+                writePage.dataset.editable = isEditable; // 新增可编辑状态标记
+
+                return true;
+
+            } catch (error) {
+                console.error('打开空白日记失败:', error);
+                alert(`操作失败: ${error.message}`);
+                return false;
+            }
+
+        });
+
+        document.getElementById('saveMenuButton').addEventListener('click', async () => {       //保存日记按钮
+            const saveBtn = document.getElementById('saveMenuButton');
+            const writePage = document.getElementById('write-page');        
+            const dateInput = document.getElementById('date-input');
+            const selectedDate = new Date(dateInput.value);    
+            
+            try {
+                // 保存前状态反馈
+                saveBtn.classList.add('loading-spinner');
+                saveBtn.disabled = true; // 防止重复点击
+
+                // 执行保存
+                const result = await window.writeDiary();
+                
+                if (result.status === "Success") {
+                    // 成功反馈
+                    saveBtn.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        saveBtn.style.transform = 'scale(1)';
+                        saveBtn.classList.remove('loading-spinner');
+                    }, 300);
+
+                    // 如果是新建日记，添加到左侧列表
+
+                    var diaryCards = document.querySelectorAll('#diary-card-list .diary-card'); // 获取所有的日记卡片
+                    var isDiaryIdMatched = false;                                               // 初始化一个标志变量，用于表示是否找到匹配的日记卡片
+                    for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
+                        // 检查当前日记卡片的id是否与currentDiaryId相同
+                        if (diaryCards[i].dataset.createdDate == dateInput.value) {
+                            isDiaryIdMatched = true;
+                            break; // 找到匹配的日记卡片后，退出循环
+                        }
+                    }//此代码块用于检查是否是卡片列表不存在的新建日记
+
+
+                    if (!isDiaryIdMatched) {
+                        // 获取当前时间
+                        let now = new Date();
+                        let hours = now.getHours();
+                        let minutes = now.getMinutes();
+                        // 格式化小时和分钟，确保它们是两位数
+                        let formattedHours = hours.toString().padStart(2, '0');
+                        let formattedMinutes = minutes.toString().padStart(2, '0');
+
+                        const newDiaryCardData = {
+                            cardDiaryids: result.newDiaryId,
+                            cardUserID: writePage.dataset.currentUserId,
+                            cardOwner: writePage.dataset.ownerType,
+                            cardDay: selectedDate.getDate(),
+                            cardWeek: "星期" + ['日', '一', '二', '三', '四', '五', '六'][new Date(document.getElementById('date-input').value).getDay()],
+                            cardWriteTime: `${formattedHours}:${formattedMinutes}`,
+                            cardTitle: document.getElementById('title-input').value || document.getElementById('date-input').value,
+                            cardSimple: document.getElementById('diary-input').value.substring(0, 10) + '...', // 截取前10字作为简介
+                            createdDate: selectedDate.toISOString().split('T')[0], // ISO 8601格式
+                            cardStyle: selfCardStyle
+                        };
+
+                        // 将新日记卡片插入到左侧列表顶部
+                        addDiaryCard(newDiaryCardData);
+
+                        // 更新当前日记ID
+                        writePage.dataset.currentDiaryId = result.newDiaryId;
+                    }
+
+                    alert('保存成功！');
+                } else {
+                    throw new Error(result.message || '保存失败');
+                }
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert(`保存失败: ${error.message}`);
+            } finally {
+                saveBtn.classList.remove('loading-spinner');
+                saveBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('deleteMenuButton').addEventListener('click', async () => {     //删除日记按钮
+            try {
+                const writePage = document.getElementById('write-page');
+                const { currentUserId, currentDiaryId, ownerType } = writePage.dataset;
+
+                // 权限验证
+                if (ownerType !== 'self') {
+                    alert('无权限删除他人日记');
+                    return;
+                }
+
+                // 二次确认
+                const confirmDelete = confirm('确定要永久删除这篇日记吗？此操作不可撤销！');
+                if (!confirmDelete) return;
+
+                // 执行删除
+                const result = await aardio.deleteDiary(currentUserId, currentDiaryId);
+                if (result !== "Success") throw new Error('删除操作未成功');
+
+                // 删除成功处理
+                _handleDeleteSuccess(currentDiaryId);
+                
+            } catch (error) {
+                console.error('删除失败:', error);
+                alert(`删除失败: ${error.message}`);
+            }
+        });
+
+        let selfCardStyle = "card-girl";
+        let userId = "";
+
+        window.setUserId = function(e){
+            userId = e;
         }
-
-        window.setDateData = function(e){
-            document.getElementById('write-page').dataset.date = e;
-        }
-
-
 
         window.setUserColor = function(e){
             if(e == "boy"){
                 document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#4988b4";});
+                selfCardStyle = "card-boy"
             }
             else{
                 document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#ff7074";});
             }
             document.querySelectorAll('.floatMenuButton').forEach(element => {element.removeAttribute("hidden");});
         }
+        
         // 保存更改的操作
         window.writeDiary = async function() {
             const diaryInput = document.getElementById("diary-input");
-            if(diaryInput.value.trim()) {
-                try {
-                    const titleInput = document.getElementById("title-input");
-                    const writePage = document.getElementById('write-page');
-                    const saveResult = await aardio.writeDiary(writePage.dataset.date, titleInput.value, diaryInput.value);
-                    if(saveResult == "Success") {
-                        window.alert("保存成功！");
-                        return true;
-                    } else {
-                        window.alert("保存失败！");
-                        return false;
-                    }
-                } catch (error) {
-                    window.alert("保存时发生错误：" + error);
-                    return false;
+            const titleInput = document.getElementById("title-input");
+            const dateInput = document.getElementById("date-input");
+            const writePage = document.getElementById('write-page');
+            
+            const selectedDate = dateInput.value;
+            const title = titleInput.value.trim();
+            const content = diaryInput.value.trim();
+
+            try {
+                // 输入验证
+                if (!content) throw new Error('日记正文内容不能为空');
+                if (!selectedDate) throw new Error('请选择日记日期');
+                
+                // 调用aardio接口
+                const result = JSON.parse(await aardio.writeDiary(
+                    selectedDate,
+                    title,
+                    content
+                ));
+
+                if (result.status !== "Success") {
+                    throw new Error(result.message || '保存失败');
                 }
-            } else {
-                alert("保存内容不能为空！");
-                return false;
+
+                // 更新界面状态
+                writePage.dataset.title = title;
+                writePage.dataset.content = content;
+                writePage.dataset.date = selectedDate; // 记录当前日期
+
+                return result;
+
+            } catch (error) {
+                alert(`保存失败：${error.message}`);
+                return { status: "Error", message: error.message };
             }
         };
 
 
-        window.setWritePage = async function(userID,diaryID) {
-
-            const diaryInput = document.getElementById("diary-input");
-            const titleInput = document.getElementById("title-input");
+        // 更改稿纸内容  在setWritePage中增加权限控制
+        window.setWritePage = async function(userId, diaryId, cardOwner) {
             const writePage = document.getElementById('write-page');
-            targetDiary = await aardio.getDiary(userID , diaryID);
-            targetDiary = JSON.parse(targetDiary);
+            writePage.dataset.currentUserId = String(userId);  // 新增当前用户标记
+            writePage.dataset.currentDiaryId = String(diaryId); // 新增当前日记标识
+            writePage.dataset.ownerType = cardOwner;        // 明确归属类型
+            const saveBtn = document.getElementById('saveMenuButton');
+            const deleteBtn = document.getElementById('deleteMenuButton');
 
-            writePage.dataset.date = targetDiary["createddate"];
-            writePage.dataset.title = targetDiary["title"];
-            writePage.dataset.content = targetDiary["content"];
+            try {
+                // 获取日记数据
+                const targetDiary = JSON.parse(await aardio.getDiary(userId, diaryId));
+                
+                // 更新界面
+                document.getElementById('title-input').value = targetDiary.title || '';
+                document.getElementById('diary-input').value = targetDiary.content || '';
+                document.getElementById('date-input').value = targetDiary.createddate || '';
+                
+                // 设置编辑状态
+                const isEditable = cardOwner === 'self'; 
+                writePage.dataset.editable = isEditable;
 
-            if(targetDiary["title"] == ""){
-                titleInput.setAttribute("placeholder", targetDiary["createddate"]);
-                titleInput.value = "";
+                // 按钮显示控制（新建始终显示）
+                document.getElementById('newMenuButton').hidden = false;
+                document.getElementById('saveMenuButton').hidden = !isEditable;
+                document.getElementById('deleteMenuButton').hidden = !isEditable;
+                
+                // 设置输入框状态
+                document.getElementById('diary-input').disabled = !isEditable;
+                document.getElementById('title-input').disabled = !isEditable;
+                
+                // 更新缓存状态
+                writePage.dataset.title = targetDiary.title;
+                writePage.dataset.content = targetDiary.content;
+                writePage.dataset.editable = isEditable; // 新增可编辑状态标记
+
+            } catch (error) {
+                console.error('日记加载失败:', error);
+                alert('无法加载日记内容');
             }
-            else{
-                titleInput.value = targetDiary["title"];
-            }
+        };
 
-            diaryInput.value = targetDiary["content"];
-        }
-
+        
         //切换日记
-        window.switchDiary = async function(e){
-            const diaryInput = document.getElementById("diary-input");
-            const titleInput = document.getElementById("title-input");
+        window.switchDiary = async function(target) {
             const writePage = document.getElementById('write-page');
+            const { userId, diaryId, owner } = target;
+            try {
+                // 保存检查流程
+                const isCurrentEditable = writePage.dataset.ownerType === 'self';
+                if (isCurrentEditable && DiaryState.hasUnsavedChanges()) {
+                    const choice = await _showSaveDialog();
+                    if (choice === 'cancel') return false;
+                    if (choice === 'save' && !await window.writeDiary()) return false;
+                }
 
-            if((titleInput.value != writePage.dataset.title || diaryInput.value != writePage.dataset.content) && writePage.dataset.content){
-                    if(i=confirm("是否保存更改？")){
-                        const result = writeDiary();
-                        if(result){
-                            setWritePage(e.dataset.userID , e.id);
-                        }
-                        else{
-                            return false;
-                        }//保存更改成功
-                    }//是否保存更改
-                    else{
-                        setWritePage(e.dataset.userID , e.id);
-                    }
-            }//检测当前页是否编辑
-            else{
-                setWritePage(e.dataset.userID , e.id);
+                // 执行切换
+                await setWritePage(userId, diaryId, owner);
+                return true;
+
+            } catch (error) {
+                console.error('日记切换失败:', error);
+                alert(`操作失败: ${error.message}`);
+                return false;
             }
-        }
+        };
 
-        //左侧列表增加月份
-        window.addMonthText =  function(e){
-            var monthH1 = document.createElement("h1");
-                monthH1.setAttribute("class","month-text");
-                var monthText = document.createTextNode(e);
-            monthH1.appendChild(monthText);
-            document.getElementById("diary-card-list").appendChild(monthH1);
-        }
+        // 私有方法集
+        const _directSwitch = async (target) => {
+            await window.setWritePage(target.userId, target.diaryId);
+            return true;
+        };
 
-        //左侧列表新增卡片
-        window.addDiaryCard = function(e){
-            cardDay = e.cardDay;
-            cardWeek = e.cardWeek;
-            cardWriteTime = e.cardWriteTime;
-            cardTitle = e.cardTitle;
-            cardSimple = e.cardSimple;
-            cardClass = e.cardClass;
-            cardUserID = e.cardUserID;
-            cardOwner = e.cardOwner;
-            cardDiaryids = e.cardDiaryids;
-                 cardDiv = document.createElement("div");
-                cardDiv.setAttribute('class',cardClass);
-                cardDiv.setAttribute('owner',cardOwner);
-                cardDiv.setAttribute('id',cardDiaryids);
-                cardDiv.dataset.userID = cardUserID;
-                var leftDiv = document.createElement("div");
-                leftDiv.setAttribute('class','card-left');
-                    var dayDiv = document.createElement("div");
-                    dayDiv.setAttribute('class','card-day');
-                    var dayText = document.createTextNode(cardDay);
-                    dayDiv.appendChild(dayText);
-                    leftDiv.appendChild(dayDiv);
-
-                    var weekDiv = document.createElement("div");
-                    weekDiv.setAttribute('class','card-week');
-                    var weekText = document.createTextNode(cardWeek);
-                    weekDiv.appendChild(weekText);
-                    leftDiv.append(weekDiv);
-                cardDiv.appendChild(leftDiv);
-                var rightDiv = document.createElement("div");
-                rightDiv.setAttribute('class','card-right');
-                    var writeTimeDiv = document.createElement("div");
-                    writeTimeDiv.setAttribute('class','card-time');
-                    var writeTimeText = document.createTextNode(cardWriteTime);
-                    writeTimeDiv.appendChild(writeTimeText);
-                    rightDiv.appendChild(writeTimeDiv);
-                    
-                    var titleDiv = document.createElement("div");
-                    titleDiv.setAttribute('class','card-title');
-                    var titleText = document.createTextNode(cardTitle);
-                    titleDiv.appendChild(titleText);
-                    rightDiv.appendChild(titleDiv);
-                    
-                    var simpleDiv = document.createElement("div");
-                    simpleDiv.setAttribute('class','card-simple');
-                    var simpleText = document.createTextNode(cardSimple);
-                    simpleDiv.appendChild(simpleText);
-                    rightDiv.appendChild(simpleDiv);
-                cardDiv.appendChild(rightDiv);
-            document.getElementById('diary-card-list').appendChild(cardDiv);
+        // 统一切换执行方法
+        const _performSwitch = async (userId, diaryId, owner) => {
+            await window.setWritePage(userId, diaryId, owner);
             
-            cardDiv.addEventListener('click', function(event){
-                switchDiary(this);
-            }.bind(cardDiv));
-            //return true;
-        }
+            // 根据权限设置输入状态
+            const isEditable = owner === 'self';
+            document.getElementById('diary-input').disabled = !isEditable;
+            document.getElementById('title-input').disabled = !isEditable;
+        };
 
-        //document.getElementById("saveMenuButton").addEventListener("click",switchDiary);
 
-    </script>
+
+        const _handleUserChoice = async (choice, target) => {
+            switch (choice) {
+                case 'save':
+                    const saveSuccess = await window.writeDiary();
+                    return saveSuccess ? _directSwitch(target) : false;
+                case 'discard':
+                    return _directSwitch(target);
+                default:
+                    return false; // 取消操作
+            }
+        };
+
+        window.getFirstDiaryCard = () => {
+            
+            return document.querySelector('.diary-card');
+        };
+  
+  </script>
 
 </body>
 </html>

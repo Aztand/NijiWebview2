@@ -2,12 +2,11 @@ import win.ui;
 import web.view;
 import web.rest.jsonLiteClient;
 import web.json;
-//import wsock.tcp.asynHttpServer;
+import wsock.tcp.asynHttpServer;
 import console;
-import time;
 import string.chineseNumber;
 /*DSG{{*/
-mainForm = win.form(text="你的日记";right=757;bottom=467;edge=1;maximize=1)
+mainForm = win.form(text="你的日记";right=1480;bottom=1001;edge=1;maximize=1)
 mainForm.add()
 /*}}*/
 
@@ -26,8 +25,13 @@ addSelfCard = function(tableIndex){
 	
 	//检测列表是否需要添加新月份
 	if(time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").month != nowMonth){
-		nowMonth = time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").month;
-		wb.xcall("addMonthText",zh.number(nowMonth) + "月");
+		diaryCreatedDate = time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d");
+		nowMonth = diaryCreatedDate.month;
+		wb.xcall("addMonthText",{
+		year = diaryCreatedDate.year;
+		month = diaryCreatedDate.month;
+		monthStr = zh.number(nowMonth) + "月";
+		});
 	}
 	
 	//创建日记列表卡片
@@ -51,24 +55,26 @@ addSelfCard = function(tableIndex){
     	cardSimple = string.replace(string.trim(diaryResponse["diaries"][tableIndex]['content']),"\n","");
     	
     //根据性别改变卡片样式
-	if(diaryResponse["diaries"][tableIndex]['space'] == 'girl')
-    	cardClass = 'diary-card card-girl';
+	if(diaryResponse["user_config"]["role"] == 'girl')
+    	cardStyle = 'card-girl';
 	else
-    	cardClass = 'diary-card card-boy';
+    	cardStyle = 'card-boy';
     	
 	cardOwner = 'self';
 	cardDiaryids = diaryResponse["diaries"][tableIndex]['id'];
-	
+	createdDate = diaryResponse["diaries"][tableIndex]['createddate'];
+
 	wb.xcall("addDiaryCard",{
     	cardDay = cardDay;
     	cardWeek = cardWeek;
     	cardWriteTime = cardWriteTime;
     	cardTitle = cardTitle;
     	cardSimple = cardSimple;
-    	cardClass = cardClass;
+    	cardStyle = cardStyle;
     	cardOwner = cardOwner;
     	cardUserID = userID;
-    	cardDiaryids = cardDiaryids	
+    	cardDiaryids = cardDiaryids;
+    	createdDate = createdDate
 	});
 }
 
@@ -76,8 +82,14 @@ addPairedCard = function(tableIndex){
 	
 	//检测列表是否需要添加新月份
 	if(time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d").month != nowMonth){
-		nowMonth = time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d").month;
-		wb.xcall("addMonthText",zh.number(nowMonth) + "月");
+		
+		diaryCreatedDate = time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d");
+		nowMonth = diaryCreatedDate.month;
+		wb.xcall("addMonthText",{
+		year = diaryCreatedDate.year;
+		month = diaryCreatedDate.month;
+		monthStr = zh.number(nowMonth) + "月";
+		});
 	}
 	
 	//创建日记列表卡片
@@ -101,23 +113,25 @@ addPairedCard = function(tableIndex){
     	cardSimple = string.replace(string.trim(diaryResponse["diaries_paired"][tableIndex]['content']),"\n","");
     	
     //根据性别改变卡片样式
-	if(diaryResponse["diaries_paired"][tableIndex]['space'] == 'girl')
-    	cardClass = 'diary-card card-girl';
+	if(diaryResponse["user_config"]["paired_user_config"]['role'] == 'girl')
+    	cardStyle = 'card-girl';
 	else
-    	cardClass = 'diary-card card-boy';
+    	cardStyle = 'card-boy';
     	
 	cardOwner = 'paired';
 	cardDiaryids = diaryResponse["diaries_paired"][tableIndex]['id'];
+	createdDate = diaryResponse["diaries_paired"][tableIndex]['createddate']
 	wb.xcall("addDiaryCard",{
     	cardDay = cardDay;
     	cardWeek = cardWeek;
     	cardWriteTime = cardWriteTime;
     	cardTitle = cardTitle;
     	cardSimple = cardSimple;
-    	cardClass = cardClass;
+    	cardStyle = cardStyle;
     	cardOwner = cardOwner;
     	cardUserID = pairedID;
-    	cardDiaryids = cardDiaryids	
+    	cardDiaryids = cardDiaryids;
+    	createdDate = createdDate
 	});
 }
 
@@ -137,7 +151,8 @@ v2sync = function(){
 	userID = diaryResponse["user_config"]["userid"];
 	pairedID = diaryResponse["user_config"]["paired_user_config"]["userid"];
 	
-	wb.xcall("setUserColor",diaryResponse["user_config"]["role"]);
+	wb.xcall("setUserColor", diaryResponse["user_config"]["role"]);
+	wb.xcall("setUserId", diaryResponse["user_config"]["userid"]);
 	
 	while(i <= diaryResponse["user_config"]["diary_count"] and j <= diaryResponse["user_config"]["paired_user_config"]["diary_count"]){
 		iDate = time(diaryResponse["diaries"][i]["createddate"],"%Y-%m-%d");
@@ -178,10 +193,13 @@ wb.external = {
 			wb.doScript('document.getElementById("wrong-tip").hidden = false;');
 		}
 		else{
+			/*用于在开发阶段获取自己的token
+			console.log(loginResponse.token)
+			//*/
 			loginGo = 1;
 			http.addHeaders = {
 				["auth"] = "token " ++ loginResponse.token;
-    			["user-agent"] = "OhApp/3.0 Platform/Android";
+    			["user-agent"] = "OhApp/3.6.12 Platform/Android";
     		}
 		}	
 	};	
@@ -197,7 +215,29 @@ wb.external = {
 			content = contentText,
 			date = dateText
 		);
+		
+		var returnTable = {
+			status = "",
+			newDiaryId = "",
+			createdDate = "",
+			}
+			
 		if(saveResponse){
+			returnTable.status = "Success";
+			returnTable.newDiaryId = saveResponse["diary"]["id"];
+			returnTable.createdDate = saveResponse["diary"]["createddate"];
+			
+			return web.json.stringify( returnTable ); 
+		}
+		else {
+			returnTable.status = "error"; 
+			return web.json.stringify( returnTable );
+		}
+	}
+	
+	deleteDiary = function(userID,diaryID){
+		delResponse = http.api("https://nideriji.cn/api/diary/delete/"++ diaryID ++ "/").get();
+		if(delResponse["error"] == 0){
 			return "Success"; 	
 		}
 		else {
@@ -243,8 +283,8 @@ mainForm.show();
 /*测试便捷代码，记得删
 			loginGo = 1;
 			http.addHeaders = {
-				["auth"] = "token 你的token";
-    			["user-agent"] = "OhApp/3.0 Platform/Android";
+				["auth"] = "token e";
+    			["user-agent"] = "OhApp/3.6.12 Platform/Android";
     		}
 
 

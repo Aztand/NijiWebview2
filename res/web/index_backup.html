@@ -1,0 +1,406 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>你的日记</title>
+    <style>
+        body{
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-top: 0;
+            margin-bottom: 0;
+            display: grid;
+            grid-template-columns: 10% 25% 65%;
+            width: 100%;
+            height: 100%;
+            background-color: whitesmoke;
+        }
+        .diary-card{
+            margin: 20px;
+            margin-left: 40px;
+            width: 90%;
+            height: 120px;
+            border-radius: 24px;
+            box-shadow: 1px 1px 10px #CCCCCC;
+            background-color: white;
+            display: grid;
+            grid-template-columns: 30% 70%;
+        }
+        .card-boy{
+            color: #4988b4;
+        }
+        .card-girl{
+            color: #ff7074;
+        }
+        .card-left{
+            display: grid;
+            grid-template-rows: 65% 35%;
+            padding: 15%;
+        }
+        .card-day{
+           margin: auto;
+           font-size: 48px;
+           cursor: default;
+           user-select: none;
+        }
+        .card-week{
+            width: auto;
+            margin: auto;
+           cursor: default;
+           user-select: none;
+        }
+        .card-right{
+            display: grid;
+            grid-template-rows: 30% 35% 35%;
+            padding: 10% 5% 0;
+            margin-left: -5%;
+        }
+        .card-time{
+            margin-top: -5px;
+           cursor: default;
+           user-select: none;
+        }
+        .card-title{
+            margin-top: -10px;
+            font-size: 20px;
+           cursor: default;
+           user-select: none;
+        }
+        .card-simple{
+            margin-top: -15px;
+            font-size: 20px;
+           cursor: default;
+           user-select: none;
+        }
+        .month-text{
+            margin-left: 40px;
+            font-size: 2.5em;
+        }
+        .icon-item{
+            margin: auto;
+        }
+        #left-navigation{
+            background-color: white;
+            box-shadow: 2px 0px 16px #DDDDDD;
+            width: 40%;
+            display: block;
+        }
+        #icon-list{
+            display: block;
+        }
+        .seperate-line{
+            border-bottom: solid black 1px;
+            width: 80%;
+            padding-top: 20%;
+            margin: auto;
+        }
+        #logo{
+            background-image: url("logo.png");
+            background-size: 100% 100%;
+            margin: auto;
+            width: 80%;
+            padding-top: 80%;
+        }
+        #treehole-logo{
+            background-image: url("treehole.png");
+            background-size: 100% 100%;
+            width: 80%;
+            margin-left: 10%;
+            padding-top: 80%;
+            margin-top: 20%;
+        }
+        #write-logo{
+            background-image: url("write-selected.png");
+            background-size: 100% 100%;
+            width: 80%;
+            margin-left: 10%;
+            padding-top: 80%;
+            margin-top: 50%;
+        }
+
+        #diary-card-list{
+            margin-top: 20px;
+            margin-right: 20px;
+            padding-right: 20px;
+            margin-bottom: 20px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        #write-page{
+            border-radius: 32px;
+            box-shadow: 2px 2px 16px #BBBBBB;
+            margin-top: 3%;
+            margin-left: 5%;
+            margin-right: 15%;
+            margin-bottom: 5%;
+            background-color: white;
+            width: 70%;
+            height: 90%;
+        }
+        #title-input{
+            font-size: xx-large;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-left: 60px;
+            width: 90%;
+            height: 60px;
+            border: none;
+            outline: none;
+            
+        }
+        #title-line{
+            height: 2px;
+            background-color: black;
+            width: 90%;
+            margin-left: 5%;
+        }
+        #diary-input{
+            border: none;
+            font-size: 1.3em;
+            font-family: '等线';
+            margin-top: 30px;
+            margin-left: 60px;
+            height: 85%;
+            width: 88%;
+            outline: none;
+        }
+        #floatMenuBar{
+            width: 72px;
+            text-align: center; 
+            padding: 0; /* 移除内边距 */
+            position: fixed; /* 使用固定定位 */
+            bottom: 10%; /* 距离页面底部的距离 */
+            right: 10%; /* 距离页面右侧的距离 */
+        }
+        .floatMenuButton{
+            margin-top: 16px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: #5abc86;
+            background-size: 70% 70%;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+        }
+        #newMenuButton{
+            background-image: url("new.png");
+        }
+        #saveMenuButton{
+            background-image: url("save.png");
+        }
+        #deleteMenuButton{
+            background-image: url("delete.png");
+        }
+    </style>
+</head>
+<body>
+
+    <div id="left-navigation">
+        <div id="logo"></div>
+        <div id="icon-list">
+            <div id="write-logo"></div>     
+            <div class="seperate-line"></div>
+            <div id="treehole-logo"></div>   
+        </div>
+    </div>
+    <div id="diary-card-list">
+        <!--
+        <h1 class="month-text">一月</h1>
+        <div class="diary-card card-boy">
+            <div class="card-left">
+                <div class="card-day">11</div>
+                <div class="card-week">星期三</div>
+            </div>
+            <div class="card-right">
+                <div class="card-time">03:52</div>
+                <div class="card-title">Day1 今天我穿越...</div>
+                <div class="card-simple">学期总算告一段落，考...</div>
+            </div>
+        </div>
+        -->
+    </div>
+    <div id="write-page">
+        <input id="title-input" type="text"  placeholder="日记标题">
+        <div id="title-line"></div>
+        <textarea id="diary-input" placeholder="请输入..."></textarea>
+    </div>
+
+    <div id="floatMenuBar">
+        <div class="floatMenuButton" id="newMenuButton" hidden></div>
+        <div class="floatMenuButton" id="saveMenuButton" hidden></div>
+        <div class="floatMenuButton" id="deleteMenuButton" hidden></div>
+        
+    </div>
+
+    <script>
+
+        window.setTextareaData = function(e){
+            document.getElementById('write-page').dataset.title = e;
+        }
+
+        window.setTitleData = function(e){
+            document.getElementById('write-page').dataset.content = e;
+        }
+
+        window.setDateData = function(e){
+            document.getElementById('write-page').dataset.date = e;
+        }
+
+
+
+        window.setUserColor = function(e){
+            if(e == "boy"){
+                document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#4988b4";});
+            }
+            else{
+                document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#ff7074";});
+            }
+            document.querySelectorAll('.floatMenuButton').forEach(element => {element.removeAttribute("hidden");});
+        }
+        // 保存更改的操作
+        window.writeDiary = async function() {
+            const diaryInput = document.getElementById("diary-input");
+            if(diaryInput.value.trim()) {
+                try {
+                    const titleInput = document.getElementById("title-input");
+                    const writePage = document.getElementById('write-page');
+                    const saveResult = await aardio.writeDiary(writePage.dataset.date, titleInput.value, diaryInput.value);
+                    if(saveResult == "Success") {
+                        window.alert("保存成功！");
+                        return true;
+                    } else {
+                        window.alert("保存失败！");
+                        return false;
+                    }
+                } catch (error) {
+                    window.alert("保存时发生错误：" + error);
+                    return false;
+                }
+            } else {
+                alert("保存内容不能为空！");
+                return false;
+            }
+        };
+
+
+        window.setWritePage = async function(userID,diaryID) {
+
+            const diaryInput = document.getElementById("diary-input");
+            const titleInput = document.getElementById("title-input");
+            const writePage = document.getElementById('write-page');
+            targetDiary = await aardio.getDiary(userID , diaryID);
+            targetDiary = JSON.parse(targetDiary);
+
+            writePage.dataset.date = targetDiary["createddate"];
+            writePage.dataset.title = targetDiary["title"];
+            writePage.dataset.content = targetDiary["content"];
+
+            if(targetDiary["title"] == ""){
+                titleInput.setAttribute("placeholder", targetDiary["createddate"]);
+                titleInput.value = "";
+            }
+            else{
+                titleInput.value = targetDiary["title"];
+            }
+
+            diaryInput.value = targetDiary["content"];
+        }
+
+        //切换日记
+        window.switchDiary = async function(e){
+            const diaryInput = document.getElementById("diary-input");
+            const titleInput = document.getElementById("title-input");
+            const writePage = document.getElementById('write-page');
+
+            if((titleInput.value != writePage.dataset.title || diaryInput.value != writePage.dataset.content) && writePage.dataset.content){
+                    if(i=confirm("是否保存更改？")){
+                        const result = writeDiary();
+                        if(result){
+                            setWritePage(e.dataset.userID , e.id);
+                        }
+                        else{
+                            return false;
+                        }//保存更改成功
+                    }//是否保存更改
+                    else{
+                        setWritePage(e.dataset.userID , e.id);
+                    }
+            }//检测当前页是否编辑
+            else{
+                setWritePage(e.dataset.userID , e.id);
+            }
+        }
+
+        //左侧列表增加月份
+        window.addMonthText =  function(e){
+            var monthH1 = document.createElement("h1");
+                monthH1.setAttribute("class","month-text");
+                var monthText = document.createTextNode(e);
+            monthH1.appendChild(monthText);
+            document.getElementById("diary-card-list").appendChild(monthH1);
+        }
+
+        //左侧列表新增卡片
+        window.addDiaryCard = function(e){
+            cardDay = e.cardDay;
+            cardWeek = e.cardWeek;
+            cardWriteTime = e.cardWriteTime;
+            cardTitle = e.cardTitle;
+            cardSimple = e.cardSimple;
+            cardClass = e.cardClass;
+            cardUserID = e.cardUserID;
+            cardOwner = e.cardOwner;
+            cardDiaryids = e.cardDiaryids;
+                 cardDiv = document.createElement("div");
+                cardDiv.setAttribute('class',cardClass);
+                cardDiv.setAttribute('owner',cardOwner);
+                cardDiv.setAttribute('id',cardDiaryids);
+                cardDiv.dataset.userID = cardUserID;
+                var leftDiv = document.createElement("div");
+                leftDiv.setAttribute('class','card-left');
+                    var dayDiv = document.createElement("div");
+                    dayDiv.setAttribute('class','card-day');
+                    var dayText = document.createTextNode(cardDay);
+                    dayDiv.appendChild(dayText);
+                    leftDiv.appendChild(dayDiv);
+
+                    var weekDiv = document.createElement("div");
+                    weekDiv.setAttribute('class','card-week');
+                    var weekText = document.createTextNode(cardWeek);
+                    weekDiv.appendChild(weekText);
+                    leftDiv.append(weekDiv);
+                cardDiv.appendChild(leftDiv);
+                var rightDiv = document.createElement("div");
+                rightDiv.setAttribute('class','card-right');
+                    var writeTimeDiv = document.createElement("div");
+                    writeTimeDiv.setAttribute('class','card-time');
+                    var writeTimeText = document.createTextNode(cardWriteTime);
+                    writeTimeDiv.appendChild(writeTimeText);
+                    rightDiv.appendChild(writeTimeDiv);
+                    
+                    var titleDiv = document.createElement("div");
+                    titleDiv.setAttribute('class','card-title');
+                    var titleText = document.createTextNode(cardTitle);
+                    titleDiv.appendChild(titleText);
+                    rightDiv.appendChild(titleDiv);
+                    
+                    var simpleDiv = document.createElement("div");
+                    simpleDiv.setAttribute('class','card-simple');
+                    var simpleText = document.createTextNode(cardSimple);
+                    simpleDiv.appendChild(simpleText);
+                    rightDiv.appendChild(simpleDiv);
+                cardDiv.appendChild(rightDiv);
+            document.getElementById('diary-card-list').appendChild(cardDiv);
+            
+            cardDiv.addEventListener('click', function(event){
+                switchDiary(this);
+            }.bind(cardDiv));
+            //return true;
+        }
+
+        //document.getElementById("saveMenuButton").addEventListener("click",switchDiary);
+
+    </script>
+
+</body>
+</html>
