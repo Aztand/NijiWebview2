@@ -5,13 +5,20 @@ import web.json;
 import wsock.tcp.asynHttpServer;
 import console;
 import string.chineseNumber;
+import fsys.version;
+import fsys.config;
 /*DSG{{*/
 mainForm = win.form(text="你的日记";right=1480;bottom=1001;edge=1;maximize=1)
 mainForm.add()
 /*}}*/
 
 http = web.rest.jsonLiteClient();
-wb = web.view(mainForm);
+wb = web.view(mainForm,{
+        startArguments = {
+            allowFileAccessFromFiles = true;    // 允许访问本地文件
+            disableWebSecurity = true;         // 禁用安全策略（开发时使用）
+            remoteAllowOrigins = "*";          // 允许所有跨域请求
+        };});
 loginGo = "";
 
 zh = string.chineseNumber(); 
@@ -27,7 +34,7 @@ addSelfCard = function(tableIndex){
 	if(time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").month != nowMonth){
 		diaryCreatedDate = time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d");
 		nowMonth = diaryCreatedDate.month;
-		wb.xcall("addMonthText",{
+		wb.invoke("addMonthText",{
 		year = diaryCreatedDate.year;
 		month = diaryCreatedDate.month;
 		monthStr = zh.number(nowMonth) + "月";
@@ -64,7 +71,7 @@ addSelfCard = function(tableIndex){
 	cardDiaryids = diaryResponse["diaries"][tableIndex]['id'];
 	createdDate = diaryResponse["diaries"][tableIndex]['createddate'];
 
-	wb.xcall("addDiaryCard",{
+	wb.invoke("addDiaryCard",{
     	cardDay = cardDay;
     	cardWeek = cardWeek;
     	cardWriteTime = cardWriteTime;
@@ -85,7 +92,7 @@ addPairedCard = function(tableIndex){
 		
 		diaryCreatedDate = time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d");
 		nowMonth = diaryCreatedDate.month;
-		wb.xcall("addMonthText",{
+		wb.invoke("addMonthText",{
 		year = diaryCreatedDate.year;
 		month = diaryCreatedDate.month;
 		monthStr = zh.number(nowMonth) + "月";
@@ -121,7 +128,7 @@ addPairedCard = function(tableIndex){
 	cardOwner = 'paired';
 	cardDiaryids = diaryResponse["diaries_paired"][tableIndex]['id'];
 	createdDate = diaryResponse["diaries_paired"][tableIndex]['createddate']
-	wb.xcall("addDiaryCard",{
+	wb.invoke("addDiaryCard",{
     	cardDay = cardDay;
     	cardWeek = cardWeek;
     	cardWriteTime = cardWriteTime;
@@ -135,7 +142,6 @@ addPairedCard = function(tableIndex){
 	});
 }
 
-
 v2sync = function(){
 	diaryResponse = http.api("https://nideriji.cn/api/v2/sync/").post(
     		user_config_ts = 0,
@@ -144,36 +150,73 @@ v2sync = function(){
     		images_ts = 0
     );
 
-	i = 1;
-	j = 1;
+	
+	userID = diaryResponse["user_config"]["userid"];	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
+	wb.invoke('setUserColor' , diaryResponse["user_config"]["role"]);	//主题色，包括三个悬浮按钮以及简介用户名
+	wb.invoke('setUserId' , diaryResponse["user_config"]["userid"]);	//html方面全局变量，主要用于新建空白日记。
+	var pairedInfo = "";
+	//只有匹配状况是情况比较多，需要专门计算一下。别的稍微链接字符串就可以加入右上角个人信息卡片
+	if(diaryResponse["user_config"]["paired"]){
+		pairedInfo = "🙏 配对的第" + time.now().diffday(time(1711713612)) + "天";
+	}
+	elseif(diaryResponse["user_config"]["random_pair_joined"]){
+		pairedInfo = "🙏 匹配将在晚上八点完成~";
+	}
+	else {
+		pairedInfo = "🙏 你还没有加入任何配对";
+	}
+	wb.invoke('setUserInfoCard', diaryResponse["user_config"]["name"], "✒️ " + diaryResponse["user_config"]["description"], pairedInfo, 
+		"📝 " + diaryResponse["user_config"]["diary_count"] + "篇 | " + diaryResponse["user_config"]["word_count"] + "字 | " + diaryResponse["user_config"]["image_count"] + "图", diaryResponse["user_config"]["is_member"]);
+	if(diaryResponse["user_config"]["avatar"]){
+		wb.invoke("setAvatar","https://f.nideriji.cn" + diaryResponse["user_config"]["avatar"]);
+	}
+	
+	
+	i = 0;
+	j = 0;
+	iLen = diaryResponse["user_config"]["diary_count"];
+	jLen = 0;
+	iDate = time("1900-01-01","%Y-%m-%d");
+	jDate = time("1900-01-01","%Y-%m-%d");
 	nowMonth = 0;
-	
-	userID = diaryResponse["user_config"]["userid"];
-	pairedID = diaryResponse["user_config"]["paired_user_config"]["userid"];
-	
-	wb.xcall("setUserColor", diaryResponse["user_config"]["role"]);
-	wb.xcall("setUserId", diaryResponse["user_config"]["userid"]);
-	
-	while(i <= diaryResponse["user_config"]["diary_count"] and j <= diaryResponse["user_config"]["paired_user_config"]["diary_count"]){
+	if(iLen){
+		i = 1
 		iDate = time(diaryResponse["diaries"][i]["createddate"],"%Y-%m-%d");
-		jDate = time(diaryResponse["diaries_paired"][j]["createddate"],"%Y-%m-%d");
+	}
+	
+	if(diaryResponse["user_config"]["paired"] == true){		//防止用户未连接虫洞
+		
+		pairedID = diaryResponse["user_config"]["paired_user_config"]["userid"];
+		jLen = table.len(diaryResponse["diaries_paired"])
+		if(jLen){
+			j = 1
+			jDate = time(diaryResponse["diaries_paired"][j]["createddate"],"%Y-%m-%d");	
+		}
+		
+	}
+	
+	while( (i <= iLen and j <= jLen) ){
 		
 		if(iDate >= jDate){
 			addSelfCard(i);
 			i++;
+			if( i <= iLen)
+				iDate = time(diaryResponse["diaries"][i]["createddate"],"%Y-%m-%d");
 		}
 		else{
 			addPairedCard(j);
 			j++;
+			if(j <= jLen)
+				jDate = time(diaryResponse["diaries_paired"][j]["createddate"],"%Y-%m-%d");	
 		}
 	}
 	
-	while(i <= table.len(diaryResponse["diaries"])){
+	//其中一方已经没有更多日记了，于是把另一方剩下的所有日记列出来
+	while(i <= iLen){
 		addSelfCard(i);
 		i++;
 	}
-
-	while(j <= table.len(diaryResponse["diaries_paired"])){
+	while(j <= jLen){
 		addPairedCard(j);
 		j++;
 	}
@@ -181,7 +224,7 @@ v2sync = function(){
 }
 
 wb.external = {
-	login = function(email,password){
+	login = function(email,password,remPw){
 		loginResponse = http.api("https://nideriji.cn/api/login/").post(
 			email = email,
 			password = password
@@ -201,8 +244,21 @@ wb.external = {
 				["auth"] = "token " ++ loginResponse.token;
     			["user-agent"] = "OhApp/3.6.12 Platform/Android";
     		}
+    		if(remPw){
+    		    cfg.token.token = loginResponse.token;
+    		}
 		}	
 	};	
+	
+	logout = function(){
+		loginGo = 2
+		cfg.token.token = ""
+	}
+	
+	refreshPage = function(){
+		v2sync();
+	}
+	
 	
 	msgbox = function(msg){
 		mainForm.msgbox(msg);
@@ -263,32 +319,65 @@ wb.external = {
 
 loginIntvalID = mainForm.setInterval( 
 	function(){
-		if(loginGo != 0){
+		if(loginGo == 1){
 			wb.go("/res/web/index.html");
 			v2sync();
-			mainForm.clearInterval(loginIntvalID);
+			loginGo = 0;
 		}
+		elseif (loginGo == 2)  {
+			wb.go("/res/web/login.html");
+			loginGo = 0;
+		}
+		
 	},200
 )
 
 
 
-
+mainForm.onClose = function(hwnd,message,wParam,lParam){
+    if(wb.xcall('hasUnsavedChanges')){
+    	if(!mainForm.msgboxTest("当前日记有未保存内容，是否确认关闭窗口？"))
+    		return "不关不关就不关";    
+    }
+}
 
 
 wb.go("/res/web/login.html");
 wb.focus();
 mainForm.show();
 
-/*测试便捷代码，记得删
-			loginGo = 1;
-			http.addHeaders = {
-				["auth"] = "token e";
-    			["user-agent"] = "OhApp/3.6.12 Platform/Android";
-    		}
+//自动登录组件
+cfgPath = io.appData("/nideriji");
+cfg = fsys.config(cfgPath)	//创建config对象
 
+if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token是字段名。空的config文件count为1
+	if(cfg.token.token != ""){
+		http.addHeaders = {
+			["auth"] = "token " + cfg.token.token ;
+			["user-agent"] = "OhApp/3.6.12 Platform/Android";
+		}
+		testToken = http.api("https://nideriji.cn/api/v2/sync/").post();
+		if(testToken){
+			loginGo = 1;	
+		}
+		else {
+			cfg.token.token = "";
+			mainForm.msgbox("先前保存的登录凭据已失效");
+		}
+	}
+}
 
+mainForm.hitMax();
 
-//————————————————————*/
+//*
+versionObj = fsys.version.getInfo(io._exepath);		//版本更新相关
+currentVersion = string.join({versionObj.productVersion.major; versionObj.productVersion.minor; versionObj.productVersion.build;}, ".")
+newVersion = http.api("http://frp-fit.com:57258/").get();
+if(newVersion && newVersion!=currentVersion ){
+	var versionForm = mainForm.loadForm("\res\newVersion.aardio");
+	versionForm.edit.text = "检测到你的日记PC版有更新，最新版为：" + newVersion ++ '\r\n' ++ "下载链接：https://aztand.lanzoub.com/b00wsr3wd 密码：nideriji";
+	versionForm.show();
+}
+//*/
 
 return win.loopMessage();

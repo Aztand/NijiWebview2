@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project ver="10" name="你的日记" libEmbed="true" icon="res\logo.ico" ui="win" output="你的日记.exe" CompanyName="" FileDescription="你的日记" LegalCopyright="Copyright (C) 榇肆 2023" ProductName="你的日记" InternalName="你的日记" FileVersion="0.0.1" ProductVersion="0.0.1" publishDir="/dist/" dstrip="false" local="false" ignored="false">
+<project ver="10" name="你的日记" libEmbed="true" icon="res\logo.ico" ui="win" output="你的日记.exe" CompanyName="" FileDescription="你的日记" LegalCopyright="Copyright (C) 榇肆 2025" ProductName="你的日记" InternalName="你的日记" FileVersion="0.1.2" ProductVersion="0.1.2" publishDir="/dist/" dstrip="false" local="false" ignored="false">
 	<file name="main.aardio" path="main.aardio" comment="main.aardio"/>
 	<folder name="资源文件" path="res" embed="true" local="false" ignored="false">
 		<file name="logo.ico" path="res\logo.ico" comment="res\logo.ico"/>
@@ -17,5 +17,7 @@
 			<file name="treehole.jpg" path="res\web\treehole.jpg" comment="res\web\treehole.jpg"/>
 		</folder>
 	</folder>
-	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false"/>
+	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">
+		<file name="newVersion.aardio" path="res\newVersion.aardio" comment="res\newVersion.aardio"/>
+	</folder>
 </project>

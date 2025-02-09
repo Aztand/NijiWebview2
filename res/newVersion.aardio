@@ -1,0 +1,23 @@
+import win.ui;
+import win.clip;
+/*DSG{{*/
+var winform = win.form(text="更新提示";right=759;bottom=231)
+winform.add(
+button={cls="button";text="复制链接";left=440;top=168;right=576;bottom=208;font=LOGFONT(h=-21);z=2};
+button2={cls="button";text="确认";left=600;top=168;right=736;bottom=208;font=LOGFONT(h=-21);z=3};
+edit={cls="edit";text="https://aztand.lanzoub.com/b00wsr3wd";left=24;top=24;right=736;bottom=144;edge=1;font=LOGFONT(h=-21);multiline=1;z=1}
+)
+/*}}*/
+
+winform.button2.oncommand = function(id,event){
+	winform.close()
+}
+
+winform.button.oncommand = function(id,event){
+	win.clip.write("https://aztand.lanzoub.com/b00wsr3wd");
+	winform.msgbox("复制成功！")
+}
+
+winform.show();
+win.loopMessage();
+return winform;

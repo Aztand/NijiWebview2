@@ -39,6 +39,7 @@
             margin-top: auto;
             margin-bottom: auto;
             padding: 30px;
+            position: relative;
         }
         .text-input{
             outline: none;
@@ -71,6 +72,9 @@
             text-align: right;
             position: absolute;
         }
+        .remember-me{
+            position: absolute;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +89,10 @@
                     <div class="input-holder">
                         <input class="text-input" id="password-input" type="password" placeholder="密码">
                         <p id="wrong-tip" hidden>账号或密码错误！</p>
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberCheck">
+                            <label for="rememberCheck">记住密码</label>
+                        </div>
                     </div>
                     <div class="input-holder" style="margin-top: 50px;">
                         <button id="login-button">登录</button>
@@ -93,13 +101,25 @@
             </div>
         </div>
     <script>
+        window.onload = function() {
+            var a = document.getElementById('password-input');
+            var b = document.getElementsByClassName('remember-me')[0];
+            
+            // 计算 a 元素的右侧位置
+            var aRight = a.offsetLeft + a.offsetWidth;
+            
+            // 设置 b 元素的 right 属性，使其与 a 元素的右侧对齐
+            b.style.right = (a.offsetParent.offsetWidth - aRight) + 'px';
+        };
+
         document.getElementById("login-button").addEventListener("click", login);
         function login() {
             document.getElementById("wrong-tip").hidden = true;
             email = document.getElementById("email-input").value;
             password = document.getElementById("password-input").value;
+            remPw = document.getElementById("rememberCheck").checked;
             if(email && password){
-                i = aardio.login(email,password);
+                i = aardio.login(email,password,remPw);
                 if(i == "login fail"){
                 document.getElementById("wrong-tip").hidden = false;
                 }
@@ -108,6 +128,18 @@
                 document.getElementById("wrong-tip").hidden = false;
             }
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            var inputElement = document.getElementById('password-input');
+
+            // 监听input元素的键盘事件
+            inputElement.addEventListener('keypress', function(event) {
+                // 检查按下的键是否是回车键（键码13）
+                if (event.key == "Enter") {
+                    login()
+                }
+            });
+        });
+
     </script>
 </body>
 </html>
