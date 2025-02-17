@@ -52,13 +52,19 @@
         body {
             margin: 0;
             display: grid;
-            grid-template-columns: 10% 25% 65%;
+            grid-template-columns: 10% 90%;
             width: 100vw;
             height: 100vh;
             background-color: var(--color-bg-page);
             position: relative;
         }
-    
+        
+        #right-diaries {
+            display: grid;
+            grid-template-columns: 25% 75%;
+            height: 100vh;
+        }
+
         /* ===== 工具类 ===== */
         .unselectable {
             cursor: default;
@@ -252,23 +258,41 @@
             margin-left: 5%;
         }
     
+        #diary-input,#preview-content {
+            /* 尺寸定位 */
+            position: absolute;
+            top: calc( var(--space-xl) + 100px ); /* 标题下沿计算 */
+            bottom: var(--space-xl);
+            /* 改用边缘定位替代百分比宽度 */
+            left: var(--space-xxl);
+            right: var(--space-xxl);
+            width: auto; /* 让宽度由左右定位自动计算 */
+            height: auto !important;/* 移除height属性，由top/bottom计算高度 */
+            margin-left: 0; /* 清除原有外边距 */
+            margin: 0;
+            margin-top: 0; /* 清除旧版margin-top */
+
+            /* 文本样式 */
+            font: 100 1.5em/1.6 'PingFang SC', -apple-system, sans-serif;
+            letter-spacing: 0.03em;
+            text-rendering: optimizeLegibility;
+
+            /* 背景与边框 */
+            background: inherit;
+            border: none;
+            outline: none;
+
+            /* 内边距 */
+            padding: 0.8rem 1.2rem;
+
+            /* 滚动条 */
+            overflow-y: auto;
+        }
+
+        /* 补充盒模型设置 */
         #diary-input {
-        border: none;
-        font-size: 1.5em; /* 增大字号 */
-        font-family: 'PingFang SC', -apple-system, sans-serif;
-        margin-top: var(--space-xl);
-        margin-left: var(--space-xxl);
-        height: 85%;
-        width: 88%;
-        outline: none;
-        font-weight: 100;
-        resize: none;
-        
-        /* 新增排版优化 */
-        line-height: 1.6;         /* 行高增加 */
-        letter-spacing: 0.03em;   /* 字间距微调 */
-        padding: 0.8rem 1.2rem;   /* 内边距优化 */
-        text-rendering: optimizeLegibility;
+            box-sizing: border-box; /* 包含padding在宽度内 */
+            resize: none;
         }
 
         /* 段落间距 */
@@ -276,6 +300,29 @@
             margin-bottom: 1.2em;
         }
     
+        /* 预览区特定优化 */
+        #preview-content {
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+
+        /* 段落间距继承 */
+        #preview-content p {
+            margin-bottom: 1.2em;
+        }
+
+        /* 图片自适应调整 */
+        #preview-content img {
+            max-width: 65%;
+            margin: 0.8em 0; /* 与段落间距匹配 */
+            vertical-align: top; /* 解决基线对齐问题 */
+        }
+
+        /* 隐藏原始文本域 */
+        #diary-input.hidden {
+            display: none; /* 替代原opacity隐藏方案 */
+        }
+
         /* ===== 浮动按钮 ===== */
         #floatMenuBar {
             width: 72px;
@@ -411,6 +458,63 @@
             margin: var(--space-xs) 0;
         }
 
+        /* 新增切换按钮样式 */
+        .toggle-switch {
+            position: absolute;
+            right: calc(var(--space-xxl)); /* 与日期选择器对齐 */
+            top: calc( var(--space-xl) + 62px );
+            display: flex;
+            gap: var(--space-md);
+            background: var(--color-bg-element);
+            padding: var(--space-xxs) var(--space-xs);
+            border-radius: var(--radius-sm);
+            /*box-shadow: 0 2px 8px var(--color-shadow-light);*/
+        }
+
+        .toggle-switch button {
+            position: relative;
+            border: none;
+            background: none;
+            font-size: var(--text-sm);
+            color: var(--color-slim-font-black);
+            padding: var(--space-xxs) var(--space-sm);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-switch button::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toggle-switch button.active {
+            color: var(--color-border);
+        }
+
+        .toggle-switch button.active::after {
+            width: 100%;
+        }
+
+        /* 状态切换动画 */
+        .hidden {
+            display: none;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            transform: translateY(10px);
+        }
+
+        [data-mode="active"] {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
     </style>
 </head>
 <body>
@@ -423,50 +527,62 @@
             <div id="treehole-logo" hidden></div>   
         </div>
     </div>
-    <div id="diary-card-list">
-    </div>
 
-    <div id="write-page">
-        <div id="date-picker-container">
-            <input id="date-input" type="date" title="这里只用来选择保存日期，而不能跳转日记哦">
+    <div class = "right-page" id="right-diaries"><!--用于查看编辑日记的右侧主页面-->
+        <div id="diary-card-list">
+                        <!-- 修改模板字段匹配 -->
+            <template id="diary-card-template">
+                <div class="diary-card {{cardStyle}}" owner="{{cardOwner}}" id="{{cardDiaryids}}" data-user-id="{{cardUserID}}" data-created-date="{{createdDate}}">
+                <div class="card-left">
+                    <div class="card-day">{{cardDay}}</div>
+                    <div class="card-week">{{cardWeek}}</div>
+                </div>
+                <div class="card-right">
+                    <div class="card-time">{{cardWriteTime}}</div>
+                    <div class="card-title">{{cardTitle}}</div>
+                    <div class="card-simple">{{cardSimple}}</div>
+                </div>
+                </div>
+            </template>
         </div>
-        <input id="title-input" type="text" placeholder="日记标题">
-        <div id="title-line"></div>
-        <textarea id="diary-input" placeholder="请输入..."></textarea>
-    </div>
 
-    <div id="floatMenuBar">
-        <div class="floatMenuButton" id="newMenuButton" hidden></div>
-        <div class="floatMenuButton" id="saveMenuButton" hidden></div>
-        <div class="floatMenuButton" id="deleteMenuButton" hidden></div>      
-    </div>
+        <div id="write-page">
+            <div id="date-picker-container">
+                <input id="date-input" type="date" title="这里只用来选择保存日期，而不能跳转日记哦">
+            </div>
+            <input id="title-input" type="text" placeholder="日记标题">
 
-    <!-- 修改模板字段匹配 -->
-    <template id="diary-card-template">
-        <div class="diary-card {{cardStyle}}" owner="{{cardOwner}}" id="{{cardDiaryids}}" data-user-id="{{cardUserID}}" data-created-date="{{createdDate}}">
-        <div class="card-left">
-            <div class="card-day">{{cardDay}}</div>
-            <div class="card-week">{{cardWeek}}</div>
+            <div id="title-line"></div>  
+
+            <div class="toggle-switch">
+                <button id="preview-mode" class="active">预览</button>
+                <button id="edit-mode" >编辑</button>
+            </div>
+
+            <textarea id="diary-input" placeholder="请输入..."></textarea>
+            <div id="preview-content" class="hidden"></div>
         </div>
-        <div class="card-right">
-            <div class="card-time">{{cardWriteTime}}</div>
-            <div class="card-title">{{cardTitle}}</div>
-            <div class="card-simple">{{cardSimple}}</div>
+
+        <div id="floatMenuBar">
+            <div class="floatMenuButton" id="newMenuButton" hidden></div>
+            <div class="floatMenuButton" id="saveMenuButton" hidden></div>
+            <div class="floatMenuButton" id="deleteMenuButton" hidden></div>      
         </div>
+
+        <div id="user-profile">
+            <div id="user-avatar">
+                <img src="logo.png" id="avatar-img" alt="用户头像">
+            </div>
+            <div id="user-info-card">
+                <h3 id="username-h3">立花 泷</h3>
+                <p id="description">✒️ 我一定会找到你的……</p>
+                <p id="paired-info">🙏 断连第445天</p>
+                <div class="info-line"></div>
+                <p id="write-statistic">📝 251篇 | 274532字 | 134图</p>
+                <p id="logout">退出登录</p>
+            </div>
         </div>
-    </template>
-    <div id="user-profile">
-        <div id="user-avatar">
-            <img src="default-avatar.png" id="avatar-img" alt="用户头像">
-        </div>
-        <div id="user-info-card">
-            <h3 id="username-h3">榇</h3>
-            <p id="description">✒️ 且听且看且从容</p>
-            <p id="paired-info">🙏 配对的第445天</p>
-            <div class="info-line"></div>
-            <p id="write-statistic">📝 251篇 | 274532字 | 134图</p>
-            <p id="logout">退出登录</p>
-        </div>
+
     </div>
     <script>
         window.hasUnsavedChanges = () => {
@@ -474,8 +590,8 @@
             // 如果当前不可编辑，直接返回false
             if (writePage.dataset.ownerType !== 'self') return false;
                 const title = document.getElementById('title-input').value;
-                const content = document.getElementById('diary-input').value;
-                return title !== writePage.dataset.title || content !== writePage.dataset.content;
+                const content = document.getElementById('diary-input').value.replace(/\r\n|\r/g, '\n');
+                return title !== writePage.dataset.title || content !== writePage.dataset.content.replace(/\r\n|\r/g, '\n');
             }
 
         const _showSaveDialog = () => new Promise(resolve => {
@@ -623,7 +739,8 @@
                 window.switchDiary({
                     userId: data.cardUserID.toString(),
                     diaryId: data.cardDiaryids.toString(),
-                    owner: data.cardOwner
+                    owner: data.cardOwner,
+                    mode: 'preview'
                 });
             }
 
@@ -645,14 +762,14 @@
             const dateInput = document.getElementById("date-input");
             const writePage = document.getElementById('write-page');
             
-            const selectedDate = dateInput.value;
+            const selectedDate = dateInput.value || writePage.dataset.createdDate;
             const title = titleInput.value;
             const content = diaryInput.value;
 
             try {
                 // 输入验证
                 if (!content.trim()) throw new Error('日记正文内容不能为空');
-                if (!selectedDate) throw new Error('请选择日记日期');
+                if (!selectedDate){ throw new Error('请选择日记日期');}
                 
                 // 调用aardio接口
                 const result = JSON.parse(await aardio.writeDiary(
@@ -672,12 +789,13 @@
 
                 //更新日记卡片简介——————————————————————————————————————————————
                 //确认当前日记存在卡片。如果是新建的日记则不用处理
+                var isDiaryIdMatched = false;
                 var diaryCards = document.querySelectorAll('#diary-card-list .diary-card'); // 获取所有的日记卡片
                     for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
                         // 检查当前日记卡片的id是否与currentDiaryId相同
                         // 找到匹配的日记卡片后，执行操作退出循环
-                        if (diaryCards[i].dataset.createdDate == dateInput.value) {
-                            console.log("got it!");
+                        if (diaryCards[i].dataset.createdDate == selectedDate) {
+                            isDiaryIdMatched = true;
                             diaryCards[i].getElementsByClassName("card-time")[0].textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });//ai写的，别问
                             diaryCards[i].getElementsByClassName("card-title")[0].textContent = title.trim() ? (title.trim().length > 10 ? title.trim().substring(0, 10) + "..." : title.trim()) : selectedDate;
                             diaryCards[i].getElementsByClassName("card-simple")[0].textContent = content.trim().length > 10 ? content.trim().substring(0, 10) + "..." : content.trim();
@@ -685,7 +803,34 @@
                         }
                     }//此代码块用于检查是否是卡片列表不存在的新建日记
                 //—————————————————————————————————————————————————————————————
+                if (!isDiaryIdMatched) {    //添加日记卡片
+                    // 获取当前时间
+                    let now = new Date();
+                    let hours = now.getHours();
+                    let minutes = now.getMinutes();
+                    // 格式化小时和分钟，确保它们是两位数
+                    let formattedHours = hours.toString().padStart(2, '0');
+                    let formattedMinutes = minutes.toString().padStart(2, '0');
 
+                    const newDiaryCardData = {
+                        cardDiaryids: result.newDiaryId,
+                        cardUserID: writePage.dataset.currentUserId,
+                        cardOwner: writePage.dataset.ownerType,
+                        cardDay: new Date(selectedDate).getDate(),
+                        cardWeek: "星期" + ['日', '一', '二', '三', '四', '五', '六'][new Date(selectedDate).getDay()],
+                        cardWriteTime: `${formattedHours}:${formattedMinutes}`,
+                        cardTitle: document.getElementById('title-input').value || selectedDate,
+                        cardSimple: document.getElementById('diary-input').value.substring(0, 10) + '...', // 截取前10字作为简介
+                        createdDate: selectedDate,
+                        cardStyle: selfCardStyle
+                    };
+
+                        // 将新日记卡片插入到左侧列表顶部
+                        addDiaryCard(newDiaryCardData);
+
+                        // 更新当前日记ID
+                    writePage.dataset.currentDiaryId = result.newDiaryId;
+                }
                 return result;
 
             } catch (error) {
@@ -695,7 +840,7 @@
         };
 
         // 更改稿纸内容  在setWritePage中增加权限控制
-        window.setWritePage = async function(userId, diaryId, cardOwner) {
+        window.setWritePage = async function(userId, diaryId, cardOwner, mode) {
             const writePage = document.getElementById('write-page');
             writePage.dataset.currentUserId = String(userId);  // 新增当前用户标记
             writePage.dataset.currentDiaryId = String(diaryId); // 新增当前日记标识
@@ -729,6 +874,10 @@
                 writePage.dataset.title = targetDiary.title;
                 writePage.dataset.content = targetDiary.content;
                 writePage.dataset.editable = isEditable; // 新增可编辑状态标记
+                writePage.dataset.createdDate = targetDiary.createddate;
+
+                previewDiv.innerHTML = convertImageTags(textarea.value);
+                switchMode(mode);
 
             } catch (error) {
                 console.error('日记加载失败:', error);
@@ -739,7 +888,7 @@
         //切换日记
         window.switchDiary = async function(target) {
             const writePage = document.getElementById('write-page');
-            const { userId, diaryId, owner } = target;
+            const { userId, diaryId, owner, mode } = target;
             try {
                 // 保存检查流程
                 const isCurrentEditable = writePage.dataset.ownerType === 'self';
@@ -750,7 +899,7 @@
                 }
 
                 // 执行切换
-                await setWritePage(userId, diaryId, owner);
+                await setWritePage(userId, diaryId, owner, mode);
                 return true;
 
             } catch (error) {
@@ -771,7 +920,8 @@
                 id: card.id,
                 diaryId: card.id,
                 userId: card.dataset.userId,
-                owner: card.getAttribute('owner') // 关键属性
+                owner: card.getAttribute('owner'), // 关键属性
+                mode: 'preview'
             };
 
             if (!diaryInfo.owner) {
@@ -824,7 +974,8 @@
                 window.switchDiary({
                     userId: diaryCard.dataset.userId,
                     diaryId: diaryCard.id,
-                    owner: diaryCard.getAttribute('owner')
+                    owner: diaryCard.getAttribute('owner'),
+                    mode: 'edit'
                 });
                 return true;
             }
@@ -845,6 +996,7 @@
                 writePage.dataset.currentUserId = String(userId);  // 新增当前用户标记
                 writePage.dataset.currentDiaryId = ""; // 清空当前日记标识
                 writePage.dataset.ownerType = "self";        // 明确归属类型
+                writePage.dataset.createdDate = formattedDate;
                 const saveBtn = document.getElementById('saveMenuButton');
                 const deleteBtn = document.getElementById('deleteMenuButton');
                 // 更新界面
@@ -865,6 +1017,7 @@
                 writePage.dataset.title = "";
                 writePage.dataset.content = "";
                 writePage.dataset.editable = isEditable; // 新增可编辑状态标记
+                switchMode('edit');
 
                 return true;
 
@@ -880,12 +1033,27 @@
             const saveBtn = document.getElementById('saveMenuButton');
             const writePage = document.getElementById('write-page');        
             const dateInput = document.getElementById('date-input');
-            const selectedDate = new Date(dateInput.value);    
+            const selectedDate = dateInput.value || writePage.dataset.createdDate;    
             
             try {
                 // 保存前状态反馈
                 saveBtn.classList.add('loading-spinner');
                 saveBtn.disabled = true; // 防止重复点击
+
+                var diaryCards = document.querySelectorAll('#diary-card-list .diary-card'); // 获取所有的日记卡片
+                    var isDiaryIdMatched = false;                                               // 初始化一个标志变量，用于表示是否找到匹配的日记卡片
+                    for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
+                        // 检查当前日记卡片的id是否与currentDiaryId相同
+                        if (diaryCards[i].dataset.createdDate == selectedDate) {
+                            isDiaryIdMatched = true;
+                            if(selectedDate != writePage.dataset.createdDate){
+                                if(!confirm("在"+writePage.dataset.createdDate+"已有一篇日记，是否确认覆盖保存？")){
+                                    return 0;//取消保存
+                                }
+                            }
+                            break; // 找到匹配的日记卡片后，退出循环
+                        }
+                    }//此代码块用于检查是否是卡片列表不存在的新建日记
 
                 // 执行保存
                 const result = await window.writeDiary();
@@ -899,46 +1067,6 @@
                     }, 300);
 
                     // 如果是新建日记，添加到左侧列表
-
-                    var diaryCards = document.querySelectorAll('#diary-card-list .diary-card'); // 获取所有的日记卡片
-                    var isDiaryIdMatched = false;                                               // 初始化一个标志变量，用于表示是否找到匹配的日记卡片
-                    for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
-                        // 检查当前日记卡片的id是否与currentDiaryId相同
-                        if (diaryCards[i].dataset.createdDate == dateInput.value) {
-                            isDiaryIdMatched = true;
-                            break; // 找到匹配的日记卡片后，退出循环
-                        }
-                    }//此代码块用于检查是否是卡片列表不存在的新建日记
-
-
-                    if (!isDiaryIdMatched) {
-                        // 获取当前时间
-                        let now = new Date();
-                        let hours = now.getHours();
-                        let minutes = now.getMinutes();
-                        // 格式化小时和分钟，确保它们是两位数
-                        let formattedHours = hours.toString().padStart(2, '0');
-                        let formattedMinutes = minutes.toString().padStart(2, '0');
-
-                        const newDiaryCardData = {
-                            cardDiaryids: result.newDiaryId,
-                            cardUserID: writePage.dataset.currentUserId,
-                            cardOwner: writePage.dataset.ownerType,
-                            cardDay: selectedDate.getDate(),
-                            cardWeek: "星期" + ['日', '一', '二', '三', '四', '五', '六'][new Date(document.getElementById('date-input').value).getDay()],
-                            cardWriteTime: `${formattedHours}:${formattedMinutes}`,
-                            cardTitle: document.getElementById('title-input').value || document.getElementById('date-input').value,
-                            cardSimple: document.getElementById('diary-input').value.substring(0, 10) + '...', // 截取前10字作为简介
-                            createdDate: selectedDate.toISOString().split('T')[0], // ISO 8601格式
-                            cardStyle: selfCardStyle
-                        };
-
-                        // 将新日记卡片插入到左侧列表顶部
-                        addDiaryCard(newDiaryCardData);
-
-                        // 更新当前日记ID
-                        writePage.dataset.currentDiaryId = result.newDiaryId;
-                    }
 
                     alert('保存成功！');
                 } else {
@@ -982,7 +1110,7 @@
         });
 
         document.getElementById('logout').addEventListener('click', async () => {    //退出登录
-            if(hasUnsavedChanges){
+            if(hasUnsavedChanges()){
                 const choice = await _showSaveDialog();
                 if (choice === 'cancel') return false;
                 if (choice === 'save' && !await window.writeDiary()) return false;      //检查未保存日记
@@ -1004,16 +1132,24 @@
 
         window.addEventListener('pageshow', function(event) {//监听页面刷新
             if (performance.navigation.type === 1) {//performance.navigation.type 的值可以为以下几种：0：表示页面是通过点击链接、表单提交等方式加载的。1：表示页面是通过刷新加载的。2：表示页面是通过“前进”或“后退”按钮加载的。
-                async () => {await aardio.refreshPage()};
+                aardio.refreshPage();
             }
         });
 
 
         let selfCardStyle = "card-girl";
         let userId = "";
+        let port = "";
+        let pairedId = "";
 
         window.setUserId = function(e){
             userId = e;
+        }
+        window.setPort = function(e){
+            port = e;
+        }
+        window.setPairedId = function(e){
+            pairedId = e;
         }
 
         window.setUserColor = function(e){
@@ -1033,13 +1169,51 @@
             document.getElementById("description").textContent = description;
             document.getElementById("paired-info").textContent = pairedInfo;
             document.getElementById("write-statistic").textContent = writeStatistic;
-            if(isMember)
-                alert("you are member!");
+            if(isMember){
+                //alert("you are member!");
+            }
+                
         }
 
         window.setAvatar = function(avatarPath){
             document.getElementById("avatar-img").setAttribute("src",avatarPath);
         }
+
+        // 优化后的切换逻辑
+        const editBtn = document.getElementById('edit-mode');
+        const previewBtn = document.getElementById('preview-mode');
+        const toggleBtn = document.getElementById('toggle-mode');
+        const textarea = document.getElementById('diary-input');
+        const previewDiv = document.getElementById('preview-content');
+        const elements = {
+            edit: [textarea, editBtn],
+            preview: [previewDiv, previewBtn]
+        };
+
+        function convertImageTags(content) {
+            const userId = document.getElementById('write-page').dataset.currentUserId;
+            return content.replace(/\[图(\d+)\]/g, (match, p1) => 
+                `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
+                    style="max-width: 80%; margin: 5px 0;" title = "图${p1}" alt="图${p1}不存在，或者您的pro已过期">`
+            );
+        }
+
+        function switchMode(mode) {
+            Object.entries(elements).forEach(([key, [el, btn]]) => {
+                el.classList.toggle('hidden', key !== mode);
+                el.setAttribute('data-mode', key === mode ? 'active' : '');
+                btn.classList.toggle('active', key === mode);
+            });
+        }
+
+        editBtn.addEventListener('click', () => switchMode('edit'));
+        previewBtn.addEventListener('click', () => {
+            previewDiv.innerHTML = convertImageTags(textarea.value);
+            switchMode('preview');
+        });
+
+        // 初始化模式
+        switchMode('preview');
   </script>
 
 </body>

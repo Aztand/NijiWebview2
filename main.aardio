@@ -2,14 +2,16 @@ import win.ui;
 import web.view;
 import web.rest.jsonLiteClient;
 import web.json;
-import wsock.tcp.asynHttpServer;
+import wsock.tcp.asynHttpServer;	
 import console;
 import string.chineseNumber;
 import fsys.version;
 import fsys.config;
 /*DSG{{*/
 mainForm = win.form(text="你的日记";right=1480;bottom=1001;edge=1;maximize=1)
-mainForm.add()
+mainForm.add(
+port={cls="static";text="close";left=56;top=936;right=120;bottom=944;hide=1;notify=1;transparent=1;z=1}
+)
 /*}}*/
 
 http = web.rest.jsonLiteClient();
@@ -20,6 +22,26 @@ wb = web.view(mainForm,{
             remoteAllowOrigins = "*";          // 允许所有跨域请求
         };});
 loginGo = "";
+token = "";
+
+NijiDocPath = io.getSpecial(0x05/*即文档文件夹*/) + "\你的日记\";
+port = "";
+
+thread.invoke(function(NijiDocPath,mainForm){
+	import wsock.tcp.simpleHttpServer;
+	var imgServer = wsock.tcp.simpleHttpServer("127.0.0.1");
+
+	_,mainForm.port.text = imgServer.getLocalIp();//会return ip,port两个返回值，所以用下划线占位ip。
+	imgServer.documentRoot = NijiDocPath
+	
+	imgServer.run( 
+	    function(response,request,session){ 
+	         response.loadcode( request.path );
+	    } 	
+	);
+	
+},NijiDocPath,mainForm);
+
 
 zh = string.chineseNumber(); 
 daytoweek = function(inputnum){
@@ -149,23 +171,98 @@ v2sync = function(){
     		readmark_ts = 0,
     		images_ts = 0
     );
-
+	
+	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
+	if(diaryResponse["user_config"]["is_member"]){	//只为pro用户下载图片，节约服务器带宽。
+		thread.invoke( 		//为自己下图
+			function( diaryResponse,NijiDocPath,token ){
+				import web.rest.jsonLiteClient;
+				http = web.rest.client();
+				http.addHeaders = {
+					["auth"] = "token " ++ token;
+					["user-agent"] = "OhApp/3.6.12 Platform/Android";
+				}
+				
+				userConfig = diaryResponse["user_config"];
+				picTable = diaryResponse["images"];
+				picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
+				
+				for(i=1;picTotal){
+					if(!io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
+						picApi = http.api("https://f.nideriji.cn/api/image/" ++ userConfig.userid ++ "/" ++ i ++ "/");
+						pic = picApi.get();
+						if( pic ){//防止该图不存在，为空编号
+							string.save(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg", pic )
+						}
+					}	
+				}
+				
+			},diaryResponse,NijiDocPath,token
+		);
+		
+		if( diaryResponse["user_config"]["paired"] ){//下载对面图像。
+			thread.invoke(
+				function( diaryResponse,NijiDocPath,token ){
+					import web.rest.jsonLiteClient;
+					http = web.rest.client();
+					http.addHeaders = {
+						["auth"] = "token " ++ token;
+						["user-agent"] = "OhApp/3.6.12 Platform/Android";
+					}
+					
+					pairedConfig = diaryResponse["user_config"]["paired_user_config"];
+					picTable = diaryResponse["images_paired"];
+					picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
+					
+					for(i=1;picTotal){
+						if(!io.exist(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg")){
+							picApi = http.api("https://f.nideriji.cn/api/image/" ++ pairedConfig.userid ++ "/" ++ i ++ "/");
+							pic = picApi.get();
+							if( pic ){//防止该图不存在，为空编号
+								string.save(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg", pic )
+							}
+						}	
+					}
+					
+				},diaryResponse,NijiDocPath,token
+			);
+		}
+	}
+		
 	
 	userID = diaryResponse["user_config"]["userid"];	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
+	if(mainForm.port.text != "close"){
+		wb.invoke('setPort' , mainForm.port.text ); };	
 	wb.invoke('setUserColor' , diaryResponse["user_config"]["role"]);	//主题色，包括三个悬浮按钮以及简介用户名
-	wb.invoke('setUserId' , diaryResponse["user_config"]["userid"]);	//html方面全局变量，主要用于新建空白日记。
+	wb.invoke('setUserId' , diaryResponse["user_config"]["userid"]);	//html方面全局变量，主要用于新建空白日记以及图片索引。匹配对象的id在下面设置。
 	var pairedInfo = "";
 	//只有匹配状况是情况比较多，需要专门计算一下。别的稍微链接字符串就可以加入右上角个人信息卡片
 	if(diaryResponse["user_config"]["paired"]){
-		pairedInfo = "🙏 配对的第" + time.now().diffday(time(1711713612)) + "天";
+		if(time.now().diffday(time(diaryResponse["user_config"]["paired_user_config"]["last_login_time"])) == 0){
+			if(time.now().diffhour(time(diaryResponse["user_config"]["paired_user_config"]["last_login_time"])) == 0){
+				pairedInfo = "🙏 对面在" + time.now().diffminute(time(diaryResponse["user_config"]["paired_user_config"]["last_login_time"])) + "分钟前登录过~";
+			}
+			else {
+				pairedInfo = "🙏 对面在" + time.now().diffhour(time(diaryResponse["user_config"]["paired_user_config"]["last_login_time"])) + "小时前登录过~";
+			}
+		}
+		else {
+			pairedInfo = "🙏 对面在" + time.now().diffday(time(diaryResponse["user_config"]["paired_user_config"]["last_login_time"])) + "天前登录过~";
+		}
 	}
 	elseif(diaryResponse["user_config"]["random_pair_joined"]){
 		pairedInfo = "🙏 匹配将在晚上八点完成~";
 	}
+	elseif(diaryResponse["user_config"]["pair_requested"]){
+		pairedInfo = "🙏 你的定向请求已发出";	
+	}
 	else {
 		pairedInfo = "🙏 你还没有加入任何配对";
 	}
-	wb.invoke('setUserInfoCard', diaryResponse["user_config"]["name"], "✒️ " + diaryResponse["user_config"]["description"], pairedInfo, 
+	var nameInfo = diaryResponse["user_config"]["name"] ? diaryResponse["user_config"]["name"] : "你的名字" ;//三元运算符
+	var descInfo =  diaryResponse["user_config"]["description"] ?  diaryResponse["user_config"]["description"] : "去手机端设置一条格言吧";
+	
+	wb.invoke('setUserInfoCard', nameInfo, "✒️ " + descInfo, pairedInfo, 
 		"📝 " + diaryResponse["user_config"]["diary_count"] + "篇 | " + diaryResponse["user_config"]["word_count"] + "字 | " + diaryResponse["user_config"]["image_count"] + "图", diaryResponse["user_config"]["is_member"]);
 	if(diaryResponse["user_config"]["avatar"]){
 		wb.invoke("setAvatar","https://f.nideriji.cn" + diaryResponse["user_config"]["avatar"]);
@@ -184,9 +281,10 @@ v2sync = function(){
 		iDate = time(diaryResponse["diaries"][i]["createddate"],"%Y-%m-%d");
 	}
 	
-	if(diaryResponse["user_config"]["paired"] == true){		//防止用户未连接虫洞
+	if( diaryResponse["user_config"]["paired"] ){		//防止用户未连接虫洞
 		
 		pairedID = diaryResponse["user_config"]["paired_user_config"]["userid"];
+		wb.invoke('setPairedId' ,pairedID);				//设置网页PairedId
 		jLen = table.len(diaryResponse["diaries_paired"])
 		if(jLen){
 			j = 1
@@ -195,7 +293,7 @@ v2sync = function(){
 		
 	}
 	
-	while( (i <= iLen and j <= jLen) ){
+	while( (i <= iLen and j <= jLen) && ( iLen || jLen /* 确保两人至少凑出一篇日记才进循环 */ )){
 		
 		if(iDate >= jDate){
 			addSelfCard(i);
@@ -212,11 +310,11 @@ v2sync = function(){
 	}
 	
 	//其中一方已经没有更多日记了，于是把另一方剩下的所有日记列出来
-	while(i <= iLen){
+	while(i <= iLen && iLen){
 		addSelfCard(i);
 		i++;
 	}
-	while(j <= jLen){
+	while(j <= jLen && jLen){
 		addPairedCard(j);
 		j++;
 	}
@@ -229,6 +327,8 @@ wb.external = {
 			email = email,
 			password = password
 		);
+		token = loginResponse.token;
+		
 		if(!loginResponse){
 			wb.doScript('document.getElementById("wrong-tip").hidden = false;');
 		}
@@ -239,6 +339,7 @@ wb.external = {
 			/*用于在开发阶段获取自己的token
 			console.log(loginResponse.token)
 			//*/
+			
 			loginGo = 1;
 			http.addHeaders = {
 				["auth"] = "token " ++ loginResponse.token;
@@ -352,6 +453,7 @@ cfg = fsys.config(cfgPath)	//创建config对象
 
 if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token是字段名。空的config文件count为1
 	if(cfg.token.token != ""){
+		token = cfg.token.token ;
 		http.addHeaders = {
 			["auth"] = "token " + cfg.token.token ;
 			["user-agent"] = "OhApp/3.6.12 Platform/Android";
@@ -379,5 +481,6 @@ if(newVersion && newVersion!=currentVersion ){
 	versionForm.show();
 }
 //*/
+
 
 return win.loopMessage();

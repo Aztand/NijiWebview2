@@ -119,7 +119,7 @@
             password = document.getElementById("password-input").value;
             remPw = document.getElementById("rememberCheck").checked;
             if(email && password){
-                i = aardio.login(email,password,remPw);
+                i =  aardio.login(email,password,remPw);
                 if(i == "login fail"){
                 document.getElementById("wrong-tip").hidden = false;
                 }
@@ -130,9 +130,15 @@
         }
         document.addEventListener('DOMContentLoaded', function() {
             var inputElement = document.getElementById('password-input');
-
+			var rempwElement = document.getElementById('rememberCheck');
             // 监听input元素的键盘事件
             inputElement.addEventListener('keypress', function(event) {
+                // 检查按下的键是否是回车键（键码13）
+                if (event.key == "Enter") {
+                    login()
+                }
+            });
+            rempwElement.addEventListener('keypress', function(event) {
                 // 检查按下的键是否是回车键（键码13）
                 if (event.key == "Enter") {
                     login()
