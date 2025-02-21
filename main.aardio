@@ -68,20 +68,22 @@ addSelfCard = function(tableIndex){
 	cardWeek = "星期" + daytoweek(time(diaryResponse["diaries"][tableIndex]['createddate'],"%Y-%m-%d").dayofweek);
 	cardWriteTime = tostring(time(diaryResponse["diaries"][tableIndex]['ts']),"%H:%M");
 	if(diaryResponse["diaries"][tableIndex]['title'] != ""){
-    	if(string.len(diaryResponse["diaries"][tableIndex]['title'])>10)
-       		cardTitle = string.left(diaryResponse["diaries"][tableIndex]['title'],10,true) + "...";
-    	else
-       		cardTitle = diaryResponse["diaries"][tableIndex]['title']; 
+       	cardTitle = diaryResponse["diaries"][tableIndex]['title']; 
 	}
 	else {
    		cardTitle = diaryResponse["diaries"][tableIndex]['createddate'];
 	}
 	
 	//卡片上日记预览文字
-	if(string.len(string.trim(diaryResponse["diaries"][tableIndex]['content']))>10)
-   		cardSimple = string.replace(string.left(string.trim(diaryResponse["diaries"][tableIndex]['content']),10,true) + "...","\n","");
-	else
-    	cardSimple = string.replace(string.trim(diaryResponse["diaries"][tableIndex]['content']),"\n","");
+	if(diaryResponse["diaries"][tableIndex]['content'] != "")
+	{
+	    cardSimpleStrip = string.replace(diaryResponse["diaries"][tableIndex]['content'], "\s+", " ");
+	
+	    if(string.len(cardSimpleStrip)>10)
+   		    cardSimple = cardSimpleStrip + "…"
+	    else
+    	    cardSimple = cardSimpleStrip;
+    }
     	
     //根据性别改变卡片样式
 	if(diaryResponse["user_config"]["role"] == 'girl')
@@ -126,20 +128,22 @@ addPairedCard = function(tableIndex){
 	cardWeek = "星期" + daytoweek(time(diaryResponse["diaries_paired"][tableIndex]['createddate'],"%Y-%m-%d").dayofweek);
 	cardWriteTime = tostring(time(diaryResponse["diaries_paired"][tableIndex]['ts']),"%H:%M");
 	if(diaryResponse["diaries_paired"][tableIndex]['title'] != ""){
-    	if(string.len(diaryResponse["diaries_paired"][tableIndex]['title'])>10)
-       		cardTitle = string.left(diaryResponse["diaries_paired"][tableIndex]['title'],10,true) + "...";
-    	else
-       		cardTitle = diaryResponse["diaries_paired"][tableIndex]['title']; 
+       	cardTitle = diaryResponse["diaries_paired"][tableIndex]['title']; 
 	}
 	else {
    		cardTitle = diaryResponse["diaries_paired"][tableIndex]['createddate'];
 	}
 	
 	//卡片上日记预览文字
-	if(string.len(string.trim(diaryResponse["diaries_paired"][tableIndex]['content']))>10)
-   		cardSimple = string.replace(string.left(string.trim(diaryResponse["diaries_paired"][tableIndex]['content']),10,true) + "...","\n","");
-	else
-    	cardSimple = string.replace(string.trim(diaryResponse["diaries_paired"][tableIndex]['content']),"\n","");
+	if(diaryResponse["diaries_paired"][tableIndex]['content'] != "")
+	{
+	    cardSimpleStrip = string.replace(diaryResponse["diaries_paired"][tableIndex]['content'], "\s+", " ");
+	
+	    if(string.len(cardSimpleStrip)>10)
+   		    cardSimple = cardSimpleStrip + "…"
+	    else
+    	    cardSimple = cardSimpleStrip;
+    }
     	
     //根据性别改变卡片样式
 	if(diaryResponse["user_config"]["paired_user_config"]['role'] == 'girl')
@@ -475,7 +479,7 @@ mainForm.hitMax();
 versionObj = fsys.version.getInfo(io._exepath);		//版本更新相关
 currentVersion = string.join({versionObj.productVersion.major; versionObj.productVersion.minor; versionObj.productVersion.build;}, ".")
 newVersion = http.api("http://frp-fit.com:57258/").get();
-if(newVersion && newVersion!=currentVersion ){
+if(newVersion && newVersion>=currentVersion ){
 	var versionForm = mainForm.loadForm("\res\newVersion.aardio");
 	versionForm.edit.text = "检测到你的日记PC版有更新，最新版为：" + newVersion ++ '\r\n' ++ "下载链接：https://aztand.lanzoub.com/b00wsr3wd 密码：nideriji";
 	versionForm.show();
