@@ -166,7 +166,7 @@
         .card-right {
             display: grid;
             grid-template-rows: 30% 35% 35%;
-            padding: 10% 5% 0;
+            padding: 10% 5% 0%;
             margin-left: -5%;
         }
     
@@ -181,6 +181,9 @@
             font-size: var(--text-md);
             cursor: default;
             user-select: none;
+            white-space: nowrap; /* 禁止文本换行 */
+            overflow: hidden; /* 隐藏溢出的文本 */
+            text-overflow: ellipsis; /* 使用省略号表示被隐藏的文本 */
         }
     
         .card-simple {
@@ -188,6 +191,9 @@
             font-size: var(--text-md);
             cursor: default;
             user-select: none;
+            white-space: nowrap; /* 禁止文本换行 */
+            overflow: hidden; /* 隐藏溢出的文本 */
+            text-overflow: ellipsis; /* 使用省略号表示被隐藏的文本 */
         }
     
         /* ===== 写作页面 ===== */
@@ -797,8 +803,6 @@
                         if (diaryCards[i].dataset.createdDate == selectedDate) {
                             isDiaryIdMatched = true;
                             diaryCards[i].getElementsByClassName("card-time")[0].textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });//ai写的，别问
-                            diaryCards[i].getElementsByClassName("card-title")[0].textContent = title.trim() ? (title.trim().length > 10 ? title.trim().substring(0, 10) + "..." : title.trim()) : selectedDate;
-                            diaryCards[i].getElementsByClassName("card-simple")[0].textContent = content.trim().length > 10 ? content.trim().substring(0, 10) + "..." : content.trim();
                             break; 
                         }
                     }//此代码块用于检查是否是卡片列表不存在的新建日记
