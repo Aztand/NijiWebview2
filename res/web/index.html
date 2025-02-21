@@ -132,12 +132,14 @@
             margin: var(--space-lg);
             margin-left: var(--space-xxl);
             width: 90%;
-            height: 120px;
+            height: auto; 
+            min-height: 120px; 
             border-radius: var(--radius-md);
             box-shadow: 1px 1px 10px var(--color-shadow-light);
             background-color: var(--color-bg-element);
             display: grid;
             grid-template-columns: 30% 70%;
+            overflow: hidden; 
         }
     
         .card-boy { color: var(--color-primary-boy); }
@@ -165,8 +167,9 @@
     
         .card-right {
             display: grid;
-            grid-template-rows: 30% 35% 35%;
+            grid-template-rows: 30% 40% 40%;
             padding: 10% 5% 0%;
+            margin-bottom: 10%;
             margin-left: -5%;
         }
     
@@ -191,7 +194,6 @@
             font-size: var(--text-md);
             cursor: default;
             user-select: none;
-            white-space: nowrap; /* 禁止文本换行 */
             overflow: hidden; /* 隐藏溢出的文本 */
             text-overflow: ellipsis; /* 使用省略号表示被隐藏的文本 */
         }
