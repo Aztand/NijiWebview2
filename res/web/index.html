@@ -45,9 +45,9 @@
             --img-logo: url("logo.png");
             --img-treehole: url("treehole.png");
             --img-write-selected: url("write-selected.png");
-            --img-new: url("new.png");
-            --img-save: url("save.png");
-            --img-delete: url("delete.png");
+            --img-new: url("new.svg");
+            --img-save: url("save.svg");
+            --img-delete: url("delete.svg");
         }
     
         /* ===== 基础样式 ===== */
@@ -354,7 +354,7 @@
             text-align: center;
             padding: 0;
             position: absolute;
-            bottom: 10%;
+            bottom: 5%;
             right: -6rem;
         }
     
@@ -380,12 +380,17 @@
             display: block !important; /* 强制覆盖其他样式 */
             opacity: 1 !important;
             visibility: visible !important;
+            background-size: 90%;
         }
         #saveMenuButton {
              background-image: var(--img-save); 
              transition: opacity 0.3s ease;
+             background-size: 55%;
         }
-        #deleteMenuButton { background-image: var(--img-delete); }
+        #deleteMenuButton { 
+            background-image: var(--img-delete); 
+            background-size: 60%;
+        }
 
         /*删除动画样式*/
         .fade-out {
