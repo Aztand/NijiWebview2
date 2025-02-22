@@ -33,11 +33,13 @@
             --radius-lg: 32px;
     
             /* 字号 */
+            --text-xxs: 0.75rem;   /* 12px */
             --text-xs: 0.875rem;   /* 14px */
             --text-sm: 1rem;       /* 16px */
             --text-md: 1.25rem;    /* 20px */
             --text-lg: 1.5rem;     /* 24px */
             --text-xl: 2.5rem;     /* 40px */
+            --text-xxl: 3.5rem;     /* 56px */
     
             /* 图片路径 */
             --img-logo: url("logo.png");
@@ -123,14 +125,14 @@
         }
     
         .month-text {
-            margin-left: var(--space-xxl);
+            margin-left: var(--space-xs);
             font-size: var(--text-xl);
         }
     
         /* ===== 日记卡片 ===== */
         .diary-card {
             margin: var(--space-lg);
-            margin-left: var(--space-xxl);
+            margin-left: var(--space-xs);
             width: auto;
             height: auto; 
             min-height: 9rem; 
@@ -147,22 +149,30 @@
     
         .card-left {
             display: grid;
-            grid-template-rows: 65% 35%;
-            padding: 15%;
+            /* grid-template-rows: 65% 35%; */
+            padding: 10%;
         }
     
         .card-day {
+            font-size: clamp(var(--text-md), 3vw, var(--text-xxl));
             margin: auto;
-            font-size: var(--text-xl);
+            margin-bottom: 0.5vw;
             cursor: default;
             user-select: none;
+            white-space: nowrap;
+
+            line-height: 1;
+            height: clamp(var(--text-md), 3vw, var(--text-xxl)); 
         }
     
         .card-week {
+            font-size: clamp(var(--text-xxs), 1vw, var(--text-md));
             width: auto;
             margin: auto;
+            margin-top: 0.5vw;
             cursor: default;
             user-select: none;
+            white-space: nowrap;
         }
     
         .card-right {
