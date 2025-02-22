@@ -191,7 +191,7 @@ v2sync = function(){
 				picTable = diaryResponse["images"];
 				picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
 				
-				for(i=1;picTotal){
+				for(i=picTotal;1;-1){
 					if(!io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
 						picApi = http.api("https://f.nideriji.cn/api/image/" ++ userConfig.userid ++ "/" ++ i ++ "/");
 						pic = picApi.get();
@@ -218,7 +218,7 @@ v2sync = function(){
 					picTable = diaryResponse["images_paired"];
 					picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
 					
-					for(i=1;picTotal){
+					for(i=picTotal;1;-1){
 						if(!io.exist(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg")){
 							picApi = http.api("https://f.nideriji.cn/api/image/" ++ pairedConfig.userid ++ "/" ++ i ++ "/");
 							pic = picApi.get();
