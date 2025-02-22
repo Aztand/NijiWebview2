@@ -115,11 +115,11 @@
         /* ===== 日记列表 ===== */
         #diary-card-list {
             margin-top: var(--space-lg);
-            margin-right: var(--space-md);
-            padding-right: var(--space-md);
+            /* margin-right: var(--space-md); */
+            /* padding-right: var(--space-md); */
             margin-bottom: var(--space-lg);
-            overflow-y: scroll;
-            overflow-x: hidden;
+            overflow-y: auto;
+            overflow-x: auto;
         }
     
         .month-text {
@@ -131,13 +131,15 @@
         .diary-card {
             margin: var(--space-lg);
             margin-left: var(--space-xxl);
-            width: 90%;
-            height: 120px;
+            width: auto;
+            height: auto; 
+            min-height: 9rem; 
             border-radius: var(--radius-md);
             box-shadow: 1px 1px 10px var(--color-shadow-light);
             background-color: var(--color-bg-element);
             display: grid;
             grid-template-columns: 30% 70%;
+            overflow: hidden; 
         }
     
         .card-boy { color: var(--color-primary-boy); }
@@ -165,29 +167,40 @@
     
         .card-right {
             display: grid;
-            grid-template-rows: 30% 35% 35%;
-            padding: 10% 5% 0;
+            grid-template-rows: 1.5rem 2rem 3.5rem;
+            padding: 1rem 1rem 1rem 0.5rem;
             margin-left: -5%;
         }
     
         .card-time {
-            margin-top: -5px;
             cursor: default;
             user-select: none;
         }
     
         .card-title {
-            margin-top: -10px;
             font-size: var(--text-md);
             cursor: default;
             user-select: none;
+            white-space: nowrap; /* 禁止文本换行 */
+            overflow: hidden; /* 隐藏溢出的文本 */
+            text-overflow: ellipsis; /* 使用省略号表示被隐藏的文本 */
         }
-    
+
+        /* 多行文本截断样式 保持兼容性 */
         .card-simple {
-            margin-top: -15px;
             font-size: var(--text-md);
             cursor: default;
             user-select: none;
+
+            overflow: hidden;
+            display: box;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            -webkit-box-orient: vertical;
+            -ms-flex-direction: column;
+            -webkit-line-clamp: 2;
+            /* 限制在3行内 */
+            line-clamp: 2;
         }
     
         /* ===== 写作页面 ===== */
@@ -754,7 +767,7 @@
             // 返回格式化的日期字符串
             return `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
         }
-     
+
         // 保存更改的操作
         window.writeDiary = async function() {
             const diaryInput = document.getElementById("diary-input");
@@ -797,8 +810,8 @@
                         if (diaryCards[i].dataset.createdDate == selectedDate) {
                             isDiaryIdMatched = true;
                             diaryCards[i].getElementsByClassName("card-time")[0].textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });//ai写的，别问
-                            diaryCards[i].getElementsByClassName("card-title")[0].textContent = title.trim() ? (title.trim().length > 10 ? title.trim().substring(0, 10) + "..." : title.trim()) : selectedDate;
-                            diaryCards[i].getElementsByClassName("card-simple")[0].textContent = content.trim().length > 10 ? content.trim().substring(0, 10) + "..." : content.trim();
+                            diaryCards[i].getElementsByClassName("card-title")[0].textContent = title ? title.replace(/\s/g, ' ') : selectedDate;
+                            diaryCards[i].getElementsByClassName("card-simple")[0].textContent = content.replace(/\s/g, ' ') ? content : content;
                             break; 
                         }
                     }//此代码块用于检查是否是卡片列表不存在的新建日记
@@ -1130,13 +1143,11 @@
             e.returnValue = ''; // 对于某些浏览器，需要设置returnValue
         });
 
-        window.addEventListener('pageshow', function(event) {//监听页面刷新
+        window.addEventListener('pageshow', function(e) {//监听页面刷新
             if (performance.navigation.type === 1) {//performance.navigation.type 的值可以为以下几种：0：表示页面是通过点击链接、表单提交等方式加载的。1：表示页面是通过刷新加载的。2：表示页面是通过“前进”或“后退”按钮加载的。
                 aardio.refreshPage();
             }
         });
-
-
         let selfCardStyle = "card-girl";
         let userId = "";
         let port = "";

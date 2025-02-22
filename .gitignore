@@ -1,0 +1,12 @@
+# 忽略 .history 文件夹
+.history/
+.build/
+dist/
+
+*.tmp
+W
+*.o
+
+*.class
+
+*.log
