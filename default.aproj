@@ -10,11 +10,14 @@
 			<file name="delete.png" path="res\web\delete.png" comment="res\web\delete.png"/>
 			<file name="index.html" path="res\web\index.html" comment="res\web\index.html"/>
 			<file name="new.png" path="res\web\new.png" comment="res\web\new.png"/>
-			<file name="save.png" path="res\web\save.png" comment="res\web\save.png"/>
-			<file name="treehole.png" path="res\web\treehole.png" comment="res\web\treehole.png"/>
-			<file name="write.png" path="res\web\write.png" comment="res\web\write.png"/>
+			<file name="save.png" path="res\web\save.png" comment="res\web\save.svg"/>
+			<file name="treehole.png" path="res\web\treehole.png" comment="res\web\treehole.svg"/>
+			<file name="write.png" path="res\web\write.png" comment="res\web\write.svg"/>
 			<file name="write-selected.png" path="res\web\write-selected.png" comment="res\web\write-selected.png"/>
 			<file name="treehole.jpg" path="res\web\treehole.jpg" comment="res\web\treehole.jpg"/>
+			<file name="delete.svg" path="res\web\delete.svg" comment="res\web\delete.svg"/>
+			<file name="new.svg" path="res\web\new.svg" comment="res\web\new.svg"/>
+			<file name="save.svg" path="res\web\save.svg" comment="res\web\save.svg"/>
 		</folder>
 	</folder>
 	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">
