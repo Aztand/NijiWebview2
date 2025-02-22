@@ -349,6 +349,15 @@
             display: none; /* 替代原opacity隐藏方案 */
         }
 
+        #word-count {
+            position: absolute;
+            bottom: var(--space-xs);
+            right: var(--space-xxl);
+            margin: 0;
+            font-size: var(--text-sm);
+            color: var(--color-slim-font-black);
+        }
+
         /* ===== 浮动按钮 ===== */
         #floatMenuBar {
             width: 72px;
@@ -592,7 +601,7 @@
 
             <textarea id="diary-input" placeholder="请输入..."></textarea>
             <div id="preview-content" class="hidden"></div>
-
+            <p id="word-count">0字</p>
             <div id="floatMenuBar">
                 <div class="floatMenuButton" id="newMenuButton" hidden></div>
                 <div class="floatMenuButton" id="saveMenuButton" hidden></div>
@@ -851,8 +860,8 @@
                         cardDay: new Date(selectedDate).getDate(),
                         cardWeek: "星期" + ['日', '一', '二', '三', '四', '五', '六'][new Date(selectedDate).getDay()],
                         cardWriteTime: `${formattedHours}:${formattedMinutes}`,
-                        cardTitle: document.getElementById('title-input').value || selectedDate,
-                        cardSimple: document.getElementById('diary-input').value.substring(0, 10) + '...', // 截取前10字作为简介
+                        cardTitle: title || selectedDate,
+                        cardSimple: content.length > 19 ? content.substring(0, 19) + '...' : content , // 截取前19字作为简介
                         createdDate: selectedDate,
                         cardStyle: selfCardStyle
                     };
@@ -909,6 +918,7 @@
                 writePage.dataset.createdDate = targetDiary.createddate;
 
                 previewDiv.innerHTML = convertImageTags(textarea.value);
+                wordCountText.textContent = `${targetDiary.content.length}字`;
                 switchMode(mode);
 
             } catch (error) {
@@ -973,8 +983,9 @@
 
         // 监听输入变化
         const diaryInput = document.getElementById('diary-input');
+        const wordCountText = document.getElementById('word-count');
         
-        diaryInput.addEventListener('input', function() {               //检测当前日记是否可编辑，以改变悬浮按钮显隐
+        diaryInput.addEventListener('input', function() {               //检测当前日记是否可编辑，以改变悬浮按钮显隐。以及字数统计监视。
             const saveBtn = document.getElementById('saveMenuButton');
             const writePage = document.getElementById('write-page');
             
@@ -984,6 +995,7 @@
             saveMenuButton.hidden = !isEditable;
             saveMenuButton.style.opacity = hasContent ? 1 : 0.5;
             saveMenuButton.disabled = !hasContent;
+            wordCountText.textContent = `${this.value.length}字`;
         });
 
         document.getElementById('newMenuButton').addEventListener('click', async () => {        //新建日记按钮（其实就是切换到今天）
