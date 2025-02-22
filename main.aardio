@@ -14,6 +14,10 @@ port={cls="static";text="close";left=56;top=936;right=120;bottom=944;hide=1;noti
 )
 /*}}*/
 
+
+import win.ui.minmax
+win.ui.minmax(mainForm,1024, 768);   // 限制宽高调整
+
 http = web.rest.jsonLiteClient();
 wb = web.view(mainForm,{
         startArguments = {
@@ -79,7 +83,7 @@ addSelfCard = function(tableIndex){
 	{
 	    cardSimpleStrip = string.replace(diaryResponse["diaries"][tableIndex]['content'], "\s+", " ");
 	
-	    if(string.len(cardSimpleStrip)>10)
+	    if(string.len(cardSimpleStrip)>19)
    		    cardSimple = cardSimpleStrip + "…"
 	    else
     	    cardSimple = cardSimpleStrip;
@@ -139,7 +143,7 @@ addPairedCard = function(tableIndex){
 	{
 	    cardSimpleStrip = string.replace(diaryResponse["diaries_paired"][tableIndex]['content'], "\s+", " ");
 	
-	    if(string.len(cardSimpleStrip)>10)
+	    if(string.len(cardSimpleStrip)>19)
    		    cardSimple = cardSimpleStrip + "…"
 	    else
     	    cardSimple = cardSimpleStrip;

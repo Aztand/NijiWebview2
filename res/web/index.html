@@ -33,19 +33,21 @@
             --radius-lg: 32px;
     
             /* 字号 */
+            --text-xxs: 0.75rem;   /* 12px */
             --text-xs: 0.875rem;   /* 14px */
             --text-sm: 1rem;       /* 16px */
             --text-md: 1.25rem;    /* 20px */
             --text-lg: 1.5rem;     /* 24px */
             --text-xl: 2.5rem;     /* 40px */
+            --text-xxl: 3.5rem;     /* 56px */
     
             /* 图片路径 */
             --img-logo: url("logo.png");
             --img-treehole: url("treehole.png");
             --img-write-selected: url("write-selected.png");
-            --img-new: url("new.png");
-            --img-save: url("save.png");
-            --img-delete: url("delete.png");
+            --img-new: url("new.svg");
+            --img-save: url("save.svg");
+            --img-delete: url("delete.svg");
         }
     
         /* ===== 基础样式 ===== */
@@ -123,14 +125,16 @@
         }
     
         .month-text {
-            margin-left: var(--space-xxl);
-            font-size: var(--text-xl);
+            font-size: clamp(var(--text-lg), 3vw, var(--text-xl));
+            margin-left: var(--space-xs);
+            white-space: nowrap; /* 禁止文本换行 */
+            overflow: hidden; /* 隐藏溢出的文本 */
         }
     
         /* ===== 日记卡片 ===== */
         .diary-card {
             margin: var(--space-lg);
-            margin-left: var(--space-xxl);
+            margin-left: var(--space-xs);
             width: auto;
             height: auto; 
             min-height: 9rem; 
@@ -147,22 +151,30 @@
     
         .card-left {
             display: grid;
-            grid-template-rows: 65% 35%;
-            padding: 15%;
+            /* grid-template-rows: 65% 35%; */
+            padding: 10%;
         }
     
         .card-day {
+            font-size: clamp(var(--text-md), 3vw, var(--text-xxl));
             margin: auto;
-            font-size: var(--text-xl);
+            margin-bottom: 0.5vw;
             cursor: default;
             user-select: none;
+            white-space: nowrap;
+
+            line-height: 1;
+            height: clamp(var(--text-md), 3vw, var(--text-xxl)); 
         }
     
         .card-week {
+            font-size: clamp(var(--text-xxs), 1vw, var(--text-md));
             width: auto;
             margin: auto;
+            margin-top: 0.5vw;
             cursor: default;
             user-select: none;
+            white-space: nowrap;
         }
     
         .card-right {
@@ -207,7 +219,7 @@
         #write-page {
             border-radius: var(--radius-lg);
             box-shadow: 2px 2px 16px var(--color-shadow-medium);
-            margin: 3% 5% 5% 15%;
+            margin: 3% 5% 5% 10%;
             width: 70%;
             height: 90%;
             background-color: var(--color-bg-element);
@@ -341,9 +353,9 @@
             width: 72px;
             text-align: center;
             padding: 0;
-            position: fixed;
-            bottom: 10%;
-            right: 10%;
+            position: absolute;
+            bottom: 5%;
+            right: -6rem;
         }
     
         .floatMenuButton {
@@ -368,12 +380,17 @@
             display: block !important; /* 强制覆盖其他样式 */
             opacity: 1 !important;
             visibility: visible !important;
+            background-size: 90%;
         }
         #saveMenuButton {
              background-image: var(--img-save); 
              transition: opacity 0.3s ease;
+             background-size: 55%;
         }
-        #deleteMenuButton { background-image: var(--img-delete); }
+        #deleteMenuButton { 
+            background-image: var(--img-delete); 
+            background-size: 60%;
+        }
 
         /*删除动画样式*/
         .fade-out {
@@ -406,7 +423,7 @@
         #user-profile {
             position: fixed;
             top: var(--space-xl);
-            right: var(--space-xxl);
+            right: var(--space-xl);
             z-index: 1000;
         }
 
@@ -574,12 +591,13 @@
 
             <textarea id="diary-input" placeholder="请输入..."></textarea>
             <div id="preview-content" class="hidden"></div>
-        </div>
 
-        <div id="floatMenuBar">
-            <div class="floatMenuButton" id="newMenuButton" hidden></div>
-            <div class="floatMenuButton" id="saveMenuButton" hidden></div>
-            <div class="floatMenuButton" id="deleteMenuButton" hidden></div>      
+            <div id="floatMenuBar">
+                <div class="floatMenuButton" id="newMenuButton" hidden></div>
+                <div class="floatMenuButton" id="saveMenuButton" hidden></div>
+                <div class="floatMenuButton" id="deleteMenuButton" hidden></div>      
+            </div>
+
         </div>
 
         <div id="user-profile">
