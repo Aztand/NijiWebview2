@@ -125,8 +125,10 @@
         }
     
         .month-text {
+            font-size: clamp(var(--text-lg), 3vw, var(--text-xl));
             margin-left: var(--space-xs);
-            font-size: var(--text-xl);
+            white-space: nowrap; /* 禁止文本换行 */
+            overflow: hidden; /* 隐藏溢出的文本 */
         }
     
         /* ===== 日记卡片 ===== */
@@ -217,7 +219,7 @@
         #write-page {
             border-radius: var(--radius-lg);
             box-shadow: 2px 2px 16px var(--color-shadow-medium);
-            margin: 3% 5% 5% 15%;
+            margin: 3% 5% 5% 10%;
             width: 70%;
             height: 90%;
             background-color: var(--color-bg-element);
@@ -351,9 +353,9 @@
             width: 72px;
             text-align: center;
             padding: 0;
-            position: fixed;
+            position: absolute;
             bottom: 10%;
-            right: 10%;
+            right: -6rem;
         }
     
         .floatMenuButton {
@@ -416,7 +418,7 @@
         #user-profile {
             position: fixed;
             top: var(--space-xl);
-            right: var(--space-xxl);
+            right: var(--space-xl);
             z-index: 1000;
         }
 
@@ -584,12 +586,13 @@
 
             <textarea id="diary-input" placeholder="请输入..."></textarea>
             <div id="preview-content" class="hidden"></div>
-        </div>
 
-        <div id="floatMenuBar">
-            <div class="floatMenuButton" id="newMenuButton" hidden></div>
-            <div class="floatMenuButton" id="saveMenuButton" hidden></div>
-            <div class="floatMenuButton" id="deleteMenuButton" hidden></div>      
+            <div id="floatMenuBar">
+                <div class="floatMenuButton" id="newMenuButton" hidden></div>
+                <div class="floatMenuButton" id="saveMenuButton" hidden></div>
+                <div class="floatMenuButton" id="deleteMenuButton" hidden></div>      
+            </div>
+
         </div>
 
         <div id="user-profile">
