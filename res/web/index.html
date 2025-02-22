@@ -44,7 +44,8 @@
             /* 图片路径 */
             --img-logo: url("logo.png");
             --img-treehole: url("treehole.png");
-            --img-write-selected: url("write-selected.png");
+            --img-write: url("write.svg");
+            --img-pic: url("pic.svg")
             --img-new: url("new.svg");
             --img-save: url("save.svg");
             --img-delete: url("delete.svg");
@@ -99,7 +100,7 @@
         }
     
         #write-logo {
-            background-image: var(--img-write-selected);
+            background-image: var(--img-write);
             background-size: 100% 100%;
             width: 80%;
             margin-left: 10%;
@@ -385,11 +386,11 @@
         #saveMenuButton {
              background-image: var(--img-save); 
              transition: opacity 0.3s ease;
-             background-size: 55%;
+             background-size: 70%;
         }
         #deleteMenuButton { 
             background-image: var(--img-delete); 
-            background-size: 60%;
+            background-size: 70%;
         }
 
         /*删除动画样式*/
