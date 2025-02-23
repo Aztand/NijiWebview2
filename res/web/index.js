@@ -611,7 +611,7 @@ function convertImageAndTimeTags(content) {
 
     return transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
-            style="max-width: 80%; margin: 5px 0;" title = "图${p1}" alt="图${p1}不存在，或者您的pro已过期">`
+            style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
     );
 }
 
