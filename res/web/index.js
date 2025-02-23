@@ -628,17 +628,17 @@ function convertImageAndTimeTags(content) {
     );
 }
 
-function formatTimeAgo(ts) {
-    const now = Math.floor(Date.now() / 1000);// 获取当前时间的时间戳
+function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
+    const now = Math.floor(Date.now() / 1000);  // 获取当前时间的时间戳
     const diff = now - ts; // 计算时间差
 
     // 定义时间单位
     const seconds = Math.floor(diff); // 秒
     const minutes = Math.floor(seconds / 60); // 分钟
-    const hours = Math.floor(minutes / 60); // 小时
-    const days = Math.floor(hours / 24); // 天
-    const months = Math.floor(days / 30); // 月（近似值）
-    const years = Math.floor(months / 12); // 年
+    const hours = Math.floor(seconds / 3600); // 小时
+    const days = Math.floor(seconds / 86400); // 天
+    const months = Math.floor(seconds / 2592000); // 月（近似值）
+    const years = Math.floor(seconds / 31104000); // 年
 
     // 根据时间差返回对应的字符串
     if (years > 0) {
