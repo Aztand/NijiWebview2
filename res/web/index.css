@@ -12,6 +12,7 @@
     --color-border: #000000;
     --color-float-btn: #4988b4;
     --color-pro-gold: gold;
+    --color-light-gray: #dddddd;
     
     /* 间距 (1rem=16px) */
     --space-xxs: 0.25rem;  /* 4px */
@@ -325,6 +326,18 @@ body {
 #preview-content {
     white-space: pre-wrap;
     overflow-wrap: break-word;
+}
+
+.timetag-line {
+    margin: 0;
+    padding-left: var(--space-xs);
+    padding-right: var(--space-xs);
+    background-color: var(--color-light-gray);
+    color: var(--color-slim-font-black);
+    border-radius: var(--radius-sm);
+}
+.time-icon {
+    font-variant-emoji: text;
 }
 
 /* 段落间距继承 */

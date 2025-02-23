@@ -289,7 +289,7 @@ window.setWritePage = async function(userId, diaryId, cardOwner, mode) {
         writePage.dataset.editable = isEditable; // 新增可编辑状态标记
         writePage.dataset.createdDate = targetDiary.createddate;
 
-        previewDiv.innerHTML = convertImageTags(textarea.value);
+        previewDiv.innerHTML = convertImageAndTimeTags(textarea.value);
         wordCountText.textContent = `${targetDiary.content.length}字`;
         switchMode(mode);
 
@@ -604,9 +604,12 @@ const elements = {
     preview: [previewDiv, previewBtn]
 };
 
-function convertImageTags(content) {
+function convertImageAndTimeTags(content) {
     const userId = document.getElementById('write-page').dataset.currentUserId;
-    return content.replace(/\[图(\d+)\]/g, (match, p1) => 
+    // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
+    transformedContent = content.replace(/^(.*?\[([0-9]{2}):([0-9]{2}):([0-9]{2})\].*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1</span>');
+
+    return transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
             style="max-width: 80%; margin: 5px 0;" title = "图${p1}" alt="图${p1}不存在，或者您的pro已过期">`
     );
@@ -622,7 +625,7 @@ function switchMode(mode) {
 
 editBtn.addEventListener('click', () => switchMode('edit'));
 previewBtn.addEventListener('click', () => {
-    previewDiv.innerHTML = convertImageTags(textarea.value);
+    previewDiv.innerHTML = convertImageAndTimeTags(textarea.value);
     switchMode('preview');
 });
 
