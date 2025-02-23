@@ -16,6 +16,8 @@
 			<file name="treehole.jpg" path="res\web\treehole.jpg" comment="res\web\treehole.jpg"/>
 			<file name="treehole.png" path="res\web\treehole.png" comment="res\web\treehole.png"/>
 			<file name="write.svg" path="res\web\write.svg" comment="res\web\write.svg"/>
+			<file name="index.css" path="res\web\index.css" comment="res\web\index.css"/>
+			<file name="index.js" path="res\web\index.js" comment="res\web\index.js"/>
 		</folder>
 	</folder>
 	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">
