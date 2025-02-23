@@ -607,7 +607,7 @@ const elements = {
 function convertImageAndTimeTags(content) {
     const userId = document.getElementById('write-page').dataset.currentUserId;
     // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
-    transformedContent = content.replace(/^(.*?\[([0-9]{2}):([0-9]{2}):([0-9]{2})\].*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1</span>');
+    transformedContent = content.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
 
     return transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
