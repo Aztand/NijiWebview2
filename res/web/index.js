@@ -629,7 +629,7 @@ function convertImageAndTimeTags(content) {
 }
 
 function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
-    return moment.unix(ts)
+    return moment.unix(ts)                      //来自你记的官方源码哇咔咔咔咔咔咔
         .locale('zh-cn')
         .fromNow()
         .replace(' ', '');
