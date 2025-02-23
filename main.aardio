@@ -95,8 +95,11 @@ addSelfCard = function(tableIndex){
     	cardStyle = 'card-boy';
     	
 	cardOwner = 'self';
-	cardDiaryids = diaryResponse["diaries"][tableIndex]['id'];
+	cardDiaryId = diaryResponse["diaries"][tableIndex]['id'];
 	createdDate = diaryResponse["diaries"][tableIndex]['createddate'];
+	cardReadmark = 0;
+	if(diaryResponse["read_marks"][tostring(cardDiaryId)] != null)
+		cardReadmark = diaryResponse["read_marks"][tostring(cardDiaryId)];
 
 	wb.invoke("addDiaryCard",{
     	cardDay = cardDay;
@@ -107,8 +110,9 @@ addSelfCard = function(tableIndex){
     	cardStyle = cardStyle;
     	cardOwner = cardOwner;
     	cardUserID = userID;
-    	cardDiaryids = cardDiaryids;
-    	createdDate = createdDate
+    	cardDiaryId = cardDiaryId;
+    	createdDate = createdDate;
+    	cardReadmark = cardReadmark
 	});
 }
 
@@ -155,8 +159,9 @@ addPairedCard = function(tableIndex){
     	cardStyle = 'card-boy';
     	
 	cardOwner = 'paired';
-	cardDiaryids = diaryResponse["diaries_paired"][tableIndex]['id'];
-	createdDate = diaryResponse["diaries_paired"][tableIndex]['createddate']
+	cardDiaryId = diaryResponse["diaries_paired"][tableIndex]['id'];
+	createdDate = diaryResponse["diaries_paired"][tableIndex]['createddate'];
+	cardReadmark = 0;
 	wb.invoke("addDiaryCard",{
     	cardDay = cardDay;
     	cardWeek = cardWeek;
@@ -166,8 +171,9 @@ addPairedCard = function(tableIndex){
     	cardStyle = cardStyle;
     	cardOwner = cardOwner;
     	cardUserID = pairedID;
-    	cardDiaryids = cardDiaryids;
-    	createdDate = createdDate
+    	cardDiaryId = cardDiaryId;
+    	createdDate = createdDate;
+    	cardReadmark = cardReadmark
 	});
 }
 
@@ -178,7 +184,7 @@ v2sync = function(){
     		readmark_ts = 0,
     		images_ts = 0
     );
-	
+    
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
 	if(diaryResponse["user_config"]["is_member"]){	//只为pro用户下载图片，节约服务器带宽。
 		thread.invoke( 		//为自己下图
@@ -291,7 +297,8 @@ v2sync = function(){
 	if( diaryResponse["user_config"]["paired"] ){		//防止用户未连接虫洞
 		
 		pairedID = diaryResponse["user_config"]["paired_user_config"]["userid"];
-		wb.invoke('setPairedId' ,pairedID);				//设置网页PairedId
+		wb.invoke('setPairedId', pairedID);				//设置网页PairedId
+		wb.invoke('setPairedGender', diaryResponse["user_config"]["paired_user_config"]["role"]);
 		jLen = table.len(diaryResponse["diaries_paired"])
 		if(jLen){
 			j = 1

@@ -19,7 +19,7 @@
         <div id="diary-card-list">
                         <!-- 修改模板字段匹配 -->
             <template id="diary-card-template">
-                <div class="diary-card {{cardStyle}}" owner="{{cardOwner}}" id="{{cardDiaryids}}" data-user-id="{{cardUserID}}" data-created-date="{{createdDate}}">
+                <div class="diary-card {{cardStyle}}" owner="{{cardOwner}}" id="{{cardDiaryId}}" data-user-id="{{cardUserID}}" data-created-date="{{createdDate}}" data-readmark="{{cardReadmark}}">
                 <div class="card-left">
                     <div class="card-day">{{cardDay}}</div>
                     <div class="card-week">{{cardWeek}}</div>
@@ -48,7 +48,7 @@
 
             <textarea id="diary-input" placeholder="请输入..."></textarea>
             <div id="preview-content" class="hidden"></div>
-            <p id="word-count">0字</p>
+            <p id="count-and-readmark"><span id="word-count">0字</span><span id="readmark-text"></span></p>
             <div id="floatMenuBar">
                 <div class="floatMenuButton" id="newMenuButton" hidden></div>
                 <div class="floatMenuButton" id="saveMenuButton" hidden></div>

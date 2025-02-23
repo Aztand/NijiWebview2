@@ -357,7 +357,7 @@ body {
     display: none; /* 替代原opacity隐藏方案 */
 }
 
-#word-count {
+#count-and-readmark {
     position: absolute;
     bottom: var(--space-xs);
     right: var(--space-xxl);

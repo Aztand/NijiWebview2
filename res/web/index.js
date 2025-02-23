@@ -151,7 +151,7 @@ window.addDiaryCard = (data) => {
         // 直接使用传入参数加载日记
         window.switchDiary({
             userId: data.cardUserID.toString(),
-            diaryId: data.cardDiaryids.toString(),
+            diaryId: data.cardDiaryId.toString(),
             owner: data.cardOwner,
             mode: 'preview'
         });
@@ -226,7 +226,7 @@ window.writeDiary = async function() {
             let formattedMinutes = minutes.toString().padStart(2, '0');
 
             const newDiaryCardData = {
-                cardDiaryids: result.newDiaryId,
+                cardDiaryId: result.newDiaryId,
                 cardUserID: writePage.dataset.currentUserId,
                 cardOwner: writePage.dataset.ownerType,
                 cardDay: new Date(selectedDate).getDate(),
@@ -235,7 +235,8 @@ window.writeDiary = async function() {
                 cardTitle: title || selectedDate,
                 cardSimple: content.length > 19 ? content.substring(0, 19) + '...' : content , // 截取前19字作为简介
                 createdDate: selectedDate,
-                cardStyle: selfCardStyle
+                cardStyle: selfCardStyle,
+                cardReadmark: 0,
             };
 
                 // 将新日记卡片插入到左侧列表顶部
@@ -260,7 +261,7 @@ window.setWritePage = async function(userId, diaryId, cardOwner, mode) {
     writePage.dataset.ownerType = cardOwner;        // 明确归属类型
     const saveBtn = document.getElementById('saveMenuButton');
     const deleteBtn = document.getElementById('deleteMenuButton');
-
+    const readmark = document.getElementById(diaryId).dataset.readmark;
     try {
         // 获取日记数据
         const targetDiary = JSON.parse(await aardio.getDiary(userId, diaryId));
@@ -290,6 +291,7 @@ window.setWritePage = async function(userId, diaryId, cardOwner, mode) {
         writePage.dataset.createdDate = targetDiary.createddate;
 
         previewDiv.innerHTML = convertImageAndTimeTags(textarea.value);
+        readmark > 0 ? readmarkText.textContent = `，${pairedGenderHan}${formatTimeAgo(readmark)}看了这篇日记` : readmarkText.textContent = "";
         wordCountText.textContent = `${targetDiary.content.length}字`;
         switchMode(mode);
 
@@ -356,6 +358,7 @@ document.getElementById('diary-card-list').addEventListener('click', async (even
 // 监听输入变化
 const diaryInput = document.getElementById('diary-input');
 const wordCountText = document.getElementById('word-count');
+const readmarkText = document.getElementById('readmark-text');
 
 diaryInput.addEventListener('input', function() {               //检测当前日记是否可编辑，以改变悬浮按钮显隐。以及字数统计监视。
     const saveBtn = document.getElementById('saveMenuButton');
@@ -555,6 +558,16 @@ let selfCardStyle = "card-girl";
 let userId = "";
 let port = "";
 let pairedId = "";
+let pairedGenderHan = "";
+
+window.setPairedGender = function(e){
+    if(e=="girl")
+        pairedGenderHan = "她";
+    else if(e=="boy")
+        pairedGenderHan = "他";
+    else
+        pairedGenderHan = "Ta";
+}
 
 window.setUserId = function(e){
     userId = e;
@@ -613,6 +626,34 @@ function convertImageAndTimeTags(content) {
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
             style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
     );
+}
+
+function formatTimeAgo(ts) {
+    const now = Math.floor(Date.now() / 1000);// 获取当前时间的时间戳
+    const diff = now - ts; // 计算时间差
+
+    // 定义时间单位
+    const seconds = Math.floor(diff); // 秒
+    const minutes = Math.floor(seconds / 60); // 分钟
+    const hours = Math.floor(minutes / 60); // 小时
+    const days = Math.floor(hours / 24); // 天
+    const months = Math.floor(days / 30); // 月（近似值）
+    const years = Math.floor(months / 12); // 年
+
+    // 根据时间差返回对应的字符串
+    if (years > 0) {
+        return `${years}年前`;
+    } else if (months > 0) {
+        return `${months}月前`;
+    } else if (days > 0) {
+        return `${days}天前`;
+    } else if (hours > 0) {
+        return `${hours}小时前`;
+    } else if (minutes > 0) {
+        return `${minutes}分钟前`;
+    } else {
+        return `${seconds}秒前`;
+    }
 }
 
 function switchMode(mode) {
