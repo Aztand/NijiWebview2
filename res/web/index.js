@@ -629,31 +629,10 @@ function convertImageAndTimeTags(content) {
 }
 
 function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
-    const now = Math.floor(Date.now() / 1000);  // 获取当前时间的时间戳
-    const diff = now - ts; // 计算时间差
-
-    // 定义时间单位
-    const seconds = Math.floor(diff); // 秒
-    const minutes = Math.floor(seconds / 60); // 分钟
-    const hours = Math.floor(seconds / 3600); // 小时
-    const days = Math.floor(seconds / 86400); // 天
-    const months = Math.floor(seconds / 2592000); // 月（近似值）
-    const years = Math.floor(seconds / 31104000); // 年
-
-    // 根据时间差返回对应的字符串
-    if (years > 0) {
-        return `${years}年前`;
-    } else if (months > 0) {
-        return `${months}月前`;
-    } else if (days > 0) {
-        return `${days}天前`;
-    } else if (hours > 0) {
-        return `${hours}小时前`;
-    } else if (minutes > 0) {
-        return `${minutes}分钟前`;
-    } else {
-        return `${seconds}秒前`;
-    }
+    return moment.unix(ts)
+        .locale('zh-cn')
+        .fromNow()
+        .replace(' ', '');
 }
 
 function switchMode(mode) {
