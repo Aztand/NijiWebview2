@@ -207,7 +207,7 @@ window.writeDiary = async function() {
             for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
                 // 检查当前日记卡片的id是否与currentDiaryId相同
                 // 找到匹配的日记卡片后，执行操作退出循环
-                if (diaryCards[i].dataset.createdDate == selectedDate) {
+                if (diaryCards[i].dataset.createdDate == selectedDate && diaryCards[i].getAttribute("owner") == "self") {
                     isDiaryIdMatched = true;
                     diaryCards[i].getElementsByClassName("card-time")[0].textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });//ai写的，别问
                     diaryCards[i].getElementsByClassName("card-title")[0].textContent = title ? title.replace(/\s/g, ' ') : selectedDate;
@@ -463,7 +463,7 @@ document.getElementById('saveMenuButton').addEventListener('click', async () => 
             var isDiaryIdMatched = false;                                               // 初始化一个标志变量，用于表示是否找到匹配的日记卡片
             for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
                 // 检查当前日记卡片的id是否与currentDiaryId相同
-                if (diaryCards[i].dataset.createdDate == selectedDate) {
+                if (diaryCards[i].dataset.createdDate == selectedDate && diaryCards[i].getAttribute("owner") == "self") {
                     isDiaryIdMatched = true;
                     if(selectedDate != writePage.dataset.createdDate){
                         if(!confirm("在"+writePage.dataset.createdDate+"已有一篇日记，是否确认覆盖保存？")){
