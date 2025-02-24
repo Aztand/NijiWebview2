@@ -13,6 +13,8 @@
     --color-float-btn: #4988b4;
     --color-pro-gold: gold;
     --color-light-gray: #dddddd;
+    --color-x-light-gray: #eeeeee;
+    --color-xx-light-gray: #fefefe;
     
     /* 间距 (1rem=16px) */
     --space-xxs: 0.25rem;  /* 4px */
@@ -115,7 +117,7 @@ body {
     margin-top: 20%;
 }
 
-#pic-page-logo {
+#gallery-logo {
     background-image: var(--img-pic);
     margin-top: 20%;
 }
@@ -157,6 +159,11 @@ body {
     display: grid;
     grid-template-columns: 30% 70%;
     overflow: hidden; 
+}
+
+.diary-card:hover {
+    background-color: var(--color-xx-light-gray);
+    box-shadow: 2px 2px 15px var(--color-shadow-light);
 }
     
 .card-boy { color: var(--color-primary-boy); }
@@ -580,11 +587,19 @@ body {
 }
 
 /*大图库相关样式*/
+#upload-container {
+    display: flex;
+    align-items: center;
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
 #upload-frame {
+    margin-left: 15%;
     width: 70%;
     height: 150px;
     border: 2px dashed var(--color-slim-font-black); /* 虚线边框 */
-    border-radius: var(--radius-md); /* 圆角 */
+    border-radius: var(--radius-sm); /* 圆角 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -596,4 +611,30 @@ body {
 
 #upload-frame:hover {
     border-color: var(--color-border);
+}
+
+#pic-upload {
+    display: none;
+}
+
+#upload-button-area {
+    margin-left: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+#upload-button-area button {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--text-md);
+    color: whitesmoke;
+    background-color: var(--color-primary-boy);
+    border: none;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.3s ease;
+}
+
+#upload-button-area button:hover {
+    background-color: var(--color-primary-boy);
+    box-shadow: 0 var(--space-xs) var(--space-xs) var(--color-shadow-light);
 }

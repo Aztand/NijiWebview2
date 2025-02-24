@@ -651,11 +651,11 @@ previewBtn.addEventListener('click', () => {
 
 const diaryPage = document.getElementById('right-diary');
 const diaryIcon = document.getElementById('write-logo');
-const picLsPage = document.getElementById('right-pic-page');
-const picLsIcon = document.getElementById('pic-page-logo'); 
+const galleryPage = document.getElementById('right-gallery');
+const picLsIcon = document.getElementById('gallery-logo'); 
 const pagesEle = {
     diary: [diaryPage, diaryIcon],
-    picLs: [picLsPage, picLsIcon]
+    gallery: [galleryPage, picLsIcon]
 }
 
 function switchPage(page) {     //切换写作页面编辑、预览模式
@@ -666,7 +666,7 @@ function switchPage(page) {     //切换写作页面编辑、预览模式
     });
 }
 diaryIcon.addEventListener('click', () => switchPage('diary'));    //左侧导航栏事件监听器
-picLsIcon.addEventListener('click', () => switchPage('picLs')); 
+picLsIcon.addEventListener('click', () => switchPage('gallery')); 
 
 // 初始化模式
 switchMode('preview');
