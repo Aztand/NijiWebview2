@@ -282,7 +282,6 @@ v2sync = function(){
 		wb.invoke("setAvatar","https://f.nideriji.cn" + diaryResponse["user_config"]["avatar"]);
 	}
 	
-	
 	i = 0;
 	j = 0;
 	iLen = diaryResponse["user_config"]["diary_count"];
@@ -308,7 +307,7 @@ v2sync = function(){
 		
 	}
 	
-	while( (i <= iLen and j <= jLen) && ( iLen || jLen /* 确保两人至少凑出一篇日记才进循环 */ )){
+	while( (i <= iLen and j <= jLen) && ( iLen || jLen  )){ // 确保两人至少凑出一篇日记才进循环 
 		
 		if(iDate >= jDate){
 			addSelfCard(i);
