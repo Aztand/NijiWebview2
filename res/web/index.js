@@ -145,7 +145,7 @@ window.addDiaryCard = (data) => {
         document.getElementById('date-input').value = dateStr;
     }
 
-    if (shouldAutoLoadFirstDiary) {
+    if (shouldAutoLoadFirstDiary && data.cardOwner == "self") { //只自动查看自己日记。防止匹配对方有隐私需求。
         shouldAutoLoadFirstDiary = false; // 立即置为false防止重复
 
         // 直接使用传入参数加载日记
@@ -612,7 +612,7 @@ const previewBtn = document.getElementById('preview-mode');
 const toggleBtn = document.getElementById('toggle-mode');
 const textarea = document.getElementById('diary-input');
 const previewDiv = document.getElementById('preview-content');
-const elements = {
+const previewEle = {
     edit: [textarea, editBtn],
     preview: [previewDiv, previewBtn]
 };
@@ -636,7 +636,7 @@ function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
 }
 
 function switchMode(mode) {
-    Object.entries(elements).forEach(([key, [el, btn]]) => {
+    Object.entries(previewEle).forEach(([key, [el, btn]]) => {
         el.classList.toggle('hidden', key !== mode);
         el.setAttribute('data-mode', key === mode ? 'active' : '');
         btn.classList.toggle('active', key === mode);

@@ -551,7 +551,7 @@ body {
 
 /* 状态切换动画 */
 .hidden {
-    display: none;
+    display: none !important;
     visibility: hidden;
     transition: all 0.3s ease;
     transform: translateY(10px);
