@@ -606,17 +606,6 @@ window.setAvatar = function(avatarPath){
     document.getElementById("avatar-img").setAttribute("src",avatarPath);
 }
 
-// 优化后的切换逻辑
-const editBtn = document.getElementById('edit-mode');
-const previewBtn = document.getElementById('preview-mode');
-const toggleBtn = document.getElementById('toggle-mode');
-const textarea = document.getElementById('diary-input');
-const previewDiv = document.getElementById('preview-content');
-const previewEle = {
-    edit: [textarea, editBtn],
-    preview: [previewDiv, previewBtn]
-};
-
 function convertImageAndTimeTags(content) {
     const userId = document.getElementById('write-page').dataset.currentUserId;
     // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
@@ -635,7 +624,18 @@ function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
         .replace(' ', '');
 }
 
-function switchMode(mode) {
+// 优化后的切换逻辑
+const editBtn = document.getElementById('edit-mode');
+const previewBtn = document.getElementById('preview-mode');
+const toggleBtn = document.getElementById('toggle-mode');
+const textarea = document.getElementById('diary-input');
+const previewDiv = document.getElementById('preview-content');
+const previewEle = {
+    edit: [textarea, editBtn],
+    preview: [previewDiv, previewBtn]
+};
+
+function switchMode(mode) {     //切换写作页面编辑、预览模式
     Object.entries(previewEle).forEach(([key, [el, btn]]) => {
         el.classList.toggle('hidden', key !== mode);
         el.setAttribute('data-mode', key === mode ? 'active' : '');
@@ -643,11 +643,30 @@ function switchMode(mode) {
     });
 }
 
-editBtn.addEventListener('click', () => switchMode('edit'));
+editBtn.addEventListener('click', () => switchMode('edit'));    //编辑、预览按钮添加事件监听器
 previewBtn.addEventListener('click', () => {
     previewDiv.innerHTML = convertImageAndTimeTags(textarea.value);
     switchMode('preview');
 });
+
+const diaryPage = document.getElementById('right-diary');
+const diaryIcon = document.getElementById('write-logo');
+const picLsPage = document.getElementById('right-pic-page');
+const picLsIcon = document.getElementById('pic-page-logo'); 
+const pagesEle = {
+    diary: [diaryPage, diaryIcon],
+    picLs: [picLsPage, picLsIcon]
+}
+
+function switchPage(page) {     //切换写作页面编辑、预览模式
+    Object.entries(pagesEle).forEach(([key, [el, btn]]) => {
+        el.classList.toggle('hidden', key !== page);
+        el.setAttribute('data-mode', key === page ? 'active' : '');
+        btn.classList.toggle('active', key === page);
+    });
+}
+diaryIcon.addEventListener('click', () => switchPage('diary'));    //左侧导航栏事件监听器
+picLsIcon.addEventListener('click', () => switchPage('picLs')); 
 
 // 初始化模式
 switchMode('preview');

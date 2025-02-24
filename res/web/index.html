@@ -10,13 +10,14 @@
     <div id="left-navigation">
         <div id="logo"></div>
         <div id="icon-list">
-            <div id="write-logo"></div>     
+            <div class = "nav-icon" id="write-logo"></div>     
             <div class="seperate-line"></div>
-            <div id="treehole-logo" hidden></div>   
+            <div class = "nav-icon" id="pic-page-logo"></div>
+            <div class = "nav-icon" id="treehole-logo" hidden></div>   
         </div>
     </div>
 
-    <div class = "right-page" id="right-diaries"><!--用于查看编辑日记的右侧主页面-->
+    <div class = "right-page" id="right-diary"><!--用于查看编辑日记的右侧主页面-->
         <div id="diary-card-list">
                         <!-- 修改模板字段匹配 -->
             <template id="diary-card-template">
@@ -74,8 +75,21 @@
 
     </div>
     
-    <div class = "right-page hidden" id="right-pic-list">
-        <template id="diary-card-template">
+    <div class = "right-page hidden" id="right-pic-page">
+        <div id = "upload-container">
+            <div id = "upload-frame">
+                <span class="upload-prompt-text">点击或拖拽文件到这里上传</span>
+                <input type="file" id="pic-upload">
+            </div>
+            <div id = "upload-btn"></div>
+            <div id = "QRcode-btn"></div>
+        </div>
+        <div id = "upload-preview-list">
+            <template id="upload-preview-template">
+                <img class="upload-preview"  id="{{previewId}}" src="{{previewSrc}}">
+            </template>
+        </div>
+        <template id="pic-template">
             <div class="pic-container"  id="{{picContainerId}}">
                 <div class="inlist-pic" id="{{inListPicId}}"></div>
             </div>

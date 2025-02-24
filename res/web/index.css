@@ -58,7 +58,7 @@ body {
     position: relative;
 }
 
-#right-diaries {
+#right-diary {
     display: grid;
     grid-template-columns: 25% 75%;
     height: 100vh;
@@ -86,22 +86,26 @@ body {
     padding-top: 80%;
 }
     
-#treehole-logo {
-    background-image: var(--img-treehole);
+.nav-icon {
     background-size: 100% 100%;
     width: 80%;
     margin-left: 10%;
     padding-top: 80%;
-    margin-top: 20%;
 }
-    
+
 #write-logo {
     background-image: var(--img-write);
-    background-size: 100% 100%;
-    width: 80%;
-    margin-left: 10%;
-    padding-top: 80%;
     margin-top: 50%;
+}
+
+#treehole-logo {
+    background-image: var(--img-treehole);
+    margin-top: 20%;
+}
+
+#pic-page-logo {
+    background-image: var(--img-pic);
+    margin-top: 20%;
 }
     
 .seperate-line {
@@ -561,4 +565,23 @@ body {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+/*大图库相关样式*/
+#upload-frame {
+    width: 70%;
+    height: 150px;
+    border: 2px dashed var(--color-slim-font-black); /* 虚线边框 */
+    border-radius: var(--radius-md); /* 圆角 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative; /* 为子元素定位 */
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+#upload-frame:hover {
+    border-color: var(--color-border);
 }
