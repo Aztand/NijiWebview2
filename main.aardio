@@ -180,7 +180,7 @@ v2sync = function(){
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
 	if(diaryResponse["user_config"]["is_member"]){	//只为pro用户下载图片，节约服务器带宽。
 		thread.invoke( 		//为自己下图
-			function( diaryResponse,NijiDocPath,token ){
+			function( diaryResponse,NijiDocPath,token,wb ){
 				import web.rest.jsonLiteClient;
 				http = web.rest.client();
 				http.addHeaders = {
@@ -201,8 +201,14 @@ v2sync = function(){
 						}
 					}	
 				}
+				//为前端图库添加图片
+				for(i=picTotal;1;-1){
+					if(io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
+						wb.invoke("addPicture",i);
+					}	
+				}
 				
-			},diaryResponse,NijiDocPath,token
+			},diaryResponse,NijiDocPath,token,wb
 		);
 		
 		if( diaryResponse["user_config"]["paired"] ){//下载对面图像。

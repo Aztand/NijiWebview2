@@ -98,8 +98,11 @@
         </div>
         <div id = "gallery-container">
             <template id="pic-template">
-                <div class="pic-container"  id="{{picContainerId}}">
-                    <div class="inlist-pic" id="{{inListPicId}}"></div>
+                <div class="pic-container">
+                    <div class="pic-background">
+                        <img id="{{inListPicId}}" src="{{inListPicSrc}}" loading = "lazy">
+                    </div>
+                    <p>图{{picNum}}</p>
                 </div>
             </template>
         </div>

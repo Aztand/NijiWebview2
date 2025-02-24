@@ -159,6 +159,22 @@ window.addDiaryCard = (data) => {
 
 };
 
+window.addPicture = (picNum) => {
+    // 获取模板
+    const template = document.getElementById('pic-template').content;
+
+    // 克隆模板
+    const clone = document.importNode(template, true);
+
+    // 替换占位符
+    clone.querySelector('img').id = `pic-${picNum}`;
+    clone.querySelector('img').src = `http://127.0.0.1:${port}/${userId}/${picNum}.jpg`;
+    clone.querySelector('p').textContent = `图${picNum}`;
+
+    // 插入到 gallery-container 中
+    document.getElementById('gallery-container').appendChild(clone);
+}
+
 function getLastDayOfMonth(year, month) {//辅助addMonthCard设置月份虚拟日期
     // 设置下一个月的第一天
     const nextMonth = new Date(year, month, 1);
@@ -315,6 +331,16 @@ window.switchDiary = async function(target) {
         }
 
         // 执行切换
+        const currentDiaryCard = document.getElementById(writePage.dataset.currentDiaryId)
+        const targetCard = document.getElementById(diaryId);
+        
+        currentDiaryCard ? currentDiaryCard.style.backgroundColor = "var(--color-bg-element)" : null;     //当前卡片切换回默认样式
+        currentDiaryCard ? currentDiaryCard.style.opacity = "1" : null;     //当前卡片切换回默认样式
+        currentDiaryCard ? currentDiaryCard.classList.toggle(`card-${currentDiaryCard.getAttribute('owner')}`) : null;
+        targetCard.style.backgroundColor = `var(--color-${targetCard.getAttribute('owner')})`;  //新打开的卡片切换到选中样式
+        targetCard.style.opacity = "0.85";  //颜色淡一点会比较舒服。字体白色，所以直接设置透明度即可
+        targetCard.classList.toggle(`card-${targetCard.getAttribute('owner')}`);
+
         await setWritePage(userId, diaryId, owner, mode);
         return true;
 
@@ -339,11 +365,6 @@ document.getElementById('diary-card-list').addEventListener('click', async (even
         owner: card.getAttribute('owner'), // 关键属性
         mode: 'preview'
     };
-
-    if (!diaryInfo.owner) {
-        console.warn('卡片缺失owner属性:', card);
-        return;
-    }
 
     try {
         await window.switchDiary(diaryInfo);

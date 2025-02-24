@@ -61,10 +61,13 @@ body {
     position: relative;
 }
 
+.right-page {
+    height: 100vh;
+}
+
 #right-diary {
     display: grid;
     grid-template-columns: 25% 75%;
-    height: 100vh;
 }
 
 /* ===== 工具类 ===== */
@@ -160,10 +163,11 @@ body {
     display: grid;
     grid-template-columns: 30% 70%;
     overflow: hidden; 
+    color: white;
 }
 
 .diary-card:hover {
-    background-color: var(--color-xx-light-gray);
+    opacity: 0.85;
     box-shadow: 2px 2px 15px var(--color-shadow-light);
 }
     
@@ -638,4 +642,50 @@ body {
 #upload-button-area button:hover {
     background-color: var(--color-primary-boy);
     box-shadow: 0 var(--space-xs) var(--space-xs) var(--color-shadow-light);
+}
+
+/* 设置图库容器的样式 */
+#gallery-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* 使图片在容器中均匀居中 */
+    gap: 20px; /* 设置图片之间的间距 */
+    padding: 20px; /* 设置容器的内边距 */
+}
+
+/* 设置每个图片容器的样式 */
+.pic-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white; /* 白色背景画框 */
+    padding: 10px; /* 设置画框的内边距 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+    border-radius: 8px; /* 设置画框的圆角 */
+}
+
+/* 设置图片背景的样式 */
+.pic-background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px; /* 设置画框的宽度 */
+    height: 150px; /* 设置画框的高度 */
+    background-color: #f0f0f0; /* 设置图片背景颜色 */
+    border-radius: 4px; /* 设置图片背景的圆角 */
+}
+
+/* 设置图片的样式 */
+.pic-background img {
+    max-width: 100%; /* 图片最大宽度为画框宽度 */
+    max-height: 100%; /* 图片最大高度为画框高度 */
+    object-fit: contain; /* 保持图片原比例 */
+    border-radius: 4px; /* 设置图片的圆角 */
+}
+
+/* 设置图片编号的样式 */
+.pic-container p {
+    margin-top: 10px; /* 设置编号与画框的距离 */
+    font-size: 14px; /* 设置编号的字体大小 */
+    color: #333; /* 设置编号的字体颜色 */
 }
