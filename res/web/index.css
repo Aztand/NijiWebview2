@@ -10,11 +10,12 @@
     --color-shadow-dark: #dddddd;
     --color-slim-font-black :#666666;
     --color-border: #000000;
-    --color-float-btn: #4988b4;
     --color-pro-gold: gold;
     --color-light-gray: #dddddd;
     --color-x-light-gray: #eeeeee;
     --color-xx-light-gray: #fefefe;
+    --color-self: var(--color-primary-boy);
+    --color-paired: var(--color-primary-girl);
     
     /* 间距 (1rem=16px) */
     --space-xxs: 0.25rem;  /* 4px */
@@ -166,8 +167,8 @@ body {
     box-shadow: 2px 2px 15px var(--color-shadow-light);
 }
     
-.card-boy { color: var(--color-primary-boy); }
-.card-girl { color: var(--color-primary-girl); }
+.card-self { color: var(--color-self); }
+.card-paired { color: var(--color-paired); }
     
 .card-left {
     display: grid;
@@ -404,7 +405,7 @@ body {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background-color: var(--color-float-btn);
+    background-color: var(--color-self);
     background-size: 70% 70%;
     background-repeat: no-repeat;
     background-position: center;
@@ -454,7 +455,7 @@ body {
     height: 64px;
     border-radius: 50%;
     border: 4px solid transparent;
-    border-top-color: var(--color-float-btn);
+    border-top-color: var(--color-self);
     animation: spin 1s linear infinite;
     background-color: transparent;
     box-sizing: border-box;
@@ -507,7 +508,7 @@ body {
 
 #user-info-card h3 {
     margin: 0;
-    color: var(--color-primary-boy);
+    color: var(--color-self);
     font-size: var(--text-md);
 }
 

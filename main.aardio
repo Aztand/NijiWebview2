@@ -88,11 +88,7 @@ addSelfCard = function(tableIndex){
     	    cardSimple = cardSimpleStrip;
     }
     	
-    //根据性别改变卡片样式
-	if(diaryResponse["user_config"]["role"] == 'girl')
-    	cardStyle = 'card-girl';
-	else
-    	cardStyle = 'card-boy';
+    cardStyle = 'card-self';
     	
 	cardOwner = 'self';
 	cardDiaryId = diaryResponse["diaries"][tableIndex]['id'];
@@ -152,11 +148,7 @@ addPairedCard = function(tableIndex){
     	    cardSimple = cardSimpleStrip;
     }
     	
-    //根据性别改变卡片样式
-	if(diaryResponse["user_config"]["paired_user_config"]['role'] == 'girl')
-    	cardStyle = 'card-girl';
-	else
-    	cardStyle = 'card-boy';
+    cardStyle = 'card-paired';
     	
 	cardOwner = 'paired';
 	cardDiaryId = diaryResponse["diaries_paired"][tableIndex]['id'];

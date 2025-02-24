@@ -235,7 +235,7 @@ window.writeDiary = async function() {
                 cardTitle: title || selectedDate,
                 cardSimple: content.length > 19 ? content.substring(0, 19) + '...' : content , // 截取前19字作为简介
                 createdDate: selectedDate,
-                cardStyle: selfCardStyle,
+                cardStyle: "card-self",
                 cardReadmark: 0,
             };
 
@@ -554,7 +554,7 @@ window.addEventListener('pageshow', function(e) {//监听页面刷新
         aardio.refreshPage();
     }
 });
-let selfCardStyle = "card-girl";
+
 let userId = "";
 let port = "";
 let pairedId = "";
@@ -579,16 +579,18 @@ window.setPairedId = function(e){
     pairedId = e;
 }
 
-window.setUserColor = function(e){
-    if(e == "boy"){
-        document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#4988b4";});
-        selfCardStyle = "card-boy"
+window.setUserColor = function(self,paired){
+    const root = document.documentElement;
+    self = self ? self : "boy";
+    paired = paired ? paired : "girl";
+    colorJson = {
+        boy : "#4988b4",
+        girl : "#ff7074"
     }
-    else{
-        document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#ff7074";});
-        document.querySelector("#user-info-card h3").style.color = "#ff7074";
-    }
-    document.querySelectorAll('.floatMenuButton').forEach(element => {element.removeAttribute("hidden");});
+    root.style.setProperty('--color-self',colorJson[self]);
+    root.style.setProperty('--color-paired',colorJson[paired]);
+    document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = colorJson[self];});
+
 }
 
 window.setUserInfoCard = function(username, description, pairedInfo, writeStatistic, isMember){
