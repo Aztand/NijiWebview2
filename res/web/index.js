@@ -670,3 +670,4 @@ picLsIcon.addEventListener('click', () => switchPage('picLs'));
 
 // 初始化模式
 switchMode('preview');
+switchPage('diary');

@@ -91,6 +91,18 @@ body {
     width: 80%;
     margin-left: 10%;
     padding-top: 80%;
+    right: 0;
+    padding-right: 10%;
+}
+
+.nav-icon.active {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    box-shadow: calc(-1 * var(--space-xs)) 0px var(--space-xs) var(--color-shadow-light);
+}
+
+.nav-icon:hover {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    box-shadow: calc(-1 * var(--space-xs)) 0px var(--space-xs) var(--color-shadow-light);
 }
 
 #write-logo {
