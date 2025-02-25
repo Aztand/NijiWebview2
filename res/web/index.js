@@ -133,7 +133,13 @@ window.addDiaryCard = (data) => {
     const siblings = [...document.getElementById('diary-card-list').children];
     const insertPos = siblings.find(el => {
         const elDate = el.dataset?.createdDate;
-        return elDate && new Date(elDate) < dateObj;
+        const elUserId = el.dataset?.userId;
+        const elDateObj = new Date(elDate);
+
+        const isSameDay = elDateObj.getTime() === dateObj.getTime();
+        const userIdMismatch = elUserId !== userId;
+
+        return (isSameDay && userIdMismatch) || elDateObj < dateObj;
     });
 
     insertPos ? insertPos.before(cardEl) 
