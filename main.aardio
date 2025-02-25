@@ -7,7 +7,15 @@ import console;
 import string.chineseNumber;
 import fsys.version;
 import fsys.config;
-import win.ui.minmax
+import win.ui.minmax;
+
+/*
+import debug;
+import debug.log;
+debug.log.setPath("/.config/log.txt");
+debug.log.checkSize(0x20000); //设置日志大小
+*/
+
 /*DSG{{*/
 mainForm = win.form(text="你的日记";right=1480;bottom=1001;edge=1;maximize=1)
 mainForm.add(
@@ -178,7 +186,6 @@ v2sync = function(){
     		readmark_ts = 0,
     		images_ts = 0
     );
-   	thread.delay(2000);//删了它编译出的exe运行有问题
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
 	if(diaryResponse["user_config"]["is_member"]){	//只为pro用户下载图片，节约服务器带宽。
 		thread.invoke( 		//为自己下图
@@ -191,23 +198,25 @@ v2sync = function(){
 				}
 				
 				userConfig = diaryResponse["user_config"];
-				picTable = diaryResponse["images"];
-				picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
-				
-				for(i=picTotal;1;-1){
-					if(!io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
-						picApi = http.api("https://f.nideriji.cn/api/image/" ++ userConfig.userid ++ "/" ++ i ++ "/");
-						pic = picApi.get();
-						if( pic ){//防止该图不存在，为空编号
-							string.save(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg", pic )
-						}
-					}	
-				}
-				//为前端图库添加图片
-				for(i=picTotal;1;-1){
-					if(io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
-						wb.invoke("addPicture",i);
-					}	
+				if(picTable != null && table.len(diaryResponse["images_paired"]) != 0){
+					picTable = diaryResponse["images"];
+					picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
+					
+					for(i=picTotal;1;-1){
+						if(!io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
+							picApi = http.api("https://f.nideriji.cn/api/image/" ++ userConfig.userid ++ "/" ++ i ++ "/");
+							pic = picApi.get();
+							if( pic ){//防止该图不存在，为空编号
+								string.save(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg", pic )
+							}
+						}	
+					}
+					//为前端图库添加图片
+					for(i=picTotal;1;-1){
+						if(io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
+							wb.invoke("addPicture",i);
+						}	
+					}
 				}
 				
 			},diaryResponse,NijiDocPath,token,wb
@@ -222,19 +231,21 @@ v2sync = function(){
 						["auth"] = "token " ++ token;
 						["user-agent"] = "OhApp/3.6.12 Platform/Android";
 					}
-					
 					pairedConfig = diaryResponse["user_config"]["paired_user_config"];
-					picTable = diaryResponse["images_paired"];
-					picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
 					
-					for(i=picTotal;1;-1){
-						if(!io.exist(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg")){
-							picApi = http.api("https://f.nideriji.cn/api/image/" ++ pairedConfig.userid ++ "/" ++ i ++ "/");
-							pic = picApi.get();
-							if( pic ){//防止该图不存在，为空编号
-								string.save(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg", pic )
-							}
-						}	
+					if(diaryResponse["images_paired"] != null && table.len(diaryResponse["images_paired"]) != 0){
+						picTable = diaryResponse["images_paired"];
+						picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
+						
+						for(i=picTotal;1;-1){
+							if(!io.exist(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg")){
+								picApi = http.api("https://f.nideriji.cn/api/image/" ++ pairedConfig.userid ++ "/" ++ i ++ "/");
+								pic = picApi.get();
+								if( pic ){//防止该图不存在，为空编号
+									string.save(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg", pic )
+								}
+							}	
+						}
 					}
 					
 				},diaryResponse,NijiDocPath,token
@@ -306,23 +317,6 @@ v2sync = function(){
 		
 	}
 	
-	while( (i <= iLen and j <= jLen) && ( iLen || jLen  )){ // 确保两人至少凑出一篇日记才进循环 
-		
-		if(iDate >= jDate){
-			addSelfCard(i);
-			i++;
-			if( i <= iLen)
-				iDate = time(diaryResponse["diaries"][i]["createddate"],"%Y-%m-%d");
-		}
-		else{
-			addPairedCard(j);
-			j++;
-			if(j <= jLen)
-				jDate = time(diaryResponse["diaries_paired"][j]["createddate"],"%Y-%m-%d");	
-		}
-	}
-	
-	//其中一方已经没有更多日记了，于是把另一方剩下的所有日记列出来
 	while(i <= iLen && iLen){
 		addSelfCard(i);
 		i++;
@@ -331,7 +325,7 @@ v2sync = function(){
 		addPairedCard(j);
 		j++;
 	}
-
+	
 }
 
 wb.external = {
@@ -436,7 +430,6 @@ loginIntvalID = mainForm.setInterval(
 	function(){
 		if(loginGo == 1){
 			wb.go("/res/web/index.html");
-			v2sync();
 			loginGo = 0;
 		}
 		elseif (loginGo == 2)  {
