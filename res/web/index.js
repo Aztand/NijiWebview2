@@ -151,7 +151,7 @@ window.addDiaryCard = (data) => {
         document.getElementById('date-input').value = dateStr;
     }
 
-    if (shouldAutoLoadFirstDiary) {
+    if (shouldAutoLoadFirstDiary && data.cardOwner == "self") { //只自动查看自己日记。防止匹配对方有隐私需求。
         shouldAutoLoadFirstDiary = false; // 立即置为false防止重复
 
         // 直接使用传入参数加载日记
@@ -164,6 +164,22 @@ window.addDiaryCard = (data) => {
     }
 
 };
+
+window.addPicture = (picNum) => {
+    // 获取模板
+    const template = document.getElementById('pic-template').content;
+
+    // 克隆模板
+    const clone = document.importNode(template, true);
+
+    // 替换占位符
+    clone.querySelector('img').id = `pic-${picNum}`;
+    clone.querySelector('img').src = `http://127.0.0.1:${port}/${userId}/${picNum}.jpg`;
+    clone.querySelector('p').textContent = `图${picNum}`;
+
+    // 插入到 gallery-container 中
+    document.getElementById('gallery-container').appendChild(clone);
+}
 
 function getLastDayOfMonth(year, month) {//辅助addMonthCard设置月份虚拟日期
     // 设置下一个月的第一天
@@ -241,7 +257,7 @@ window.writeDiary = async function() {
                 cardTitle: title || selectedDate,
                 cardSimple: content.length > 19 ? content.substring(0, 19) + '...' : content , // 截取前19字作为简介
                 createdDate: selectedDate,
-                cardStyle: selfCardStyle,
+                cardStyle: "card-self",
                 cardReadmark: 0,
             };
 
@@ -321,6 +337,16 @@ window.switchDiary = async function(target) {
         }
 
         // 执行切换
+        const currentDiaryCard = document.getElementById(writePage.dataset.currentDiaryId)
+        const targetCard = document.getElementById(diaryId);
+        
+        currentDiaryCard ? currentDiaryCard.style.backgroundColor = "var(--color-bg-element)" : null;     //当前卡片切换回默认样式
+        currentDiaryCard ? currentDiaryCard.style.opacity = "1" : null;     //当前卡片切换回默认样式
+        currentDiaryCard ? currentDiaryCard.classList.toggle(`card-${currentDiaryCard.getAttribute('owner')}`) : null;
+        targetCard.style.backgroundColor = `var(--color-${targetCard.getAttribute('owner')})`;  //新打开的卡片切换到选中样式
+        targetCard.style.opacity = "0.85";  //颜色淡一点会比较舒服。字体白色，所以直接设置透明度即可
+        targetCard.classList.toggle(`card-${targetCard.getAttribute('owner')}`);
+
         await setWritePage(userId, diaryId, owner, mode);
         return true;
 
@@ -345,11 +371,6 @@ document.getElementById('diary-card-list').addEventListener('click', async (even
         owner: card.getAttribute('owner'), // 关键属性
         mode: 'preview'
     };
-
-    if (!diaryInfo.owner) {
-        console.warn('卡片缺失owner属性:', card);
-        return;
-    }
 
     try {
         await window.switchDiary(diaryInfo);
@@ -560,7 +581,7 @@ window.addEventListener('pageshow', function(e) {//监听页面刷新
         aardio.refreshPage();
     }
 });
-let selfCardStyle = "card-girl";
+
 let userId = "";
 let port = "";
 let pairedId = "";
@@ -585,16 +606,18 @@ window.setPairedId = function(e){
     pairedId = e;
 }
 
-window.setUserColor = function(e){
-    if(e == "boy"){
-        document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#4988b4";});
-        selfCardStyle = "card-boy"
+window.setUserColor = function(self,paired){
+    const root = document.documentElement;
+    self = self ? self : "boy";
+    paired = paired ? paired : "girl";
+    colorJson = {
+        boy : "#4988b4",
+        girl : "#ff7074"
     }
-    else{
-        document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = "#ff7074";});
-        document.querySelector("#user-info-card h3").style.color = "#ff7074";
-    }
-    document.querySelectorAll('.floatMenuButton').forEach(element => {element.removeAttribute("hidden");});
+    root.style.setProperty('--color-self',colorJson[self]);
+    root.style.setProperty('--color-paired',colorJson[paired]);
+    document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = colorJson[self];});
+
 }
 
 window.setUserInfoCard = function(username, description, pairedInfo, writeStatistic, isMember){
@@ -611,17 +634,6 @@ window.setUserInfoCard = function(username, description, pairedInfo, writeStatis
 window.setAvatar = function(avatarPath){
     document.getElementById("avatar-img").setAttribute("src",avatarPath);
 }
-
-// 优化后的切换逻辑
-const editBtn = document.getElementById('edit-mode');
-const previewBtn = document.getElementById('preview-mode');
-const toggleBtn = document.getElementById('toggle-mode');
-const textarea = document.getElementById('diary-input');
-const previewDiv = document.getElementById('preview-content');
-const elements = {
-    edit: [textarea, editBtn],
-    preview: [previewDiv, previewBtn]
-};
 
 function convertImageAndTimeTags(content) {
     const userId = document.getElementById('write-page').dataset.currentUserId;
@@ -641,19 +653,75 @@ function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
         .replace(' ', '');
 }
 
-function switchMode(mode) {
-    Object.entries(elements).forEach(([key, [el, btn]]) => {
+// 优化后的切换逻辑
+const editBtn = document.getElementById('edit-mode');
+const previewBtn = document.getElementById('preview-mode');
+const toggleBtn = document.getElementById('toggle-mode');
+const textarea = document.getElementById('diary-input');
+const previewDiv = document.getElementById('preview-content');
+const previewEle = {
+    edit: [textarea, editBtn],
+    preview: [previewDiv, previewBtn]
+};
+
+function switchMode(mode) {     //切换写作页面编辑、预览模式
+    Object.entries(previewEle).forEach(([key, [el, btn]]) => {
         el.classList.toggle('hidden', key !== mode);
         el.setAttribute('data-mode', key === mode ? 'active' : '');
         btn.classList.toggle('active', key === mode);
     });
 }
 
-editBtn.addEventListener('click', () => switchMode('edit'));
+editBtn.addEventListener('click', () => switchMode('edit'));    //编辑、预览按钮添加事件监听器
 previewBtn.addEventListener('click', () => {
     previewDiv.innerHTML = convertImageAndTimeTags(textarea.value);
     switchMode('preview');
 });
 
+const diaryPage = document.getElementById('right-diary');
+const diaryIcon = document.getElementById('write-logo');
+const galleryPage = document.getElementById('right-gallery');
+const picLsIcon = document.getElementById('gallery-logo'); 
+const pagesEle = {
+    diary: [diaryPage, diaryIcon],
+    gallery: [galleryPage, picLsIcon]
+}
+
+function switchPage(page) {     //切换写作页面编辑、预览模式
+    Object.entries(pagesEle).forEach(([key, [el, btn]]) => {
+        el.classList.toggle('hidden', key !== page);
+        el.setAttribute('data-mode', key === page ? 'active' : '');
+        btn.classList.toggle('active', key === page);
+    });
+}
+diaryIcon.addEventListener('click', () => switchPage('diary'));    //左侧导航栏事件监听器
+picLsIcon.addEventListener('click', () => switchPage('gallery')); 
+
 // 初始化模式
 switchMode('preview');
+switchPage('diary');
+
+document.getElementById('pic-upload').addEventListener('change', function(event) {   //用户在图库选择上传文件时，先自动上传到本地服务端。再由aardio后台压图、上传你记服务器。
+    const file = event.target.files[0]; // 获取用户选择的文件
+    if (file) {
+        uploadFile(file); // 调用上传函数
+    }
+});
+
+function uploadFile(file) {
+    const formData = new FormData(); // 创建 FormData 对象
+    formData.append('file', file); // 将文件添加到 FormData
+
+    // 使用 Fetch API 上传文件
+    fetch(`http://127.0.0.1:${port}/upload/`, { // 替换为你的上传接口 URL
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Upload successful:', data);
+    })
+    .catch(error => {
+        console.error('Upload failed:', error);
+    });
+}

@@ -10,9 +10,12 @@
     --color-shadow-dark: #dddddd;
     --color-slim-font-black :#666666;
     --color-border: #000000;
-    --color-float-btn: #4988b4;
     --color-pro-gold: gold;
     --color-light-gray: #dddddd;
+    --color-x-light-gray: #eeeeee;
+    --color-xx-light-gray: #fefefe;
+    --color-self: var(--color-primary-boy);
+    --color-paired: var(--color-primary-girl);
     
     /* 间距 (1rem=16px) */
     --space-xxs: 0.25rem;  /* 4px */
@@ -58,10 +61,14 @@ body {
     position: relative;
 }
 
-#right-diaries {
+.right-page {
+    height: 100vh;
+    overflow-y: auto;
+}
+
+#right-diary {
     display: grid;
     grid-template-columns: 25% 75%;
-    height: 100vh;
 }
 
 /* ===== 工具类 ===== */
@@ -86,22 +93,38 @@ body {
     padding-top: 80%;
 }
     
-#treehole-logo {
-    background-image: var(--img-treehole);
+.nav-icon {
     background-size: 100% 100%;
     width: 80%;
     margin-left: 10%;
     padding-top: 80%;
-    margin-top: 20%;
+    right: 0;
+    padding-right: 10%;
 }
-    
+
+.nav-icon.active {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    box-shadow: calc(-1 * var(--space-xs)) 0px var(--space-xs) var(--color-shadow-light);
+}
+
+.nav-icon:hover {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    box-shadow: calc(-1 * var(--space-xs)) 0px var(--space-xs) var(--color-shadow-light);
+}
+
 #write-logo {
     background-image: var(--img-write);
-    background-size: 100% 100%;
-    width: 80%;
-    margin-left: 10%;
-    padding-top: 80%;
     margin-top: 50%;
+}
+
+#treehole-logo {
+    background-image: var(--img-treehole);
+    margin-top: 20%;
+}
+
+#gallery-logo {
+    background-image: var(--img-pic);
+    margin-top: 20%;
 }
     
 .seperate-line {
@@ -141,10 +164,16 @@ body {
     display: grid;
     grid-template-columns: 30% 70%;
     overflow: hidden; 
+    color: white;
+}
+
+.diary-card:hover {
+    opacity: 0.85;
+    box-shadow: 2px 2px 15px var(--color-shadow-light);
 }
     
-.card-boy { color: var(--color-primary-boy); }
-.card-girl { color: var(--color-primary-girl); }
+.card-self { color: var(--color-self); }
+.card-paired { color: var(--color-paired); }
     
 .card-left {
     display: grid;
@@ -381,7 +410,7 @@ body {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background-color: var(--color-float-btn);
+    background-color: var(--color-self);
     background-size: 70% 70%;
     background-repeat: no-repeat;
     background-position: center;
@@ -431,7 +460,7 @@ body {
     height: 64px;
     border-radius: 50%;
     border: 4px solid transparent;
-    border-top-color: var(--color-float-btn);
+    border-top-color: var(--color-self);
     animation: spin 1s linear infinite;
     background-color: transparent;
     box-sizing: border-box;
@@ -484,7 +513,7 @@ body {
 
 #user-info-card h3 {
     margin: 0;
-    color: var(--color-primary-boy);
+    color: var(--color-self);
     font-size: var(--text-md);
 }
 
@@ -551,7 +580,7 @@ body {
 
 /* 状态切换动画 */
 .hidden {
-    display: none;
+    display: none !important;
     visibility: hidden;
     transition: all 0.3s ease;
     transform: translateY(10px);
@@ -561,4 +590,104 @@ body {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+/*大图库相关样式*/
+#upload-container {
+    display: flex;
+    align-items: center;
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+#upload-frame {
+    margin-left: 15%;
+    width: 70%;
+    height: 150px;
+    border: 2px dashed var(--color-slim-font-black); /* 虚线边框 */
+    border-radius: var(--radius-sm); /* 圆角 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative; /* 为子元素定位 */
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+#upload-frame:hover {
+    border-color: var(--color-border);
+}
+
+#pic-upload {
+    display: none;
+}
+
+#upload-button-area {
+    margin-left: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+#upload-button-area button {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--text-md);
+    color: whitesmoke;
+    background-color: var(--color-primary-boy);
+    border: none;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.3s ease;
+}
+
+#upload-button-area button:hover {
+    background-color: var(--color-primary-boy);
+    box-shadow: 0 var(--space-xs) var(--space-xs) var(--color-shadow-light);
+}
+
+/* 设置图库容器的样式 */
+#gallery-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* 使图片在容器中均匀居中 */
+    gap: 20px; /* 设置图片之间的间距 */
+    padding: 20px; /* 设置容器的内边距 */
+}
+
+/* 设置每个图片容器的样式 */
+.pic-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white; /* 白色背景画框 */
+    padding: 10px; /* 设置画框的内边距 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+    border-radius: 8px; /* 设置画框的圆角 */
+}
+
+/* 设置图片背景的样式 */
+.pic-background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px; /* 设置画框的宽度 */
+    height: 150px; /* 设置画框的高度 */
+    background-color: #f0f0f0; /* 设置图片背景颜色 */
+    border-radius: 4px; /* 设置图片背景的圆角 */
+}
+
+/* 设置图片的样式 */
+.pic-background img {
+    max-width: 100%; /* 图片最大宽度为画框宽度 */
+    max-height: 100%; /* 图片最大高度为画框高度 */
+    object-fit: contain; /* 保持图片原比例 */
+    border-radius: 4px; /* 设置图片的圆角 */
+}
+
+/* 设置图片编号的样式 */
+.pic-container p {
+    margin-top: 10px; /* 设置编号与画框的距离 */
+    margin-bottom: 0;
+    font-size: 14px; /* 设置编号的字体大小 */
+    color: #333; /* 设置编号的字体颜色 */
 }
