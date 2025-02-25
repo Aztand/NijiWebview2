@@ -601,6 +601,7 @@ window.addEventListener('pageshow', function(e) {//监听页面刷新
 
 let userId = "";
 let port = "";
+let uploadPort = "";
 let pairedId = "";
 let pairedGenderHan = "";
 
@@ -618,6 +619,9 @@ window.setUserId = function(e){
 }
 window.setPort = function(e){
     port = e;
+}
+window.setUploadPort = function(e){
+    uploadPort = e;
 }
 window.setPairedId = function(e){
     pairedId = e;
@@ -730,7 +734,7 @@ function uploadFile(file) {
     formData.append('file', file); // 将文件添加到 FormData
 
     // 使用 Fetch API 上传文件
-    fetch(`http://127.0.0.1:${port}/upload/`, { // 替换为你的上传接口 URL
+    fetch(`http://127.0.0.1:${uploadPort}/upload/`, {
         method: 'POST',
         body: formData
     })

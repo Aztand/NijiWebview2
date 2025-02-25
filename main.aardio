@@ -35,9 +35,8 @@ loginGo = "";
 token = "";
 
 NijiDocPath = io.getSpecial(0x05/*即文档文件夹*/) + "\你的日记\";
-port = "";
 
-thread.invoke(function(NijiDocPath,mainForm){
+thread.invoke(function(NijiDocPath,mainForm){	//看图服务器。
 	import wsock.tcp.simpleHttpServer;
 	var imgServer = wsock.tcp.simpleHttpServer("127.0.0.1");
 
@@ -46,13 +45,36 @@ thread.invoke(function(NijiDocPath,mainForm){
 	
 	imgServer.run( 
 	    function(response,request,session){ 
-
+			
 	   		response.loadcode( request.path );	
 
 	    }
 	);
 	
 },NijiDocPath,mainForm);
+
+uploadServer = wsock.tcp.asynHttpServer();
+uploadServer.run( {
+
+	//自定义某个路径的响应程序
+	["/upload/main.aardio"] = function(response,request,session){ 
+			fileData = request.postFileData()
+			console.dump(fileData)
+			if(fileData){
+				io.createDir(io.joinpath(NijiDocPath,"upload_temp"))
+				var fileName = io.joinpath(NijiDocPath,"upload_temp",fileData.file.filename) 
+				var ok,err = fileData.file.save(fileName); 
+				if(!ok){ response.error(err); }
+
+				response.contentType = "text/plain";
+				response.write("/upload_temp/",fileData.file.filename)
+				return response.close() 
+			} 		
+    }
+    
+    //表里找不到的路径，仍然会正常访问存在的文件（支持资源文件）	
+} );
+_,uploadPort = uploadServer.getLocalIp();
 
 
 zh = string.chineseNumber(); 
@@ -256,7 +278,9 @@ v2sync = function(){
 	userID = diaryResponse["user_config"]["userid"];	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
 	wb.invoke('setUserId' , userID);	//html方面全局变量，主要用于新建空白日记以及图片索引。匹配对象的id在下面设置。
 	if(mainForm.port.text != "close"){
-		wb.invoke('setPort' , mainForm.port.text ); };	
+		wb.invoke('setPort' , mainForm.port.text ); 
+	}
+	wb.invoke('setUploadPort', uploadPort );	
 	wb.invoke('setUserColor' , diaryResponse["user_config"]["role"] , diaryResponse["user_config"]["paired_user_config"]["role"] || null);	//主题色，包括三个悬浮按钮以及简介用户名
 	var pairedInfo = "";
 	//————————————————————————————————只有匹配状况是情况比较多，需要专门计算一下。别的稍微链接字符串就可以加入右上角个人信息卡片
