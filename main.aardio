@@ -2,7 +2,7 @@ import win.ui;
 import web.view;
 import web.rest.jsonLiteClient;
 import web.json;
-import wsock.tcp.asynHttpServer;	
+import wsock.tcp.asynHttpServer;
 import console;
 import string.chineseNumber;
 import fsys.version;
@@ -39,8 +39,10 @@ thread.invoke(function(NijiDocPath,mainForm){
 	
 	imgServer.run( 
 	    function(response,request,session){ 
-	         response.loadcode( request.path );
-	    } 	
+
+	   		response.loadcode( request.path );	
+
+	    }
 	);
 	
 },NijiDocPath,mainForm);
@@ -176,7 +178,7 @@ v2sync = function(){
     		readmark_ts = 0,
     		images_ts = 0
     );
-    
+   	thread.delay(2000);//删了它编译出的exe运行有问题
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
 	if(diaryResponse["user_config"]["is_member"]){	//只为pro用户下载图片，节约服务器带宽。
 		thread.invoke( 		//为自己下图
@@ -240,12 +242,11 @@ v2sync = function(){
 		}
 	}
 		
-	
 	userID = diaryResponse["user_config"]["userid"];	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
+	wb.invoke('setUserId' , userID);	//html方面全局变量，主要用于新建空白日记以及图片索引。匹配对象的id在下面设置。
 	if(mainForm.port.text != "close"){
 		wb.invoke('setPort' , mainForm.port.text ); };	
 	wb.invoke('setUserColor' , diaryResponse["user_config"]["role"]);	//主题色，包括三个悬浮按钮以及简介用户名
-	wb.invoke('setUserId' , diaryResponse["user_config"]["userid"]);	//html方面全局变量，主要用于新建空白日记以及图片索引。匹配对象的id在下面设置。
 	var pairedInfo = "";
 	//————————————————————————————————只有匹配状况是情况比较多，需要专门计算一下。别的稍微链接字符串就可以加入右上角个人信息卡片
 	if(diaryResponse["user_config"]["paired"]){

@@ -694,3 +694,28 @@ picLsIcon.addEventListener('click', () => switchPage('gallery'));
 // 初始化模式
 switchMode('preview');
 switchPage('diary');
+
+document.getElementById('pic-upload').addEventListener('change', function(event) {   //用户在图库选择上传文件时，先自动上传到本地服务端。再由aardio后台压图、上传你记服务器。
+    const file = event.target.files[0]; // 获取用户选择的文件
+    if (file) {
+        uploadFile(file); // 调用上传函数
+    }
+});
+
+function uploadFile(file) {
+    const formData = new FormData(); // 创建 FormData 对象
+    formData.append('file', file); // 将文件添加到 FormData
+
+    // 使用 Fetch API 上传文件
+    fetch(`http://127.0.0.1:${port}/upload/`, { // 替换为你的上传接口 URL
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Upload successful:', data);
+    })
+    .catch(error => {
+        console.error('Upload failed:', error);
+    });
+}

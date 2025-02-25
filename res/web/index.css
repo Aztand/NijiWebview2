@@ -63,6 +63,7 @@ body {
 
 .right-page {
     height: 100vh;
+    overflow-y: auto;
 }
 
 #right-diary {
@@ -686,6 +687,7 @@ body {
 /* 设置图片编号的样式 */
 .pic-container p {
     margin-top: 10px; /* 设置编号与画框的距离 */
+    margin-bottom: 0;
     font-size: 14px; /* 设置编号的字体大小 */
     color: #333; /* 设置编号的字体颜色 */
 }
