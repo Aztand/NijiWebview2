@@ -261,8 +261,19 @@ window.writeDiary = async function() {
                 cardReadmark: 0,
             };
 
-                // 将新日记卡片插入到左侧列表顶部
-                addDiaryCard(newDiaryCardData);
+            // 将新日记卡片插入到左侧列表顶部
+            addDiaryCard(newDiaryCardData);
+
+            //切换卡片列表选中卡片
+            const currentDiaryCard = document.getElementById(writePage.dataset.currentDiaryId)
+            const targetCard = document.getElementById(result.newDiaryId);
+                
+            currentDiaryCard ? currentDiaryCard.style.backgroundColor = "var(--color-bg-element)" : null;     //当前卡片切换回默认样式
+            currentDiaryCard ? currentDiaryCard.style.opacity = "1" : null;     //当前卡片切换回默认样式
+            currentDiaryCard ? currentDiaryCard.classList.toggle(`card-${currentDiaryCard.getAttribute('owner')}`) : null;
+            targetCard.style.backgroundColor = `var(--color-${targetCard.getAttribute('owner')})`;  //新打开的卡片切换到选中样式
+            targetCard.style.opacity = "0.85";  //颜色淡一点会比较舒服。字体白色，所以直接设置透明度即可
+            targetCard.classList.toggle(`card-${targetCard.getAttribute('owner')}`);
 
                 // 更新当前日记ID
             writePage.dataset.currentDiaryId = result.newDiaryId;
@@ -438,6 +449,12 @@ document.getElementById('newMenuButton').addEventListener('click', async () => {
             if (choice === 'save' && !await window.writeDiary()) return false;
         }
 
+        //取消卡片列表选择
+        const currentDiaryCard = document.getElementById(writePage.dataset.currentDiaryId)
+        currentDiaryCard ? currentDiaryCard.style.backgroundColor = "var(--color-bg-element)" : null;     //当前卡片切换回默认样式
+        currentDiaryCard ? currentDiaryCard.style.opacity = "1" : null;     //当前卡片切换回默认样式
+        currentDiaryCard ? currentDiaryCard.classList.toggle(`card-${currentDiaryCard.getAttribute('owner')}`) : null;
+
         // 执行切换
         writePage.dataset.currentUserId = String(userId);  // 新增当前用户标记
         writePage.dataset.currentDiaryId = ""; // 清空当前日记标识
@@ -578,7 +595,7 @@ window.addEventListener('beforeunload', function(e) {//阻止返回上一页面
 
 window.addEventListener('pageshow', function(e) {//监听页面刷新
     // if (performance.navigation.type === 1) {//performance.navigation.type 的值可以为以下几种：0：表示页面是通过点击链接、表单提交等方式加载的。1：表示页面是通过刷新加载的。2：表示页面是通过“前进”或“后退”按钮加载的。
-        aardio.refreshPage();
+        aardio.loadPage();
     // }
 });
 

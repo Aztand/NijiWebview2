@@ -15,7 +15,6 @@ import debug.log;
 debug.log.setPath("/.config/log.txt");
 debug.log.checkSize(0x20000); //设置日志大小
 */
-
 /*DSG{{*/
 mainForm = win.form(text="你的日记";right=1480;bottom=1001;edge=1;maximize=1)
 mainForm.add(
@@ -257,7 +256,7 @@ v2sync = function(){
 	wb.invoke('setUserId' , userID);	//html方面全局变量，主要用于新建空白日记以及图片索引。匹配对象的id在下面设置。
 	if(mainForm.port.text != "close"){
 		wb.invoke('setPort' , mainForm.port.text ); };	
-	wb.invoke('setUserColor' , diaryResponse["user_config"]["role"]);	//主题色，包括三个悬浮按钮以及简介用户名
+	wb.invoke('setUserColor' , diaryResponse["user_config"]["role"] , diaryResponse["user_config"]["paired_user_config"]["role"] || null);	//主题色，包括三个悬浮按钮以及简介用户名
 	var pairedInfo = "";
 	//————————————————————————————————只有匹配状况是情况比较多，需要专门计算一下。别的稍微链接字符串就可以加入右上角个人信息卡片
 	if(diaryResponse["user_config"]["paired"]){
@@ -363,7 +362,7 @@ wb.external = {
 		cfg.token.token = ""
 	}
 	
-	refreshPage = function(){
+	loadPage = function(){
 		v2sync();
 	}
 	
