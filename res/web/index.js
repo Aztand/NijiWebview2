@@ -137,7 +137,7 @@ window.addDiaryCard = (data) => {
         const elDateObj = new Date(elDate);
 
         const isSameDay = elDateObj.getTime() === dateObj.getTime();
-        const userIdMismatch = elUserId !== userId;
+        const userIdMismatch = elUserId !== String(userId);
 
         return (isSameDay && userIdMismatch) || elDateObj < dateObj;
     });
@@ -577,9 +577,9 @@ window.addEventListener('beforeunload', function(e) {//阻止返回上一页面
 });
 
 window.addEventListener('pageshow', function(e) {//监听页面刷新
-    if (performance.navigation.type === 1) {//performance.navigation.type 的值可以为以下几种：0：表示页面是通过点击链接、表单提交等方式加载的。1：表示页面是通过刷新加载的。2：表示页面是通过“前进”或“后退”按钮加载的。
+    // if (performance.navigation.type === 1) {//performance.navigation.type 的值可以为以下几种：0：表示页面是通过点击链接、表单提交等方式加载的。1：表示页面是通过刷新加载的。2：表示页面是通过“前进”或“后退”按钮加载的。
         aardio.refreshPage();
-    }
+    // }
 });
 
 let userId = "";

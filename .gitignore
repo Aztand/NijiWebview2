@@ -1,6 +1,7 @@
 # 忽略 .history 文件夹
 .history/
 .build/
+.config/
 dist/
 
 *.tmp
