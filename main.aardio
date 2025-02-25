@@ -475,8 +475,6 @@ if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token
 	}
 }
 
-mainForm.hitMax();
-
 //*
 versionObj = fsys.version.getInfo(io._exepath);		//版本更新相关
 currentVersion = string.join({versionObj.productVersion.major; versionObj.productVersion.minor; versionObj.productVersion.build;}, ".")
