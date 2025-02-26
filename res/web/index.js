@@ -779,7 +779,9 @@ window.addUploadPreview = (uploadNum) => {
     const clone = document.importNode(template, true);
 
     // 替换占位符
-    clone.querySelector('img').id = `preview-${uploadNum}`;
+    clone.querySelector('.preview-container').id = `preview-${uploadNum}`;
+    clone.querySelector('.preview-container').dataset.num = uploadNum;
+    clone.querySelector('span').setAttribute('onclick', `removePreview('preview-${uploadNum}')`)
     clone.querySelector('img').src = `http://127.0.0.1:${port}/upload_temp/${uploadNum}.jpg`;
 
     // 插入到 gallery-container 中
@@ -808,10 +810,19 @@ window.addPicture = (picNum) => {
     }
 }
 
-window.delUploadPreview = (previewNum) => {
+function removePreview(previewId) {         //用于前端主动叉掉图像并且清除后端列表
+    const previewElement = document.getElementById(previewId);
+    if (previewElement) {
+        var previewNum = previewElement.dataset.num;
+        aardio.removePreview(previewNum);
+        delUploadPreview(previewNum);
+    }
+}
+
+window.delUploadPreview = (previewNum) => { //用于服务端上传成功后删除前端预览
     const previewList = document.getElementById('upload-preview-list');
-    const previewPic = document.getElementById(`preview-${previewNum}`);
-    previewPic.remove();
+    const previewContainer = document.getElementById(`preview-${previewNum}`);
+    previewContainer.remove();
     if(previewList.querySelectorAll('img').length == 0){
         previewList.classList.add('hidden');
     }

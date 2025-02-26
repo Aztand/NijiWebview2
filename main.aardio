@@ -263,6 +263,9 @@ v2sync = function(){
 	uploadTmpNum = 1;
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
 	if(isMember){	//只为pro用户下载图片，节约服务器带宽。
+	
+		wb.invoke('document.getElementById("pro-tag").classList.remove("hidden")');
+		
 		thread.invoke( 		//为自己下图
 			function( diaryResponse,NijiDocPath,token,wb ){
 				import web.rest.jsonLiteClient;
@@ -536,6 +539,13 @@ wb.external = {
 		uploadTmpNum = 1;
 	}
 	
+	removePreview = function(previewNum){
+		previewNum = tonumber(previewNum);
+		
+		table.removeByValue(uploadTmpTable,previewNum);
+		io.remove(io.joinpath(NijiDocPath,"upload_temp", previewNum + ".jpg"));
+		
+	}
 	
 };//wb.external结束
 

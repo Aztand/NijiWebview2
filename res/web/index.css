@@ -513,8 +513,21 @@ body {
 
 #user-info-card h3 {
     margin: 0;
+    display: inline-flex;
     color: var(--color-self);
     font-size: var(--text-md);
+}
+
+#pro-tag{
+    display: inline-flex;
+    background-color: var(--color-pro-gold);
+    color: white;
+    margin-left: var(--space-sm);
+    border-radius: var(--radius-sm);
+    padding-left: var(--space-xs);
+    padding-right: var(--space-xs);
+    padding-top: 0;
+    padding-bottom: var(--space-xxs);
 }
 
 #user-info-card p {
@@ -683,17 +696,41 @@ body {
     gap: 10px; /* 图片之间的间距 */
     margin-left: 15%;
     width: 70%;
-    height: 100px;
+    height: 110px;
     background-color: #ffe9a7; /* 背景颜色 */
     border-radius: 8px; /* 圆角 */
     margin-top: 20px; /* 上边距 */
+    overflow-y: hidden;
 }
+
+.preview-container {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 0px;
+    color: black;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 900;
+}
+
 
 /* 预览图像的样式 */
 .upload-preview {
     width: 80px; /* 预览图像的宽度 */
     height: 80px; /* 预览图像的高度 */
     margin-top: 10px;
+    display: block;
     object-fit: cover; /* 保持图像比例并填充容器 */
     border-radius: 6px; /* 圆角 */
     border: 2px solid #ddd; /* 边框 */

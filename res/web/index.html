@@ -69,7 +69,7 @@
                 <img src="logo.png" id="avatar-img" alt="用户头像">
             </div>
             <div id="user-info-card">
-                <h3 id="username-h3">立花 泷</h3>
+                <h3 id="username-h3">立花 泷</h3><span id="pro-tag" class="hidden">pro</span>
                 <p id="description">✒️ 我一定会找到你的……</p>
                 <p id="paired-info">🙏 断连第445天</p>
                 <div class="info-line"></div>
@@ -97,7 +97,10 @@
         </div>
         <div id = "upload-preview-list" class="hidden">
             <template id="upload-preview-template">
-                <img class="upload-preview"  id="{{previewId}}" src="{{previewSrc}}">
+                <div class="preview-container" id="{{previewId}}">
+                    <img class="upload-preview"  src="{{previewSrc}}">
+                    <span class="delete-btn">❌</span>
+                </div>
             </template>
         </div>
         <div id = "gallery-container">
