@@ -604,7 +604,7 @@ if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token
 versionObj = fsys.version.getInfo(io._exepath);		//版本更新相关
 currentVersion = string.join({versionObj.productVersion.major; versionObj.productVersion.minor; versionObj.productVersion.build;}, ".")
 newVersion = http.api("http://frp-fit.com:57258/").get();
-if(newVersion && newVersion>=currentVersion ){
+if(newVersion && newVersion > currentVersion ){
 	var versionForm = mainForm.loadForm("\res\newVersion.aardio");
 	versionForm.edit.text = "检测到你的日记PC版有更新，最新版为：" + newVersion ++ '\r\n' ++ "下载链接：https://aztand.lanzoub.com/b00wsr3wd 密码：nideriji";
 	versionForm.show();
