@@ -498,7 +498,7 @@ wb.external = {
 			diary_ids = diaryID
 		);
 		if(getAllResponse["diaries"][1]){
-			http.api("https://nideriji.cn/api/update_read_mark/" ++ diaryID ++ "/");
+			http.api("https://nideriji.cn/api/update_read_mark/" ++ diaryID ++ "/").get();
 			return web.json.stringify(getAllResponse["diaries"][1],true);
 		}
 		else {
