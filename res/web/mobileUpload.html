@@ -51,7 +51,7 @@
     <body>
         <div class="container">
             <button id="fileButton">选择文件</button>
-            <input type="file" id="fileInput" style="display: none;" accept="image/*">
+            <input type="file" id="fileInput" style="display: none;" accept="image/*" multiple>
         </div>
 
         <script>
@@ -70,15 +70,13 @@ fileButton.addEventListener('click', () => {
 });
 // 文件选择后的处理
 fileInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        // 在这里实现文件上传逻辑
-        console.log(`已选择文件: ${file.name}`);
-        await uploadFile(file); // 假设 uploadFile 是上传函数
+    const files = event.target.files;
 
-        // 上传完成后，继续打开文件选择器
-        openFilePicker();
-    }
+    // 遍历文件并逐个上传
+    Array.from(files).forEach(file => {
+        uploadFile(file); // 调用上传函数
+    });
+    openFilePicker();
 });
 
 function uploadFile(file) {

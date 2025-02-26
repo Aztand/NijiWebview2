@@ -713,10 +713,13 @@ switchMode('preview');
 switchPage('diary');
 
 document.getElementById('pic-upload').addEventListener('change', function(event) {   //用户在图库选择上传文件时，先自动上传到本地服务端。再由aardio后台压图、上传你记服务器。
-    const file = event.target.files[0]; // 获取用户选择的文件
-    if (file) {
+    // 获取用户选择的所有文件
+    const files = event.target.files;
+
+    // 遍历文件并逐个上传
+    Array.from(files).forEach(file => {
         uploadFile(file); // 调用上传函数
-    }
+    });
 });
 
 function uploadFile(file) {
