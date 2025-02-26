@@ -626,6 +626,7 @@ body {
 #upload-button-area {
     margin-left: var(--space-md);
     display: flex;
+    position: relative;
     flex-direction: column;
     gap: var(--space-md);
 }
@@ -643,6 +644,35 @@ body {
 #upload-button-area button:hover {
     background-color: var(--color-primary-boy);
     box-shadow: 0 var(--space-xs) var(--space-xs) var(--color-shadow-light);
+}
+
+#QRcode-card {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 256px;
+    height: 266px;
+    background: var(--color-bg-element);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 12px var(--color-shadow-medium);
+    padding: var(--space-md);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    transform: translateY(-10px);
+    text-align: center;
+}
+
+#QRcode-card img {
+    margin: 5%;
+    width: 90%;
+    height: 90%;
+}
+
+#QRcode-btn:hover + #QRcode-card {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 /* 预览列表容器的样式 */

@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <style>
+            /* 重置默认样式 */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            /* 设置页面背景和居中容器 */
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background-color: #f0f0f0;
+                font-family: Arial, sans-serif;
+            }
+
+            /* 容器样式 */
+            .container {
+                text-align: center;
+            }
+
+            /* 按钮样式 */
+            #fileButton {
+                padding: 20px 40px;
+                font-size: 24px;
+                color: #fff;
+                background-color: #007bff;
+                border: none;
+                border-radius: 15px;
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            /* 按钮悬停效果 */
+            #fileButton:hover {
+                background-color: #0056b3;
+                transform: scale(1.05);
+            }
+
+            /* 按钮点击效果 */
+            #fileButton:active {
+                transform: scale(0.95);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <button id="fileButton">选择文件</button>
+            <input type="file" id="fileInput" style="display: none;" accept="image/*">
+        </div>
+
+        <script>
+// 获取按钮和文件输入元素
+const fileButton = document.getElementById('fileButton');
+const fileInput = document.getElementById('fileInput');
+
+// 自动触发文件选择器
+function openFilePicker() {
+    fileInput.click();
+}
+
+// 点击按钮时触发文件选择器
+fileButton.addEventListener('click', () => {
+    fileInput.click();
+});
+// 文件选择后的处理
+fileInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        // 在这里实现文件上传逻辑
+        console.log(`已选择文件: ${file.name}`);
+        await uploadFile(file); // 假设 uploadFile 是上传函数
+
+        // 上传完成后，继续打开文件选择器
+        openFilePicker();
+    }
+});
+
+function uploadFile(file) {
+    const formData = new FormData(); // 创建 FormData 对象
+    formData.append('file', file); // 将文件添加到 FormData
+
+    // 使用 Fetch API 上传文件
+    fetch(`../upload/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json()) // 解析 JSON 数据
+    .then(data => null)   // 处理数据
+    .catch(error => console.error('Error:', error)); // 错误处理
+}
+
+// 页面加载后自动打开文件选择器
+window.addEventListener('load', () => {
+    openFilePicker();
+});
+        </script>
+    </body>
+</html>

@@ -10,7 +10,7 @@ import fsys.version;
 import fsys.config;
 import win.ui.minmax;
 import process.ffmpeg
-
+import qrencode.bitmap
 /*
 import debug;
 import debug.log;
@@ -35,19 +35,25 @@ wb = web.view(mainForm,{
         };});
 loginGo = "";
 token = "";
+uploadIP = "";
 isMember = false;
 
 NijiDocPath = io.getSpecial(0x05/*即文档文件夹*/) + "\你的日记\";
 
 thread.invoke(function(NijiDocPath,mainForm){	//看图服务器。
 	import wsock.tcp.simpleHttpServer;
-	var imgServer = wsock.tcp.simpleHttpServer("127.0.0.1");
-
+	var imgServer = wsock.tcp.simpleHttpServer();
+	var threadIp;
+	var threadPort;
 	_,mainForm.port.text = imgServer.getLocalIp();//会return ip,port两个返回值，所以用下划线占位ip。
 	imgServer.documentRoot = NijiDocPath
 	
 	imgServer.run( 
 	    function(response,request,session){ 
+			//添加禁止缓存的HTTP头
+			response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+			response.headers["Pragma"] = "no-cache";
+			response.headers["Expires"] = "0";
 			
 	   		response.loadcode( request.path );	
 
@@ -59,6 +65,7 @@ thread.invoke(function(NijiDocPath,mainForm){	//看图服务器。
 uploadTmpTable = {};	//图片列表
 uploadTmpNum = 1;	//缓存图片编号
 uploadServer = wsock.tcp.asynHttpServer();
+
 uploadServer.run( {
 
 	//自定义某个路径的响应程序
@@ -101,9 +108,23 @@ uploadServer.run( {
 			} 		
     }
     
+    ["/mobileUpload/main.aardio"] = function(response,request,session){
+		//添加禁止缓存的HTTP头
+		response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+		response.headers["Pragma"] = "no-cache";
+		response.headers["Expires"] = "0";
+    	
+    	response.loadcode("/res/web/mobileUpload.html");
+    }
+    
+    
     //表里找不到的路径，仍然会正常访问存在的文件（支持资源文件）	
 } );
-_,uploadPort = uploadServer.getLocalIp();
+uploadIP = uploadServer.getUrl( , true);
+_,uploadPort = uploadServer.getLocalIp();	//快传二维码
+QRcodeURL = uploadIP + "/mobileUpload/";
+QRobj = qrencode.bitmap( QRcodeURL );
+QRobj.copyBitmap( 512 ).save( io.joinpath(NijiDocPath,"upload_temp","QRcode.jpg") , 512 )
 
 
 zh = string.chineseNumber(); 
@@ -238,6 +259,8 @@ v2sync = function(){
     );
     
     isMember = diaryResponse["user_config"]["is_member"];
+    uploadTmpTable = {};	//清空上传图片相关的缓存
+	uploadTmpNum = 1;
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
 	if(isMember){	//只为pro用户下载图片，节约服务器带宽。
 		thread.invoke( 		//为自己下图
@@ -308,9 +331,12 @@ v2sync = function(){
 		
 	userID = diaryResponse["user_config"]["userid"];	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
 	wb.invoke('setUserId' , userID);	//html方面全局变量，主要用于新建空白日记以及图片索引。匹配对象的id在下面设置。
+	
+	//为html传输看图端口
 	if(mainForm.port.text != "close"){
 		wb.invoke('setPort' , mainForm.port.text ); 
 	}
+	
 	wb.invoke('setUploadPort', uploadPort );	
 	wb.invoke('setUserColor' , diaryResponse["user_config"]["role"] , diaryResponse["user_config"]["paired_user_config"]["role"] || null);	//主题色，包括三个悬浮按钮以及简介用户名
 	var pairedInfo = "";

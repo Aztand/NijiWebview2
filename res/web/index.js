@@ -606,6 +606,7 @@ window.setUserId = function(e){
 }
 window.setPort = function(e){
     port = e;
+    document.getElementById("QRcode-img").src = `http://127.0.0.1:${port}/upload_temp/QRcode.jpg`
 }
 window.setUploadPort = function(e){
     uploadPort = e;
@@ -786,3 +787,37 @@ document.getElementById('upload-btn').addEventListener('click', async () => {   
         alert("因为服务器成本过高，\n图片功能仅对pro用户开放");
     }
 });
+
+
+//自动重载加载失败的图片——————————————————————————————————————————————————————————————————————
+function handleImageError(img) {
+    const src = img.src;
+    img.src = ''; // 清空src，触发重新加载
+    img.src = src;
+}
+
+// 为所有图片添加错误事件监听器
+function addErrorListeners() {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.addEventListener('error', () => handleImageError(img));
+    });
+}
+
+// 监听DOM变化，确保动态插入的图片也能被处理
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+            if (node.tagName === 'IMG') {
+                node.addEventListener('error', () => handleImageError(node));
+            }
+        });
+    });
+});
+
+// 开始观察整个文档的DOM变化
+observer.observe(document.body, { childList: true, subtree: true });
+
+// 初始时，为所有已存在的图片添加错误事件监听器
+addErrorListeners();
+//———————————————————————————————————————————————————————————————————————————————————————————
