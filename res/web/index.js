@@ -135,11 +135,12 @@ window.addDiaryCard = (data) => {
         const elDate = el.dataset?.createdDate;
         const elUserId = el.dataset?.userId;
         const elDateObj = new Date(elDate);
+        const isMonth = el.classList.contains("month-text");
 
         const isSameDay = elDateObj.getTime() === dateObj.getTime();
         const userIdMismatch = elUserId !== String(userId);
 
-        return (isSameDay && userIdMismatch) || elDateObj < dateObj;
+        return (isSameDay && userIdMismatch && !isMonth) || elDateObj < dateObj;
     });
 
     insertPos ? insertPos.before(cardEl) 
@@ -731,6 +732,40 @@ function uploadFile(file) {
     .then(data => null)   // 处理数据
     .catch(error => console.error('Error:', error)); // 错误处理
 }
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const uploadFrame = document.getElementById('upload-frame');
+
+    // 添加拖拽事件监听器
+    uploadFrame.addEventListener('dragover', (e) => {
+        e.preventDefault(); // 阻止默认行为
+    });
+
+    uploadFrame.addEventListener('dragleave', (e) => {
+        e.preventDefault(); // 阻止默认行为
+    });
+
+    uploadFrame.addEventListener('drop', (e) => {
+        e.preventDefault(); // 阻止默认行为
+
+        // 获取拖拽的文件
+        const files = e.dataTransfer.files;
+        // 遍历文件并上传
+        Array.from(files).forEach(file => {
+            uploadFile(file);
+        });
+    });
+
+    // 确保其他元素不会干扰拖拽上传
+    document.body.addEventListener('dragover', (e) => {
+        e.preventDefault(); // 阻止默认行为
+    });
+
+    document.body.addEventListener('drop', (e) => {
+        e.preventDefault(); // 阻止默认行为
+    });
+});
+
 
 window.addUploadPreview = (uploadNum) => {
     // 获取模板
