@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project ver="10" name="你的日记" libEmbed="true" icon="res\logo.ico" ui="win" output="你的日记.exe" CompanyName="" FileDescription="你的日记" LegalCopyright="Copyright (C) 榇肆 2025" ProductName="你的日记" InternalName="你的日记" FileVersion="0.1.5" ProductVersion="0.1.5" publishDir="/dist/" dstrip="false" local="false" ignored="false">
+<project ver="10" name="你的日记" libEmbed="true" icon="res\logo.ico" ui="win" output="你的日记.exe" CompanyName="" FileDescription="你的日记" LegalCopyright="Copyright (C) 榇肆 2025" ProductName="你的日记" InternalName="你的日记" FileVersion="0.2.0" ProductVersion="0.2.0" publishDir="/dist/" dstrip="false" local="false" ignored="false">
 	<file name="main.aardio" path="main.aardio" comment="main.aardio"/>
 	<folder name="资源文件" path="res" embed="true" local="false" ignored="false">
 		<file name="logo.ico" path="res\logo.ico" comment="res\logo.ico"/>
-		<folder name="web" path="res\web" comment="res\web">
+		<folder name="web" path="res\web" comment="res\web" local="false" embed="false" ignored="false">
 			<file name="bg.png" path="res\web\bg.png" comment="res\web\bg.png"/>
 			<file name="delete.svg" path="res\web\delete.svg" comment="res\web\delete.svg"/>
 			<file name="index.css" path="res\web\index.css" comment="res\web\index.css"/>
@@ -18,6 +18,7 @@
 			<file name="treehole.jpg" path="res\web\treehole.jpg" comment="res\web\treehole.jpg"/>
 			<file name="treehole.png" path="res\web\treehole.png" comment="res\web\treehole.png"/>
 			<file name="write.svg" path="res\web\write.svg" comment="res\web\write.svg"/>
+			<file name="mobileUpload.html" path="res\web\mobileUpload.html" comment="res\web\mobileUpload.html"/>
 		</folder>
 	</folder>
 	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">
