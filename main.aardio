@@ -80,28 +80,21 @@ uploadServer.run( {
 			fileData = request.postFileData()
 			//console.open()
 			if(fileData){
-				io.createDir(io.joinpath(NijiDocPath,"upload_temp"))
+				
+				var outputDir = io.joinpath(NijiDocPath, "upload_temp");
+				io.createDir(outputDir);
+				
 				var fileName = io.joinpath(NijiDocPath,"upload_temp",uploadTmpNum + '.jpg') 
-				var ok,err = fileData.file.save(fileName); 
-				if(ok){
+				var image_object = gdip.image(fileData.file.value());
+				if(image_object){
 					// 压图！防止你记服务器爆炸
-					var outputDir = io.joinpath(NijiDocPath, "upload_temp");
-					var gdipObj = gdip.bitmap(fileName);
-					while(io.getSize(fileName) > 1000000){
-						gdipObj.resize( gdipObj.width * 0.9 , gdipObj.height * 0.9 );
-						gdipObj.save(fileName);
-						gdipObj = gdip.bitmap(fileName);
-					}/*
-					var ffmpegCmd = process.ffmpeg(
-    					outputDir, // 输出目录
-    					"-i", io.joinpath(outputDir, uploadTmpNum + ".jpg"), // 输入文件完整路径
-    					"-y", // 覆盖输出文件
-    					"-vf", "scale=min(iw\,1920):-1", //限制宽度最大1920px，高度按比例缩放
-    					"-q:v","85", // 视频质量参数(实际上处理图片时应使用图片参数)
-    					"-fs","1000K", // 限制文件大小
-    					io.joinpath(outputDir, uploadTmpNum + ".jpg") // 输出文件完整路径
-					);*/
 
+					temp_buffer = image_object.saveToBuffer();
+					image_object.save(fileName);
+					
+					while(string.bytes( temp_buffer ) > 1000000){
+						image_object.save(fileName,90);
+					}
 					response.contentType = "text/plain";
 					response.write(uploadTmpNum);
 					wb.invoke('addUploadPreview',uploadTmpNum);	//添加预览
