@@ -35,6 +35,7 @@ wb = web.view(mainForm,{
         };});
 loginGo = "";
 token = "";
+isMember = false;
 
 NijiDocPath = io.getSpecial(0x05/*即文档文件夹*/) + "\你的日记\";
 
@@ -235,8 +236,10 @@ v2sync = function(){
     		readmark_ts = 0,
     		images_ts = 0
     );
+    
+    isMember = diaryResponse["user_config"]["is_member"];
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
-	if(diaryResponse["user_config"]["is_member"]){	//只为pro用户下载图片，节约服务器带宽。
+	if(isMember){	//只为pro用户下载图片，节约服务器带宽。
 		thread.invoke( 		//为自己下图
 			function( diaryResponse,NijiDocPath,token,wb ){
 				import web.rest.jsonLiteClient;
@@ -476,6 +479,11 @@ wb.external = {
 	}
 	
 	uploadImage = function(/* 自动读取UploadTmpTable以及upload_temp下文件，所以无需参数 */){
+		
+		if(!isMember){
+			mainForm.msgbox("请开通会员后使用图片功能！");
+			return 0; 
+		}
 		
 		for(k,v in uploadTmpTable){
 			uploadApi = http.api("https://f.nideriji.cn/api/upload_image/");

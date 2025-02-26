@@ -590,6 +590,7 @@ let port = "";
 let uploadPort = "";
 let pairedId = "";
 let pairedGenderHan = "";
+let isMember = false;
 
 window.setPairedGender = function(e){
     if(e=="girl")
@@ -627,12 +628,13 @@ window.setUserColor = function(self,paired){
 
 }
 
-window.setUserInfoCard = function(username, description, pairedInfo, writeStatistic, isMember){
+window.setUserInfoCard = function(username, description, pairedInfo, writeStatistic, isMemberAar){
     document.getElementById("username-h3").textContent = username;
     document.getElementById("description").textContent = description;
     document.getElementById("paired-info").textContent = pairedInfo;
     document.getElementById("write-statistic").textContent = writeStatistic;
-    if(isMember){
+    if(isMemberAar){
+        isMember = true
         //alert("you are member!");
     }
         
@@ -775,3 +777,12 @@ window.delUploadPreview = (previewNum) => {
         previewList.classList.add('hidden');
     }
 }
+
+document.getElementById('upload-btn').addEventListener('click', async () => {     //上传图片按钮
+    if(isMember){
+        aardio.uploadImage();
+    }
+    else{
+        alert("因为服务器成本过高，\n图片功能仅对pro用户开放");
+    }
+});
