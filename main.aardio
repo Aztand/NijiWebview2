@@ -5,9 +5,11 @@ import web.json;
 import wsock.tcp.asynHttpServer;
 import console;
 import string.chineseNumber;
+import fsys;
 import fsys.version;
 import fsys.config;
 import win.ui.minmax;
+import process.ffmpeg
 
 /*
 import debug;
@@ -53,21 +55,47 @@ thread.invoke(function(NijiDocPath,mainForm){	//看图服务器。
 	
 },NijiDocPath,mainForm);
 
+uploadTmpTable = {};	//图片列表
+uploadTmpNum = 1;	//缓存图片编号
 uploadServer = wsock.tcp.asynHttpServer();
 uploadServer.run( {
 
 	//自定义某个路径的响应程序
 	["/upload/main.aardio"] = function(response,request,session){ 
+			//添加禁止缓存的HTTP头
+			response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+			response.headers["Pragma"] = "no-cache";
+			response.headers["Expires"] = "0";
+			
 			fileData = request.postFileData()
-			console.dump(fileData)
+			//console.open()
 			if(fileData){
 				io.createDir(io.joinpath(NijiDocPath,"upload_temp"))
-				var fileName = io.joinpath(NijiDocPath,"upload_temp",fileData.file.filename) 
+				var fileName = io.joinpath(NijiDocPath,"upload_temp",uploadTmpNum + '.jpg') 
 				var ok,err = fileData.file.save(fileName); 
-				if(!ok){ response.error(err); }
+				if(ok){
+					// 压图！防止你记服务器爆炸
+					var outputDir = io.joinpath(NijiDocPath, "upload_temp");
+					var ffmpegCmd = process.ffmpeg(
+    					outputDir, // 输出目录
+    					"-i", io.joinpath(outputDir, uploadTmpNum + ".jpg"), // 输入文件完整路径
+    					"-y", // 覆盖输出文件
+    					"-q:v","2", // 视频质量参数(实际上处理图片时应使用图片参数)
+    					"-fs","1M", // 限制文件大小
+    					io.joinpath(outputDir, uploadTmpNum + ".jpg") // 输出文件完整路径
+					);
 
-				response.contentType = "text/plain";
-				response.write("/upload_temp/",fileData.file.filename)
+					response.contentType = "text/plain";
+					response.write(uploadTmpNum);
+					wb.invoke('addUploadPreview',uploadTmpNum);	//添加预览
+					table.insert(uploadTmpTable,uploadTmpNum) ;	//添加表。用于上传。
+					uploadTmpNum++ ;
+				}
+				else {
+					response.error(err) 
+				}
+				
+
 				return response.close() 
 			} 		
     }
@@ -234,7 +262,7 @@ v2sync = function(){
 						}	
 					}
 					//为前端图库添加图片
-					for(i=picTotal;1;-1){
+					for(i=1;picTotal;1){
 						if(io.exist(NijiDocPath ++ userConfig.userid ++ "\" ++ i ++ ".jpg")){
 							wb.invoke("addPicture",i);
 						}	
@@ -425,7 +453,7 @@ wb.external = {
 	
 	deleteDiary = function(userID,diaryID){
 		delResponse = http.api("https://nideriji.cn/api/diary/delete/"++ diaryID ++ "/").get();
-		if(delResponse["error"] == 0){
+		if(delResponse["error"] != null ? delResponse["error"] == 0 : false/* 若不存在delR则直接报错 */){
 			return "Success"; 	
 		}
 		else {
@@ -446,6 +474,34 @@ wb.external = {
 		} 
 		
 	}
+	
+	uploadImage = function(/* 自动读取UploadTmpTable以及upload_temp下文件，所以无需参数 */){
+		
+		for(k,v in uploadTmpTable){
+			uploadApi = http.api("https://f.nideriji.cn/api/upload_image/");
+			uploadResponse = uploadApi.sendMultipartForm( { 
+				image = "@" + NijiDocPath + "\upload_temp\" + v + ".jpg";
+			});
+			if(uploadResponse["error"] != null){
+				if(uploadResponse["error"] == 0){
+					newPicId = uploadResponse["image_id"];
+					if(!io.exist(io.joinpath( NijiDocPath , userID )))
+						io.createDir(io.joinpath(NijiDocPath,userID));
+					fsys.move(io.joinpath(NijiDocPath,"upload_temp", v + ".jpg"),io.joinpath(NijiDocPath,userID,newPicId + ".jpg"));
+					wb.invoke("addPicture",newPicId);
+					wb.invoke("delUploadPreview",v);
+				}
+				else {
+					wb.invoke("alert","上传出错！");
+				}
+				
+			}
+		}
+		
+		uploadTmpTable = {};//重置初始化。
+		uploadTmpNum = 1;
+	}
+	
 	
 };//wb.external结束
 

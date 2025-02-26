@@ -645,6 +645,37 @@ body {
     box-shadow: 0 var(--space-xs) var(--space-xs) var(--color-shadow-light);
 }
 
+/* 预览列表容器的样式 */
+#upload-preview-list {
+    display: flex;
+    padding-left: 10px;
+    overflow-x: auto; /* 允许水平滚动 */
+    gap: 10px; /* 图片之间的间距 */
+    margin-left: 15%;
+    width: 70%;
+    height: 100px;
+    background-color: #ffe28a; /* 背景颜色 */
+    border-radius: 8px; /* 圆角 */
+    margin-top: 20px; /* 上边距 */
+}
+
+/* 预览图像的样式 */
+.upload-preview {
+    width: 80px; /* 预览图像的宽度 */
+    height: 80px; /* 预览图像的高度 */
+    margin-top: 10px;
+    object-fit: cover; /* 保持图像比例并填充容器 */
+    border-radius: 6px; /* 圆角 */
+    border: 2px solid #ddd; /* 边框 */
+    transition: transform 0.2s ease, border-color 0.2s ease; /* 过渡效果 */
+}
+
+/* 鼠标悬停时的效果 */
+.upload-preview:hover {
+    transform: scale(1.05); /* 放大效果 */
+    border-color: #007bff; /* 边框颜色变化 */
+}
+
 /* 设置图库容器的样式 */
 #gallery-container {
     display: flex;

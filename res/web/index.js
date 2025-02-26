@@ -165,22 +165,6 @@ window.addDiaryCard = (data) => {
 
 };
 
-window.addPicture = (picNum) => {
-    // 获取模板
-    const template = document.getElementById('pic-template').content;
-
-    // 克隆模板
-    const clone = document.importNode(template, true);
-
-    // 替换占位符
-    clone.querySelector('img').id = `pic-${picNum}`;
-    clone.querySelector('img').src = `http://127.0.0.1:${port}/${userId}/${picNum}.jpg`;
-    clone.querySelector('p').textContent = `图${picNum}`;
-
-    // 插入到 gallery-container 中
-    document.getElementById('gallery-container').appendChild(clone);
-}
-
 function getLastDayOfMonth(year, month) {//辅助addMonthCard设置月份虚拟日期
     // 设置下一个月的第一天
     const nextMonth = new Date(year, month, 1);
@@ -466,6 +450,8 @@ document.getElementById('newMenuButton').addEventListener('click', async () => {
         document.getElementById('title-input').value = '';
         document.getElementById('diary-input').value = '';
         document.getElementById('date-input').value = formattedDate;
+        wordCountText.textContent = `0字`;
+        readmarkText.textContent = '';
         // 设置编辑状态
         const isEditable = true; 
         writePage.dataset.editable = isEditable;
@@ -738,11 +724,54 @@ function uploadFile(file) {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Upload successful:', data);
-    })
-    .catch(error => {
-        console.error('Upload failed:', error);
-    });
+    .then(response => response.json()) // 解析 JSON 数据
+    .then(data => null)   // 处理数据
+    .catch(error => console.error('Error:', error)); // 错误处理
+}
+
+window.addUploadPreview = (uploadNum) => {
+    // 获取模板
+    const template = document.getElementById('upload-preview-template').content;
+    const previewList = document.getElementById('upload-preview-list');
+
+    // 克隆模板
+    const clone = document.importNode(template, true);
+
+    // 替换占位符
+    clone.querySelector('img').id = `preview-${uploadNum}`;
+    clone.querySelector('img').src = `http://127.0.0.1:${port}/upload_temp/${uploadNum}.jpg`;
+
+    // 插入到 gallery-container 中
+    previewList.classList.remove('hidden');
+    previewList.appendChild(clone);
+}
+
+window.addPicture = (picNum) => {
+    // 获取模板
+    const template = document.getElementById('pic-template').content;
+    // 克隆模板
+    const clone = document.importNode(template, true);
+    // 父元素
+    const parentElement = document.getElementById('gallery-container');
+
+    // 替换占位符
+    clone.querySelector('img').id = `pic-${picNum}`;
+    clone.querySelector('img').src = `http://127.0.0.1:${port}/${userId}/${picNum}.jpg`;
+    clone.querySelector('p').textContent = `图${picNum}`;
+
+    // 插入到 gallery-container 中
+    if (parentElement.firstChild) {
+        parentElement.insertBefore(clone, parentElement.firstChild);
+    } else {
+        parentElement.appendChild(clone);
+    }
+}
+
+window.delUploadPreview = (previewNum) => {
+    const previewList = document.getElementById('upload-preview-list');
+    const previewPic = document.getElementById(`preview-${previewNum}`);
+    previewPic.remove();
+    if(previewList.querySelectorAll('img').length == 0){
+        previewList.classList.add('hidden');
+    }
 }

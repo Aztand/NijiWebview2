@@ -84,14 +84,14 @@
         <div id = "upload-container">
             <div id = "upload-frame">
                 <label for="pic-upload" class="upload-prompt-text">点击文字或拖拽文件到这里上传</span>
-                <input type="file" id="pic-upload" multiple>
+                <input type="file" id="pic-upload" >
             </div>
             <div id = "upload-button-area">
-                <button id = "upload-btn">开始上传</button >
-                <button id = "QRcode-btn">扫码快传</button >
+                <button id = "upload-btn" onclick="aardio.uploadImage();">开始上传</button >
+                <button id = "QRcode-btn" onclick="alert('功能暂未实装！');">扫码快传</button >
             </div>
         </div>
-        <div id = "upload-preview-list">
+        <div id = "upload-preview-list" class="hidden">
             <template id="upload-preview-template">
                 <img class="upload-preview"  id="{{previewId}}" src="{{previewSrc}}">
             </template>
