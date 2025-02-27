@@ -266,7 +266,6 @@ v2sync = function(){
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
 	if(isMember){	//只为pro用户下载图片，节约服务器带宽。
 	
-		wb.invoke('document.getElementById("pro-tag").classList.remove("hidden")');
 		
 		thread.invoke( 		//为自己下图
 			function( diaryResponse,NijiDocPath,token,wb ){
@@ -391,10 +390,11 @@ v2sync = function(){
 	}
 	
 	if( diaryResponse["user_config"]["paired"] ){		//防止用户未连接虫洞
-		
-		pairedID = diaryResponse["user_config"]["paired_user_config"]["userid"];
+		pairedConfig = diaryResponse["user_config"]["paired_user_config"]
+		pairedID = pairedConfig["userid"];
 		wb.invoke('setPairedId', pairedID);				//设置网页PairedId
-		wb.invoke('setPairedGender', diaryResponse["user_config"]["paired_user_config"]["role"]);
+		//wb.invoke('setPairedGender', pairedConfig["role"]);
+		wb.invoke('setPairSpan', pairedConfig["role"], pairedConfig["name"]);
 		jLen = table.len(diaryResponse["diaries_paired"])
 		if(jLen){
 			j = 1
@@ -548,6 +548,17 @@ wb.external = {
 		io.remove(io.joinpath(NijiDocPath,"upload_temp", previewNum + ".jpg"));
 		
 	}
+	
+	unpair = function(){
+		unpairResp = http.api("https://nideriji.cn/api/unpair/").get();
+		if(unpairResp["error"] != null){
+			if(unpair["error"] == 0 ){
+				return "success"; 	
+			}
+		}
+		return "error"; 
+	}
+	
 	
 };//wb.external结束
 

@@ -832,10 +832,6 @@ body {
     margin: 0;
 }
 
-#paired-name-span {
-    color: var(--color-primary-girl);
-}
-
 #close-pair-btn {
     border: none;
     background-color: var(--color-primary-boy);
@@ -846,4 +842,7 @@ body {
     border-radius: var(--radius-sm);
     margin-left: 36%;
     margin-top: 20vh;
+}
+#close-pair-btn:hover {
+    box-shadow: 0px 4px 8px var(--color-shadow-light);;
 }

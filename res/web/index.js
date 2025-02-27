@@ -637,8 +637,15 @@ window.setUserInfoCard = function(username, description, pairedInfo, writeStatis
     document.getElementById("write-statistic").textContent = writeStatistic;
     if(isMemberAar){
         isMember = true
-        //alert("you are member!");
+        document.getElementById("pro-tag").classList.remove("hidden")
     }
+}
+
+window.setPairSpan = function( role, pairname ){
+    window.setPairedGender(role);
+    var cardName = pairname ? pairname : "Ta";
+    document.getElementById("paired-name-span").style.color = "var(--color-paired)";
+    document.getElementById("paired-name-span").textContent = cardName;
         
 }
 
@@ -874,3 +881,13 @@ observer.observe(document.body, { childList: true, subtree: true });
 // 初始时，为所有已存在的图片添加错误事件监听器
 addErrorListeners();
 //———————————————————————————————————————————————————————————————————————————————————————————
+
+function unpair(){
+    if(confirm("你确定要关闭「虫洞」吗？")){
+        if(confirm("你真的要关闭「虫洞」吗？！")){
+            aardio.unpair();
+            alert("「虫洞」已关闭！")
+            location.reload();
+        }
+    }
+}
