@@ -12,7 +12,7 @@ import win.ui.minmax;
 import process.ffmpeg;
 import qrencode.bitmap;
 import gdip.graphics;
-import gdip.image;
+import gdip.bitmap;
 /*
 import debug;
 import debug.log;
@@ -85,16 +85,16 @@ uploadServer.run( {
 				io.createDir(outputDir);
 				
 				var fileName = io.joinpath(NijiDocPath,"upload_temp",uploadTmpNum + '.jpg') 
-				var image_object = gdip.image(fileData.file.value());
+				var image_object = gdip.bitmap(fileData.file.value());
 				if(image_object){
 					// 压图！防止你记服务器爆炸
 
 					temp_buffer = image_object.saveToBuffer();
-					image_object.save(fileName);
-					
-					while(string.bytes( temp_buffer ) > 1000000){
-						image_object.save(fileName,90);
+					while( #temp_buffer > 1000000){
+						image_object = image_object.resize( image_object.width * 0.9, image_object.height * 0.9) ;
+						temp_buffer = image_object.saveToBuffer();
 					}
+					image_object.save(fileName);
 					response.contentType = "text/plain";
 					response.write(uploadTmpNum);
 					wb.invoke('addUploadPreview',uploadTmpNum);	//添加预览
