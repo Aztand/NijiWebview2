@@ -19,6 +19,12 @@
 			<file name="treehole.png" path="res\web\treehole.png" comment="res\web\treehole.png"/>
 			<file name="write.svg" path="res\web\write.svg" comment="res\web\write.svg"/>
 			<file name="mobileUpload.html" path="res\web\mobileUpload.html" comment="res\web\mobileUpload.html"/>
+			<file name="Ionicons4.5.0.ttf" path="res\web\Ionicons4.5.0.ttf" comment="res\web\Ionicons4.5.0.ttf"/>
+			<file name="girl.svg" path="res\web\girl.svg" comment="res\web\girl.svg"/>
+			<file name="pair.svg" path="res\web\pair.svg" comment="res\web\pair.svg"/>
+			<file name="treehole.svg" path="res\web\treehole.svg" comment="res\web\treehole.svg"/>
+			<file name="favicon.ico" path="res\web\favicon.ico" comment="res\web\favicon.ico"/>
+			<file name="boy.svg" path="res\web\boy.svg" comment="res\web\boy.svg"/>
 		</folder>
 	</folder>
 	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">

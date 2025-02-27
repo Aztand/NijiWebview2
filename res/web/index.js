@@ -693,9 +693,12 @@ const diaryPage = document.getElementById('right-diary');
 const diaryIcon = document.getElementById('write-logo');
 const galleryPage = document.getElementById('right-gallery');
 const picLsIcon = document.getElementById('gallery-logo'); 
+const pairSysPage = document.getElementById('right-pair-sys');
+const pairSysIcon = document.getElementById('pair-sys-logo');
 const pagesEle = {
     diary: [diaryPage, diaryIcon],
-    gallery: [galleryPage, picLsIcon]
+    gallery: [galleryPage, picLsIcon],
+    pairSys: [pairSysPage, pairSysIcon]
 }
 
 function switchPage(page) {     //切换写作页面编辑、预览模式
@@ -707,6 +710,7 @@ function switchPage(page) {     //切换写作页面编辑、预览模式
 }
 diaryIcon.addEventListener('click', () => switchPage('diary'));    //左侧导航栏事件监听器
 picLsIcon.addEventListener('click', () => switchPage('gallery')); 
+pairSysIcon.addEventListener('click', () => switchPage('pairSys')); 
 
 // 初始化模式
 switchMode('preview');

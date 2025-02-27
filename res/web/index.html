@@ -7,6 +7,9 @@
     <link rel="preload" href="new.svg" as="image">
     <link rel="preload" href="save.svg" as="image">
     <link rel="preload" href="delete.svg" as="image">
+    <link rel="preload" href="pair.svg" as="image">
+    <link rel="preload" href="boy.svg" as="image">
+    <link rel="preload" href="girl.svg" as="image">
     <link rel="stylesheet" type="text/css" href="index.css">
     <script src="moment.js"></script>
 </head>
@@ -18,7 +21,7 @@
             <div class = "nav-icon" id="write-logo"></div>     
             <div class="seperate-line"></div>
             <div class = "nav-icon" id="gallery-logo"></div>
-            <div class = "nav-icon" id="treehole-logo" hidden></div>   
+            <div class = "nav-icon" id="pair-sys-logo"></div>   
         </div>
     </div>
 
@@ -114,6 +117,21 @@
             </template>
         </div>
     </div>
+
+    <div class = "right-page hidden" id="right-pair-sys">
+        <div class = "pair-page" id = "pairing-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
+            <div class = "pair-page" id = "pair-logo"></div>
+            <p id = "pair-title">平行空间</p>
+            <p id = "pair-open-text">虫洞开启</p>
+            <p id = "pair-tip-text">正在与<span id = "paired-name-span">她</span>交换日记中。如需停止，请关闭「虫洞」。</p>
+
+            <button id = "close-pair-btn">关闭「虫洞」</button>
+        </div>
+        <div id = "unpair-page" class="hidden">
+
+        </div>
+    </div>
+
     <script src="index.js"></script>
 
 </body>

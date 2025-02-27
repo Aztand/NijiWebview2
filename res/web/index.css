@@ -1,4 +1,10 @@
 /* ===== 基础变量 ===== */
+@font-face {
+    font-family: 'Niji-icon-font';
+    src: url('Ionicons4.5.0.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 :root {
     /* 颜色 */
     --color-primary-boy: #4988b4;
@@ -48,6 +54,9 @@
     --img-new: url("new.svg");
     --img-save: url("save.svg");
     --img-delete: url("delete.svg");
+    --img-pair: url("pair.svg");
+    --img-boy: url("boy.svg");
+    --img-girl: url("girl.svg");
 }
     
 /* ===== 基础样式 ===== */
@@ -100,6 +109,7 @@ body {
     padding-top: 80%;
     right: 0;
     padding-right: 10%;
+    background-repeat: no-repeat;
 }
 
 .nav-icon.active {
@@ -126,7 +136,13 @@ body {
     background-image: var(--img-pic);
     margin-top: 20%;
 }
-    
+
+#pair-sys-logo {
+    background-image: var(--img-pair);
+    background-size: 90% 100%;
+    margin-top: 20%;
+}
+
 .seperate-line {
     border-bottom: 1px solid var(--color-border);
     width: 80%;
@@ -788,4 +804,46 @@ body {
     margin-bottom: 0;
     font-size: 14px; /* 设置编号的字体大小 */
     color: #333; /* 设置编号的字体颜色 */
+}
+
+.pair-page {
+    height: 100vh;
+    overflow-y: hidden;
+}
+
+#pairing-page p{
+    text-align: center;
+    color: #666666;
+    font-family: '等线';
+    font-size: 24;
+}
+
+#pair-logo {
+    width: 20vw;
+    height: 20vw;
+    margin-left: 40%;
+    margin-top: 5vw;
+    background-image: var(--img-pair);
+    background-repeat: round;
+}
+
+#pair-title {
+    font-size: 64!important;
+    margin: 0;
+}
+
+#paired-name-span {
+    color: var(--color-primary-girl);
+}
+
+#close-pair-btn {
+    border: none;
+    background-color: var(--color-primary-boy);
+    color: white;
+    font-size: var(--text-lg);
+    height: 64px;
+    width: 512px;
+    border-radius: var(--radius-sm);
+    margin-left: 36%;
+    margin-top: 20vh;
 }
