@@ -56,6 +56,7 @@
     --img-unpair: url("unpair.svg");
     --img-boy: url("boy.svg");
     --img-girl: url("girl.svg");
+    --img-wormhole: url("wormhole.png");
 }
     
 /* ===== 基础样式 ===== */
@@ -841,6 +842,25 @@ body {
     background-image: var(--img-pair);
 }
 
+#wormhole-logo {
+    background-image: var(--img-wormhole);
+    background-size: cover;
+    width: 15vw;
+    height: 15vw;
+    margin-bottom: 10vh;
+    margin-top: -10vh;
+    animation: rotate 5s linear infinite; /* 旋转动画，5秒转一圈，无限循环 */
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
 #pair-title {
     font-size: 64!important;
     margin: 0;
@@ -864,10 +884,17 @@ body {
     border-radius: var(--radius-sm);
     margin: var(--space-sm);
     font-family: '等线', 'Ionicons';
+    padding-bottom: 10px;
 }
 
 .pair-page-btn-area button:active{
     border: inset;
+}
+
+span.Ionicon-xl {
+    font-size: var(--text-xl)!important;
+    transform: translateY(7px);
+    display: inline-block;
 }
 
 #close-pair-btn {
