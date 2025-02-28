@@ -11,6 +11,7 @@
     <link rel="preload" href="boy.svg" as="image">
     <link rel="preload" href="girl.svg" as="image">
     <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="preload" href="Ionicons.ttf" as="font" type="font/truetype" crossorigin>
     <script src="moment.js"></script>
       <!-- 1. 引入 markdown-it.js -->
     <script src="markdown-it.min.js"></script>
@@ -126,18 +127,37 @@
     </div>
 
     <div class = "right-page hidden" id="right-pair-sys">
-        <div class = "pair-page" id = "pairing-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
-            <div class = "pair-page" id = "pair-logo"></div>
+
+        <div class = "pair-page hidden" id = "pairing-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
+            <div class = "pair-logo" id = "pair-logo"></div>
             <p id = "pair-title">平行空间</p>
             <p id = "pair-open-text">虫洞开启</p>
-            <p id = "pair-tip-text">正在与<span id = "paired-name-span">她</span>交换日记中。如需停止，请关闭「虫洞」。</p>
+            <p>
+                正在与<span id = "paired-name-span">她</span>交换日记中。如需停止，请关闭「虫洞」。<br />
+            </p>
 
-
-            <button id = "close-pair-btn" onclick="unpair()">关闭「虫洞」</button>
+            <div class="pair-page-btn-area">
+                <button id = "close-pair-btn" onclick="unpair()">关闭「虫洞」</button> 
+            </div>
         </div>
-        <div id = "unpair-page" class="hidden">
 
+        <div class = "pair-page" id = "unpair-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
+            <div class = "pair-logo boy-logo" id = "unpair-logo"></div>
+            <p id = "pair-title">平行空间</p>
+            <p id = "pair-open-text">虫洞关闭</p>
+            <p>
+                当两人互相开启「虫洞」后，异性的图标便会点亮。然后便能看到对方的日记。<br />
+                当一方写了新的日记，或更新了已有的日记时，另一方会收到推送通知。<br />
+                「虫洞」开启之后可以随时关闭。
+            </p>
+
+            <div class="pair-page-btn-area">
+                <button id = "random-pair-btn" onclick="">随机匹配 </button>
+                <br />
+                <button id = "direct-pair-btn" onclick="">定向开启 </button> 
+            </div>
         </div>
+        
     </div>
 
     <script src="index.js"></script>

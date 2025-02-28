@@ -656,14 +656,19 @@ window.setAvatar = function(avatarPath){
 
 const md = window.markdownit({
     html: true,
-    highlight: function (code, lang) {
-      if (lang && hljs.getLanguage(lang)) {
-        try { return hljs.highlight(code, { language: lang }).value; } 
-        catch (e) {}
+    highlight: function (str, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          try {
+            return '<pre class="hljs"><code>' +
+                   hljs.highlight(lang, str, true).value +
+                   '</code></pre>';
+          } catch (__) {}
+        }
+    
+        return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
       }
-      return '';
-    }
   });
+  
 
 function convertContentToPreview(content) {
     const userId = document.getElementById('write-page').dataset.currentUserId;
