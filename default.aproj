@@ -29,6 +29,7 @@
 			<file name="github.min.css" path="res\web\github.min.css" comment="res\web\github.min.css"/>
 			<file name="github-markdown.min.css" path="res\web\github-markdown.min.css" comment="res\web\github-markdown.min.css"/>
 			<file name="highlight.min.js" path="res\web\highlight.min.js" comment="res\web\highlight.min.js"/>
+			<file name="markdown-it.min.js" path="res\web\markdown-it.min.js" comment="res\web\markdown-it.min.js"/>
 		</folder>
 	</folder>
 	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">
