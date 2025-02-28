@@ -308,7 +308,8 @@ window.setWritePage = async function(userId, diaryId, cardOwner, mode) {
         writePage.dataset.editable = isEditable; // 新增可编辑状态标记
         writePage.dataset.createdDate = targetDiary.createddate;
 
-        previewDiv.innerHTML = convertImageAndTimeTags(textarea.value);
+        previewDiv.innerHTML = convertContentToPreview(textarea.value);
+        hljs.highlightAll();
         readmark > 0 ? readmarkText.textContent = `，${pairedGenderHan}${formatTimeAgo(readmark)}看了这篇日记` : readmarkText.textContent = "";
         wordCountText.textContent = `${targetDiary.content.length}字`;
         switchMode(mode);
@@ -653,15 +654,23 @@ window.setAvatar = function(avatarPath){
     document.getElementById("avatar-img").setAttribute("src",avatarPath);
 }
 
-function convertImageAndTimeTags(content) {
+//配置 marked（高亮）
+marked.setOptions({
+    highlight: function(code, lang) {
+        return hljs.highlightAuto(code).value;
+    },
+    breaks: false // 换行转换为 <br>
+});
+
+function convertContentToPreview(content) {
     const userId = document.getElementById('write-page').dataset.currentUserId;
     // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
     transformedContent = content.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
 
-    return transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
+    return marked.parse( transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
             style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
-    );
+    ));
 }
 
 function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
@@ -692,7 +701,8 @@ function switchMode(mode) {     //切换写作页面编辑、预览模式
 
 editBtn.addEventListener('click', () => switchMode('edit'));    //编辑、预览按钮添加事件监听器
 previewBtn.addEventListener('click', () => {
-    previewDiv.innerHTML = convertImageAndTimeTags(textarea.value);
+    previewDiv.innerHTML = convertContentToPreview(textarea.value);
+    hljs.highlightAll();
     switchMode('preview');
 });
 
