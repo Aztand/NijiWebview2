@@ -10,7 +10,7 @@
     <link rel="preload" href="pair.svg" as="image">
     <link rel="preload" href="boy.svg" as="image">
     <link rel="preload" href="girl.svg" as="image">
-    <link rel="preload" href="wormhole.png" as="image">
+    <link rel="preload" href="wormhole.svg" as="image">
     <link rel="stylesheet" type="text/css" href="index.css">
     <link rel="preload" href="Ionicons.ttf" as="font" type="font/truetype" crossorigin>
     <script src="moment.js"></script>
@@ -141,7 +141,7 @@
             </div>
         </div>
 
-        <div class = "pair-page" id = "unpair-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
+        <div class = "pair-page hidden" id = "unpair-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
             <div class = "pair-logo boy-logo" id = "unpair-logo"></div>
             <p id = "pair-title">平行空间</p>
             <p>虫洞关闭</p>
@@ -156,10 +156,10 @@
                 <button id = "direct-pair-btn" onclick="">定向开启 <span class="Ionicon-xl"></span></button> 
             </div>
         </div>
-        <div class = "pair-page hidden" id = "wormhole-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
+        <div class = "pair-page" id = "wormhole-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
             <div class = "pair-logo" id = "wormhole-logo"></div>
             <p id = "pair-title">随机匹配</p>
-            <p >在宇宙空间里，漂浮着很多个「时空涡旋」。</p>
+            <p>在宇宙空间里，漂浮着很多个「时空涡旋」。</p>
             <p>如果你想和别的世界「随机匹配」，不妨进入一个「涡旋」</p>
             <p>当里面的世界足够多时，「时空涡旋」便会炸裂。这时，它里面的世界们便会随机配对。</p>
 
