@@ -12,7 +12,7 @@
     <link rel="preload" href="girl.svg" as="image">
     <link rel="preload" href="wormhole.svg" as="image">
     <link rel="stylesheet" type="text/css" href="index.css">
-    <link rel="preload" href="Ionicons.ttf" as="font" type="font/truetype" crossorigin>
+    <link rel="preload" href="Ionicons.ttf" as="font" type="font/ttf" crossorigin>
     <script src="moment.js"></script>
       <!-- 1. 引入 markdown-it.js -->
     <script src="markdown-it.min.js"></script>
@@ -65,7 +65,7 @@
                 <button id="edit-mode" >编辑</button>
             </div>
 
-            <textarea id="diary-input" placeholder="请输入..."></textarea>
+            <textarea id="diary-input" placeholder="请输入..." onkeydown="handleTabKey(event)"></textarea>
             <div id="preview-content" class="hidden"></div>
             <p id="count-and-readmark"><span id="word-count">0字</span><span id="readmark-text"></span></p>
             <div id="floatMenuBar">

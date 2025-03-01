@@ -587,6 +587,29 @@ window.addEventListener('pageshow', function(e) {//监听页面刷新
     // }
 });
 
+function insertTabAtCursor(areaId) {
+    var textArea = document.getElementById(areaId);
+    var scrollPos = textArea.scrollTop;
+    var cursorPos = textArea.selectionStart;
+
+    var front = (textArea.value).substring(0, textArea.selectionStart);
+    var back = (textArea.value).substring(textArea.selectionEnd, textArea.value.length);
+    
+    textArea.value = front + "        " + back;
+    cursorPos = cursorPos + 8;
+    textArea.selectionStart = cursorPos;
+    textArea.selectionEnd = cursorPos;
+    textArea.focus();
+    textArea.scrollTop = scrollPos;
+}
+
+function handleTabKey(e) {
+    if (e.keyCode === 9) { // Tab key
+        e.preventDefault(); // Prevent default tab behavior
+        insertTabAtCursor('diary-input');
+    }
+}
+
 let userId = "";
 let port = "";
 let uploadPort = "";
