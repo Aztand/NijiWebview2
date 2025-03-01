@@ -90,7 +90,14 @@
             </div>
         </div>
 
-    </div>
+        <div id = "Hotkey-tip-container">
+            <p id = "Hotkey-tip" onclick = "ToggleHotkeyTipsShow()">快捷键</p>
+            <p class="Hotkey-tips hidden">Tab：插入自动缩进</p>
+            <p class="Hotkey-tips hidden">Ctrl+T：插入时间</p>
+            <p class="Hotkey-tips hidden">Ctrl+D：插入日期及时间</p>
+            </div>
+
+        </div>
     
     <div class = "right-page hidden" id="right-gallery">
         <div id = "upload-container">
@@ -162,9 +169,15 @@
             <p>在宇宙空间里，漂浮着很多个「时空涡旋」。</p>
             <p>如果你想和别的世界「随机匹配」，不妨进入一个「涡旋」</p>
             <p>当里面的世界足够多时，「时空涡旋」便会炸裂。这时，它里面的世界们便会随机配对。</p>
-
+            <h1 id="working-h1" class = "hidden" style="
+            color: #666666;
+            font-size: 128px;
+            font-family: '等线';
+            position: absolute;
+            bottom: 5vh;
+        ">施工中……</h1>
             <div class="pair-page-btn-area">
-                <button id = "join-wormhole-btn" onclick="">加入这个「涡旋」 <span class="Ionicon-xl"></span></button>
+                <button id = "join-wormhole-btn" onclick="document.getElementById('working-h1').classList.remove('hidden')">加入这个「涡旋」 <span class="Ionicon-xl"></span></button>
             </div>
         </div>
         

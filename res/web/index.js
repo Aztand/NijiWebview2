@@ -587,7 +587,7 @@ window.addEventListener('pageshow', function(e) {//监听页面刷新
     // }
 });
 
-function insertTabAtCursor(areaId) {
+function insertTabAtCursor(areaId) {    //Tab缩进代码
     var textArea = document.getElementById(areaId);
     var scrollPos = textArea.scrollTop;
     var cursorPos = textArea.selectionStart;
@@ -608,6 +608,60 @@ function handleTabKey(e) {
         e.preventDefault(); // Prevent default tab behavior
         insertTabAtCursor('diary-input');
     }
+}
+
+function insertTextAtCursor(areaId, text) {     //快捷键插入日期时间代码
+    var textArea = document.getElementById(areaId);
+    var scrollPos = textArea.scrollTop;
+    var cursorPos = textArea.selectionStart;
+  
+    var front = textArea.value.substring(0, cursorPos);
+    var back = textArea.value.substring(cursorPos, textArea.value.length);
+  
+    textArea.value = front + text + back;
+    cursorPos += text.length;
+    textArea.selectionStart = cursorPos;
+    textArea.selectionEnd = cursorPos;
+    textArea.focus();
+    textArea.scrollTop = scrollPos;
+  }
+  
+function handleSpecialKeys(e) {
+    if (e.ctrlKey) {
+      if (e.keyCode === 68) { // Shift+D
+        e.preventDefault(); // Prevent default Shift+D behavior
+        var date = new Date();
+        var dateString = date.getFullYear() + "/" +
+                         ("0" + (date.getMonth() + 1)).slice(-2) + "/" +
+                         ("0" + date.getDate()).slice(-2) + " [" +
+                         ("0" + date.getHours()).slice(-2) + ":" +
+                         ("0" + date.getMinutes()).slice(-2) + ":" +
+                         ("0" + date.getSeconds()).slice(-2) + "]";
+        insertTextAtCursor('diary-input', dateString);
+      } else if (e.keyCode === 84) { // Shift+T
+        e.preventDefault(); // Prevent default Shift+T behavior
+        var time = new Date();
+        var timeString = "[" +
+                         ("0" + time.getHours()).slice(-2) + ":" +
+                         ("0" + time.getMinutes()).slice(-2) + ":" +
+                         ("0" + time.getSeconds()).slice(-2) + "]";
+        insertTextAtCursor('diary-input', timeString);
+      }
+    }
+}
+  
+// 绑定事件监听器到textarea
+diaryInput.addEventListener('keydown', handleSpecialKeys);
+
+function ToggleHotkeyTipsShow() {
+    // 选择所有具有'.Hotkey-tips'类的元素
+    const hotkeyTipsElements = document.querySelectorAll('.Hotkey-tips');
+
+    // 遍历所有选中的元素，并切换'hidden'类
+    hotkeyTipsElements.forEach(element => {
+    element.classList.toggle('hidden');
+    });
+
 }
 
 let userId = "";
