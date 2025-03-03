@@ -736,7 +736,7 @@ var md = window.markdownit({
     html:         false,        // 在源码中启用 HTML 标签
     xhtmlOut:     false,        // 使用 '/' 来闭合单标签 （比如 <br />）。
                                 // 这个选项只对完全的 CommonMark 模式兼容。
-    breaks:       true,        // 转换段落里的 '\n' 到 <br>。
+    breaks:       false,        // 转换段落里的 '\n' 到 <br>。
     langPrefix:   'language-',  // 给围栏代码块的 CSS 语言前缀。对于额外的高亮代码非常有用。
     linkify:      false,        // 将类似 URL 的文本自动转换为链接。
   
@@ -745,7 +745,6 @@ var md = window.markdownit({
   
     // 双 + 单引号替换对，当 typographer 启用时。
     // 或者智能引号等，可以是 String 或 Array。
-    //
     // 比方说，你可以支持 '«»„“' 给俄罗斯人使用， '„“‚‘'  给德国人使用。
     // 还有 ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] 给法国人使用（包括 nbsp）。
     quotes: '“”‘’',
@@ -760,9 +759,9 @@ var md = window.markdownit({
           hljs.highlight(str, { language: lang || 'plaintext' });
         
         return `<pre><code class="hljs language-${result.language}">${result.value}</code></pre>`;
-      }
+    }
     
-  }).disable('code');
+}).disable('code');
   
 // 覆盖 paragraph 规则
 md.block.ruler.at('paragraph', (state, startLine, endLine) => {
@@ -787,13 +786,19 @@ md.block.ruler.at('paragraph', (state, startLine, endLine) => {
   
     // 关键修改：禁用 trim
     const content = state.getLines(startLine, nextLine, state.blkIndent, false);
-  
+
+    // 转义行首空格
+     const escapedContent = content.replace(/^(\s+)/gm, (_, spaces) => {
+        return '\u00A0'.repeat(spaces.length); // Unicode 版的 &nbsp;
+    });
+
     state.line = nextLine;
     const tokenOpen = state.push('paragraph_open', 'p', 1);
     tokenOpen.map = [startLine, state.line];
   
     const tokenInline = state.push('inline', '', 0);
-    tokenInline.content = content; // 原始内容（含首尾空格）
+    tokenInline.content = escapedContent;
+    //tokenInline.content = content; // 原始内容（含首尾空格）
     tokenInline.map = [startLine, state.line];
     tokenInline.children = [];
   
@@ -802,9 +807,14 @@ md.block.ruler.at('paragraph', (state, startLine, endLine) => {
     return true;
 });
   
+// 覆盖 inline 渲染器，保留行首空格
+md.renderer.rules.inline = function (tokens, idx, options, env, self) {
+    return tokens[idx].content; // 直接返回内容，保留空白字符
+};
+
 //取消自动合并空行
-const defaultParagraphRenderer = this.md.renderer.rules.paragraph_open || ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
-this.md.renderer.rules.paragraph_open = function (tokens, idx, options, env, self) {
+const defaultParagraphRenderer = md.renderer.rules.paragraph_open || ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
+md.renderer.rules.paragraph_open = function (tokens, idx, options, env, self) {
     let result = '';
     if (idx > 1) {
       const inline = tokens[idx - 2];
@@ -817,28 +827,24 @@ this.md.renderer.rules.paragraph_open = function (tokens, idx, options, env, sel
       }
     }
     return result + defaultParagraphRenderer(tokens, idx, options, env, self);
-  };
+};
+
 
 function convertContentToPreview(content) {
+
     const userId = document.getElementById('write-page').dataset.currentUserId;
+
+    // 解析 Markdown
+    transformedContent = md.render(content);
     // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
-    transformedContent = content.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
+    transformedContent = transformedContent.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
     // 处理图片标签
     transformedContent = transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
             style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
     );
-
-    //var protectPlaceholder = "）短的占位符（";
-
-    // 替换连续空行
-    //transformedContent = transformedContent.replace(/\n(?=\s*(?:\n|$))/g, "<br>");
-
-    // 解析 Markdown
-    transformedContent = md.render(transformedContent);
-
-    // 恢复连续空行
-   // transformedContent = transformedContent.replace(new RegExp(protectPlaceholder, 'g'), '<br>');
+    // 不使用<p>
+    transformedContent = transformedContent.replace(/\<p\>/g,'').replace(/\<\/p\>/g,'');
 
     return transformedContent;
 }
