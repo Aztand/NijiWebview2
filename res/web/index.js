@@ -595,7 +595,7 @@ function insertTabAtCursor(areaId) {    //Tab缩进代码
     var front = (textArea.value).substring(0, textArea.selectionStart);
     var back = (textArea.value).substring(textArea.selectionEnd, textArea.value.length);
     
-    textArea.value = front + "        " + back;
+    textArea.value = front + "    " + back;
     cursorPos = cursorPos + 8;
     textArea.selectionStart = cursorPos;
     textArea.selectionEnd = cursorPos;
@@ -731,31 +731,100 @@ window.setAvatar = function(avatarPath){
     document.getElementById("avatar-img").setAttribute("src",avatarPath);
 }
 
-const md = window.markdownit({
-    html: true,
-    highlight: function (str, lang) {
-        if (lang && hljs.getLanguage(lang)) {
-          try {
-            return '<pre class="hljs"><code>' +
-                   hljs.highlight(lang, str, true).value +
-                   '</code></pre>';
-          } catch (__) {}
-        }
-    
-        return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+// 所有的选项列表（默认情况下）
+var md = window.markdownit({
+    html:         false,        // 在源码中启用 HTML 标签
+    xhtmlOut:     false,        // 使用 '/' 来闭合单标签 （比如 <br />）。
+                                // 这个选项只对完全的 CommonMark 模式兼容。
+    breaks:       true,        // 转换段落里的 '\n' 到 <br>。
+    langPrefix:   'language-',  // 给围栏代码块的 CSS 语言前缀。对于额外的高亮代码非常有用。
+    linkify:      false,        // 将类似 URL 的文本自动转换为链接。
+  
+    // 启用一些语言中立的替换 + 引号美化
+    typographer:  false,
+  
+    // 双 + 单引号替换对，当 typographer 启用时。
+    // 或者智能引号等，可以是 String 或 Array。
+    //
+    // 比方说，你可以支持 '«»„“' 给俄罗斯人使用， '„“‚‘'  给德国人使用。
+    // 还有 ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] 给法国人使用（包括 nbsp）。
+    quotes: '“”‘’',
+  
+    // 高亮函数，会返回转义的HTML。
+    // 或 '' 如果源字符串未更改，则应在外部进行转义。
+    // 如果结果以 <pre ... 开头，内部包装器则会跳过。
+    highlight: (str, lang) => {
+        const autoDetect = !lang; // 未指定语言时自动检测
+        const result = autoDetect ? 
+          hljs.highlightAuto(str) : 
+          hljs.highlight(str, { language: lang || 'plaintext' });
+        
+        return `<pre><code class="hljs language-${result.language}">${result.value}</code></pre>`;
       }
-  });
+    
+  }).disable('code');
+  
+// 覆盖 paragraph 规则
+md.block.ruler.at('paragraph', (state, startLine, endLine) => {
+    const parentType = state.parentType;
+    let nextLine = startLine + 1;
+  
+    state.parentType = 'paragraph';
+    for (; nextLine < endLine && !state.isEmpty(nextLine); nextLine++) {
+      if (state.sCount[nextLine] - state.blkIndent > 3) continue;
+      if (state.sCount[nextLine] < 0) continue;
+  
+      let terminated = false;
+      const rules = state.md.block.ruler.getRules('paragraph');
+      for (let i = 0; i < rules.length; i++) {
+        if (rules[i](state, nextLine, endLine, true)) {
+          terminated = true;
+          break;
+        }
+      }
+      if (terminated) break;
+    }
+  
+    // 关键修改：禁用 trim
+    const content = state.getLines(startLine, nextLine, state.blkIndent, false);
+  
+    state.line = nextLine;
+    const tokenOpen = state.push('paragraph_open', 'p', 1);
+    tokenOpen.map = [startLine, state.line];
+  
+    const tokenInline = state.push('inline', '', 0);
+    tokenInline.content = content; // 原始内容（含首尾空格）
+    tokenInline.map = [startLine, state.line];
+    tokenInline.children = [];
+  
+    state.push('paragraph_close', 'p', -1);
+    state.parentType = parentType;
+    return true;
+});
   
 
 function convertContentToPreview(content) {
     const userId = document.getElementById('write-page').dataset.currentUserId;
     // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
     transformedContent = content.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
-    //md.render或marked.parse
-    return md.render( transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
+    // 处理图片标签
+    transformedContent = transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
             style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
-    ));
+    );
+
+    //var protectPlaceholder = "）短的占位符（";
+
+    // 替换连续空行
+    //transformedContent = transformedContent.replace(/\n(?=\s*(?:\n|$))/g, "<br>");
+
+    // 解析 Markdown
+    transformedContent = md.render(transformedContent);
+
+    // 恢复连续空行
+   // transformedContent = transformedContent.replace(new RegExp(protectPlaceholder, 'g'), '<br>');
+
+    return transformedContent;
 }
 
 function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
