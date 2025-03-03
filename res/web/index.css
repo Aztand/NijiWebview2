@@ -101,25 +101,27 @@ body {
     margin: auto;
     padding-top: 80%;
 }
+
+#icon-list{
+    padding-right: 0.4rem;
+}
     
 .nav-icon {
     background-size: 100% 100%;
     width: 80%;
     margin-left: 10%;
     padding-top: 80%;
-    right: 0;
     padding-right: 10%;
     background-repeat: no-repeat;
+    transition: filter 0.3s ease; /* 添加过渡效果 */
 }
 
 .nav-icon.active {
-    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    box-shadow: calc(-1 * var(--space-xs)) 0px var(--space-xs) var(--color-shadow-light);
+    filter: drop-shadow(0 0 10px var(--color-self)); /* 发光效果 */
 }
 
 .nav-icon:hover {
-    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    box-shadow: calc(-1 * var(--space-xs)) 0px var(--space-xs) var(--color-shadow-light);
+    filter: drop-shadow(0 0 10px var(--color-self)); /* 发光效果 */
 }
 
 #write-logo {
