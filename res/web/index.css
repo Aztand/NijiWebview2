@@ -70,6 +70,14 @@ body {
     position: relative;
 }
 
+.hljs {
+    white-space: pre-wrap;  /* 允许代码自动换行 */
+    word-wrap: break-word;  /* 兼容旧浏览器 */
+    overflow-wrap: break-word; /* 现代浏览器换行 */
+    overflow-y: auto;        /* 启用垂直滚动 */
+    overflow-x: hidden;      /* 禁用横向滚动 */
+}
+
 .right-page {
     height: 100vh;
     overflow-y: auto;
@@ -390,6 +398,7 @@ body {
 /* 段落间距继承 */
 #preview-content p {
     margin-bottom: 1.2em;
+    margin: 0;
 }
 
 /* 图片自适应调整 */
@@ -593,7 +602,6 @@ body {
     background: var(--color-bg-element);
     padding: var(--space-xxs) var(--space-xs);
     border-radius: var(--radius-sm);
-    /*box-shadow: 0 2px 8px var(--color-shadow-light);*/
 }
 
 .toggle-switch button {
