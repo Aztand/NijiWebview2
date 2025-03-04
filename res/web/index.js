@@ -668,6 +668,7 @@ let userId = "";
 let port = "";
 let uploadPort = "";
 let pairedId = "";
+let pairedName = "";
 let pairedGenderHan = "";
 let isMember = false;
 
@@ -698,12 +699,14 @@ window.setUserColor = function(self,paired){
     const root = document.documentElement;
     self = self ? self : "boy";
     paired = paired ? paired : "girl";
-    colorJson = {
+    var colorJson = {
         boy : "#4988b4",
         girl : "#ff7074"
     }
+
     root.style.setProperty('--color-self',colorJson[self]);
     root.style.setProperty('--color-paired',colorJson[paired]);
+    root.style.setProperty('--img-unpair-logo',`var(--img-${self})`);
     document.querySelectorAll('.floatMenuButton').forEach(element => {element.style.backgroundColor = colorJson[self];});
 
 }
@@ -721,10 +724,9 @@ window.setUserInfoCard = function(username, description, pairedInfo, writeStatis
 
 window.setPairSpan = function( role, pairname ){
     window.setPairedGender(role);
-    var cardName = pairname ? pairname : "Ta";
-    document.getElementById("paired-name-span").style.color = "var(--color-paired)";
-    document.getElementById("paired-name-span").textContent = cardName;
-        
+    pairedName = pairname ? pairname : "Ta";
+    PAGE_CONFIGS['paired']['paragraphs'][1] = `正在与<span id = "paired-name-span">${pairedName}</span>交换日记中。如需停止，请关闭「虫洞」。`
+    setPairPage('paired');
 }
 
 window.setAvatar = function(avatarPath){
@@ -967,7 +969,7 @@ document.getElementById('upload-btn').addEventListener('click', async () => {   
 });
 
 
-//自动重载加载失败的图片——————————————————————————————————————————————————————————————————————
+//自动重载加载失败的图片—————————————————————START—————————————————————————————————————————————————
 function handleImageError(img) {
     const src = img.src;
     img.src = ''; // 清空src，触发重新加载
@@ -998,7 +1000,149 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 // 初始时，为所有已存在的图片添加错误事件监听器
 addErrorListeners();
-//———————————————————————————————————————————————————————————————————————————————————————————
+//—————————————————————————————————————————END——————————————————————————————————————————————————
+
+
+
+//虫洞页面设置及功能函数————————————————————START—————————————————————————————————————————————————
+
+// 页面配置函数
+function setPairPage(configName) {
+
+    var config = PAGE_CONFIGS[configName];
+
+    const container = document.getElementById('pair-container');
+    
+    // 清空之前的内容
+    container.querySelector('.pair-text').innerHTML = '';
+    container.querySelector('.pair-buttons').innerHTML = '';
+
+    // 设置返回按钮
+    const backBtn = container.querySelector('.pair-back-btn');
+    backBtn.className = config.showBack ? 'pair-back-btn' : 'pair-back-btn hidden';
+    if(config.backAction) {
+        backBtn.onclick = config.backAction;
+    }
+
+    // 设置输入框
+    const input = container.querySelector('.pair-input');
+    input.className = config.showInput ? 'pair-input' : 'pair-input hidden';
+
+    // 设置Logo
+    const logo = container.querySelector('.pair-logo');
+    logo.className = `pair-logo ${config.logoClass || ''}`;
+
+    // 设置标题
+    container.querySelector('#pair-title').textContent = config.title;
+
+    // 设置文本段落
+    const textContainer = container.querySelector('.pair-text');
+    config.paragraphs.forEach(text => {
+        const p = document.createElement('p');
+        p.innerHTML = text;
+        textContainer.appendChild(p);
+    });
+
+    // 设置按钮
+    const btnContainer = container.querySelector('.pair-buttons');
+    config.buttons.forEach(btnConfig => {
+        const btn = document.createElement('button');
+        btn.className = `${btnConfig.className || ''}`;
+        btn.innerHTML = `${btnConfig.text} ${btnConfig.icon || ''}`;
+        btn.onclick = btnConfig.action;
+        btnContainer.appendChild(btn);
+    });
+
+    // 显示容器
+    //container.classList.remove('hidden');
+}
+
+// 预定义的页面配置库
+PAGE_CONFIGS = {
+    // 未匹配初始界面
+    unpair: {
+        logoClass: "unpair-logo-img",
+        title: "平行空间",
+        showInput: false,
+        paragraphs: [
+            "虫洞关闭",
+            '当两人互相开启「虫洞」后，异性的图标便会点亮。然后便能看到对方的日记。<br />当一方写了新的日记，或更新了已有的日记时，另一方会收到推送通知。<br />「虫洞」开启之后可以随时关闭。'
+        ],
+        buttons: [
+            {
+                text: "随机匹配",
+                className: "random-btn",
+                icon: '<span class="Ionicon-xl"></span>',
+                action: () => setPairPage('wormhole')
+            },
+            {
+                text: "定向开启", 
+                className: "direct-btn",
+                icon: '<span class="Ionicon-xl"></span>',
+                action: () => switchPage('directInput')
+            }
+        ]
+    },
+
+    // 虫洞界面
+    wormhole: {
+        logoClass: "wormhole-logo",
+        title: "随机匹配",
+        showBack: true,
+        backAction: () => setPairPage('unpair'),
+        showInput: false,
+        paragraphs: [
+            "在宇宙空间里，漂浮着很多个「时空涡旋」。",
+            '如果你想和别的世界「随机匹配」，不妨进入一个「涡旋」',
+            '当里面的世界足够多时，「时空涡旋」便会炸裂。这时，它里面的世界们便会随机配对。'
+        ],
+        buttons: [
+            {
+                text: "加入这个「涡旋」",
+                className: "join-wormhole-btn",
+                icon: '<span class="Ionicon-xl"></span>',
+                action: () => alert('施工中……')
+            }
+        ]
+    },
+
+    // 定向页面
+    directInput: {
+        logoClass: "code-input-logo",
+        title: "输入虫洞密码",
+        showBack: true,
+        showInput: true,
+        paragraphs: ["请输入对方的6位配对码"],
+        buttons: [
+            {
+                text: "确认连接",
+                className: "confirm-btn",
+                action: null//validatePairCode
+            }
+        ]
+    },
+
+    // 配对成功页
+    paired: {
+        logoClass: "pair-logo-img",
+        title: "平行空间",
+        showBack: false,
+        paragraphs: [
+            "虫洞开启",
+            `正在与<span id = "paired-name-span">Ta</span>交换日记中。如需停止，请关闭「虫洞」。`,
+            "当对方更新日记时会收到通知"
+        ],
+        buttons: [
+            {
+                text: "关闭虫洞",
+                className: "close-pair-btn",
+                action: () => unpair()
+            }
+        ]
+    }
+};
+
+setPairPage('unpair');
 
 function unpair(){
     if(confirm("你确定要关闭「虫洞」吗？")){

@@ -136,51 +136,18 @@
 
     <div class = "right-page hidden" id="right-pair-sys">
 
-        <div class = "pair-page hidden" id = "pairing-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
-            <div class = "pair-logo" id = "pair-logo"></div>
-            <p id = "pair-title">平行空间</p>
-            <p>虫洞开启</p>
-            <p>
-                正在与<span id = "paired-name-span">她</span>交换日记中。如需停止，请关闭「虫洞」。<br />
-            </p>
-            <div class="pair-page-btn-area">
-                <button id = "close-pair-btn" onclick="unpair()">关闭「虫洞」</button> 
-            </div>
-        </div>
+    <!-- 配对页面 -->
+    <div class="pair-page" id="pair-container">
+        <!-- 返回按钮 -->
+        <div class="pair-back-btn hidden"></div>
+        <div class="pair-logo"></div>
+        <p id = "pair-title"></p>
+        <div class="pair-text"></div>
+        <!-- 对方邮箱 -->
+        <input type="text" class="pair-input hidden" placeholder="请输入对方注册邮箱">
+        <div class="pair-buttons"></div>
+    </div>
 
-        <div class = "pair-page hidden" id = "unpair-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
-            <div class = "pair-logo boy-logo" id = "unpair-logo"></div>
-            <p id = "pair-title">平行空间</p>
-            <p>虫洞关闭</p>
-            <p>
-                当两人互相开启「虫洞」后，异性的图标便会点亮。然后便能看到对方的日记。<br />
-                当一方写了新的日记，或更新了已有的日记时，另一方会收到推送通知。<br />
-                「虫洞」开启之后可以随时关闭。
-            </p>
-            <div class="pair-page-btn-area">
-                <button id = "random-pair-btn" onclick="">随机匹配 <span class="Ionicon-xl"></span></button>
-                <br />
-                <button id = "direct-pair-btn" onclick="">定向开启 <span class="Ionicon-xl"></span></button> 
-            </div>
-        </div>
-        <div class = "pair-page" id = "wormhole-page">    <!-- 两个div用于已匹配、未匹配的不同状态，不同页面 -->
-            <div class = "pair-logo" id = "wormhole-logo"></div>
-            <p id = "pair-title">随机匹配</p>
-            <p>在宇宙空间里，漂浮着很多个「时空涡旋」。</p>
-            <p>如果你想和别的世界「随机匹配」，不妨进入一个「涡旋」</p>
-            <p>当里面的世界足够多时，「时空涡旋」便会炸裂。这时，它里面的世界们便会随机配对。</p>
-            <h1 id="working-h1" class = "hidden" style="
-            color: #666666;
-            font-size: 128px;
-            font-family: '等线';
-            position: absolute;
-            bottom: 5vh;
-        ">施工中……</h1>
-            <div class="pair-page-btn-area">
-                <button id = "join-wormhole-btn" onclick="document.getElementById('working-h1').classList.remove('hidden')">加入这个「涡旋」 <span class="Ionicon-xl"></span></button>
-            </div>
-        </div>
-        
     </div>
 
     <script src="index.js"></script>

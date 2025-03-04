@@ -843,11 +843,25 @@ body {
     text-align: center; /* 文本居中 */
 }
 
+.pair-back-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 96px;
+    font-family: 'Ionicons';
+    cursor: pointer;
+    color: var(--color-self);
+}
+
 .pair-page p{
     text-align: center;
     color: #666666;
     font-family: '等线';
     font-size: 24;
+}
+
+#paired-name-span {
+    color: var(--color-paired);
 }
 
 .pair-logo {
@@ -857,26 +871,22 @@ body {
     background-repeat: round;
 }
 
-.girl-logo{
-    background-image: var(--img-girl);
+.unpair-logo-img{
+    background-image: var(--img-unpair-logo);
 }
 
-.boy-logo{
-    background-image: var(--img-boy);
-}
-
-#pair-logo {
+.pair-logo-img {
     background-image: var(--img-pair);
 }
 
-#wormhole-logo {
-    background-image: var(--img-wormhole);
-    background-size: cover;
-    width: 15vw;
-    height: 15vw;
-    margin-bottom: 10vh;
-    margin-top: -10vh;
-    animation: rotate 5s linear infinite; /* 旋转动画，5秒转一圈，无限循环 */
+.wormhole-logo {
+    background-image: var(--img-wormhole)!important;
+    background-size: cover!important;
+    width: 15vw!important;
+    height: 15vw!important;
+    margin-bottom: 10vh!important;
+    margin-top: -10vh!important;
+    animation: rotate 5s linear infinite!important; /* 旋转动画，5秒转一圈，无限循环 */
   }
 
   @keyframes rotate {
@@ -893,13 +903,13 @@ body {
     margin: 0;
 }
 
-.pair-page-btn-area {
+.pair-buttons {
     position: absolute;
     bottom: 4vh;
     align-items: center;
 }
 
-.pair-page-btn-area button{
+.pair-buttons button{
     border: solid;
     border-width: thin;
     border-color: var(--color-self);
@@ -912,9 +922,10 @@ body {
     margin: var(--space-sm);
     font-family: '等线', 'Ionicons';
     padding-bottom: 10px;
+    display: block;
 }
 
-.pair-page-btn-area button:active{
+.pair-buttons button:active{
     border: inset;
 }
 
@@ -924,10 +935,10 @@ span.Ionicon-xl {
     display: inline-block;
 }
 
-#close-pair-btn {
+.close-pair-btn {
     border: none;
     background-color: var(--color-self);
 }
-#close-pair-btn:hover {
+.close-pair-btn:hover {
     box-shadow: 0px 4px 8px var(--color-shadow-light);;
 }
