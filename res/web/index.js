@@ -762,80 +762,14 @@ var md = window.markdownit({
     }
     
 }).disable('code');
-  
-// 覆盖 paragraph 规则
-md.block.ruler.at('paragraph', (state, startLine, endLine) => {
-    const parentType = state.parentType;
-    let nextLine = startLine + 1;
-  
-    state.parentType = 'paragraph';
-    for (; nextLine < endLine && !state.isEmpty(nextLine); nextLine++) {
-      if (state.sCount[nextLine] - state.blkIndent > 3) continue;
-      if (state.sCount[nextLine] < 0) continue;
-  
-      let terminated = false;
-      const rules = state.md.block.ruler.getRules('paragraph');
-      for (let i = 0; i < rules.length; i++) {
-        if (rules[i](state, nextLine, endLine, true)) {
-          terminated = true;
-          break;
-        }
-      }
-      if (terminated) break;
-    }
-  
-    // 关键修改：禁用 trim
-    const content = state.getLines(startLine, nextLine, state.blkIndent, false);
-
-    // 转义行首空格
-     const escapedContent = content.replace(/^(\s+)/gm, (_, spaces) => {
-        return '\u00A0'.repeat(spaces.length); // Unicode 版的 &nbsp;
-    });
-
-    state.line = nextLine;
-    const tokenOpen = state.push('paragraph_open', 'p', 1);
-    tokenOpen.map = [startLine, state.line];
-  
-    const tokenInline = state.push('inline', '', 0);
-    tokenInline.content = escapedContent;
-    //tokenInline.content = content; // 原始内容（含首尾空格）
-    tokenInline.map = [startLine, state.line];
-    tokenInline.children = [];
-  
-    state.push('paragraph_close', 'p', -1);
-    state.parentType = parentType;
-    return true;
-});
-  
-// 覆盖 inline 渲染器，保留行首空格
-md.renderer.rules.inline = function (tokens, idx, options, env, self) {
-    return tokens[idx].content; // 直接返回内容，保留空白字符
-};
-
-//取消自动合并空行
-const defaultParagraphRenderer = md.renderer.rules.paragraph_open || ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
-md.renderer.rules.paragraph_open = function (tokens, idx, options, env, self) {
-    let result = '';
-    if (idx > 1) {
-      const inline = tokens[idx - 2];
-      const paragraph = tokens[idx];
-      if (inline.type === 'inline' && inline.map && inline.map[1] && paragraph.map && paragraph.map[0]) {
-        const diff = paragraph.map[0] - inline.map[1];
-        if (diff > 0) {
-          result = '<br>'.repeat(diff);
-        }
-      }
-    }
-    return result + defaultParagraphRenderer(tokens, idx, options, env, self);
-};
-
 
 function convertContentToPreview(content) {
 
     const userId = document.getElementById('write-page').dataset.currentUserId;
 
     // 解析 Markdown
-    transformedContent = md.render(content);
+    // transformedContent = md.render(content);
+    transformedContent = content;
     // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
     transformedContent = transformedContent.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
     // 处理图片标签
@@ -843,8 +777,6 @@ function convertContentToPreview(content) {
         `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
             style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
     );
-    // 不使用<p>
-    transformedContent = transformedContent.replace(/\<p\>/g,'').replace(/\<\/p\>/g,'');
 
     return transformedContent;
 }
