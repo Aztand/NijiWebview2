@@ -1053,8 +1053,7 @@ function setPairPage(configName) {
         btnContainer.appendChild(btn);
     });
 
-    // 显示容器
-    //container.classList.remove('hidden');
+    return '切换成功';
 }
 
 // 预定义的页面配置库

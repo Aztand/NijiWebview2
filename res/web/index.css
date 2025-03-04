@@ -936,9 +936,11 @@ span.Ionicon-xl {
 }
 
 .close-pair-btn {
-    border: none;
-    background-color: var(--color-self);
+    border: none!important;
+    background-color: var(--color-self)!important;
+    padding: 0!important;
+    color: white!important;
 }
 .close-pair-btn:hover {
-    box-shadow: 0px 4px 8px var(--color-shadow-light);;
+    box-shadow: 0px 4px 8px var(--color-shadow-light)!important;
 }
