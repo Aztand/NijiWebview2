@@ -1151,17 +1151,13 @@ PAGE_CONFIGS = {
                 text: "加入这个「涡旋」",
                 className: "join-wormhole-btn",
                 icon: '<span class="Ionicon-xl"></span>',
-                action: () => {
-                    swalMsg.fire({
-                        text: "施工中…"
-                    });
-                }
+                action: () => joinRandomPair()
             }
         ]
     },
 
     // 虫洞匹配中
-    paring: {
+    pairing: {
         logoClass: "wormhole-logo",
         title: "随机匹配",
         showBack: true,
@@ -1176,7 +1172,7 @@ PAGE_CONFIGS = {
             {
                 text: "断开连接",
                 className: "full-color-btn",
-                action: () => null
+                action: () => cancelRandomPair()
             }
         ]
     },
@@ -1203,7 +1199,6 @@ PAGE_CONFIGS = {
         logoClass: "unpair-logo-img",
         title: "平行空间",
         showBack: false,
-        showInput: true,
         paragraphs: ["已单向开启虫洞，正在等待对方开启……",
                      "为了防止单向骚扰，「定向开启」只有在双方都发起请求之后才能配对成功。在配对成功之前我们不会向另一方发出通知。请主动联系对方，让他也跟你定向开启。成功后我们会发送你配对成功的通知。"
         ],
@@ -1211,7 +1206,7 @@ PAGE_CONFIGS = {
             {
                 text: "停止我的请求",
                 className: "full-color-btn",
-                action: () => unpair()  
+                action: () => unpair( false )
             }
         ]
     },
@@ -1230,7 +1225,31 @@ PAGE_CONFIGS = {
             {
                 text: "关闭虫洞",
                 className: "full-color-btn",
-                action: () => unpair()
+                action: () => unpair( true )
+            }
+        ]
+    },
+
+    // 虫洞未求名
+    unknowName: {
+        logoClass: "unknow-name",
+        paragraphs: [
+            "第1天",
+            "祝贺！已与来自「时空」另一边的<span class = 'card-paired'>Ta</span>配对。",
+            "你们现在可以看到对方的<i>最新的三篇</i>日记了。<br />以后，每过一天你们都可以多看到一篇对方以前的日记，以及所有新增的日记。",
+            "如果你想知道对方的名字，可以发出「求名」请求。「求名」通过后可以看到彼此所有的日记",
+            "如果你不想继续配对，随时可以终止。"
+        ],
+        buttons: [
+            {
+                text: "「你的名字」是？",
+                className: "know-name-btn",
+                action: () => knowYourName()
+            },
+            {
+                text: "终止配对",
+                className: "full-color-btn",
+                action: () => unpair( true )
             }
         ]
     }
@@ -1238,7 +1257,59 @@ PAGE_CONFIGS = {
 
 setPairPage('unpair');
 
-function unpair(){
+function joinRandomPair(){
+    aardio.joinRandomPair();
+    swalMsg.fire({
+        title: "加入「涡旋」成功",
+        text: "耐心等待「涡旋」炸裂吧！",
+    }).then((result) => {
+        setPairPage('pairing');
+    });
+}
+
+function cancelRandomPair(){
+    aardio.cancelRandomPair();
+    swalMsg.fire({
+        text: "虫洞已关闭",
+    }).then((result) => {
+        setPairPage('wormhole');
+    });
+}
+
+function knowYourName(){
+    aardio.knowYourName();
+    swalMsg.fire({
+        text: "求名已发送！"
+    });
+}
+
+async function sendDirec(){
+    var pairEmail = document.getElementById('pair-email-input').value.trim();
+    var pairResult = await aardio.directPair(pairEmail);
+    if(pairResult == 'paired'){
+        swalMsg.fire({
+            title: "配对成功",
+            text: "虫洞已经开启，让「她的名字」出现在「你的日记」吧！"
+        }).then((result) => {
+            location.reload();
+        });
+    }
+    else if(pairResult == 'waiting'){
+        swalMsg.fire({
+            title: "请求已经发送",
+            text: "下面就等对方也向你发送请求啦"
+        }).then((result) => {
+            setPairPage('directSended')
+        });
+    }
+    else {
+        swalMsg.fire({
+            text: "配对请求失败，也许你填写的邮箱不可用"
+        })
+    }
+}
+
+function unpair( refresh ){
 
     swalMsg.fire({
         text: "你确定要关闭「虫洞」吗？",
@@ -1250,7 +1321,12 @@ function unpair(){
             swalMsg.fire({
                 text: "「虫洞」已关闭！"
             });
-            location.reload();
+            if(refresh){
+                location.reload();
+            }
+            else{
+                setPairPage('unpair')
+            }
         }
     });
 

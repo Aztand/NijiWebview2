@@ -881,6 +881,7 @@ body {
     color: #666666;
     font-family: '等线';
     font-size: 24;
+    max-width: 60vw;
 }
 
 #paired-name-span {
