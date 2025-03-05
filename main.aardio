@@ -550,10 +550,47 @@ wb.external = {
 	}
 	
 	unpair = function(){
-		unpairResp = http.api("https://nideriji.cn/api/unpair/").get();
+		var unpairResp = http.api("https://nideriji.cn/api/unpair/").get();
 		if(unpairResp["error"] != null){
-			if(unpair["error"] == 0 ){
+			if(unpairResp["error"] == 0 ){
 				return "success"; 	
+			}
+		}
+		return "error"; 
+	}
+	
+	joinRandomPair = function(){
+		var joinResp = http.api("https://nideriji.cn/api/join_random_pair/").get();
+		if(joinResp["error"] != null){
+			if(joinResp["error"] == 0 ){
+				return "success"; 	
+			}
+		}
+		return "error"; 
+	}
+	
+	cancelRandomPair = function(){
+		var cancelResp = http.api("https://nideriji.cn/api/cancel_random_pair/").get();
+		if(cancelResp["error"] != null){
+			if(cancelResp["error"] == 0 ){
+				return "success"; 	
+			}
+		}
+		return "error"; 
+	}
+	
+	directPair = function(targetEmail){
+		var dircResp = http.api("https://nideriji.cn/api/pair/").post(
+			target_email = targetEmail
+		)
+		if(dircResp["error"] != null){
+			if(dircResp["error"] == 0 ){
+				if(dircResp["paired"]){
+					return "paired"; 
+				}
+				else{
+					return "waiting"; 
+				}
 			}
 		}
 		return "error"; 

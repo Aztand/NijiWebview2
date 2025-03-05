@@ -8,16 +8,33 @@ window.hasUnsavedChanges = () => {
     }
 
 const _showSaveDialog = () => new Promise(resolve => {
-    const saveFirst = confirm("当前日记有未保存修改，是否保存？");
-    if (saveFirst) return resolve('save');
     
-    const confirmDiscard = confirm("确定要放弃修改吗？");
-    resolve(confirmDiscard ? 'discard' : 'cancel');
+    swalMsg.fire({
+        text: "当前日记有未保存修改，是否保存？",
+        confirmButtonText: "确定",
+        showCancelButton: true
+    }).then((result) => {
+        if( result.isConfirmed ){
+            resolve('save');
+        }
+        else{
+            swalMsg.fire({
+                text: "确定要放弃修改吗？",
+                confirmButtonText: "确定",
+                showCancelButton: true
+            }).then((result) => {
+                resolve( result.isConfirmed  ? 'discard' : 'cancel' )
+            });
+        }
+    });
+
 });
 
 const _handleSwitchError = (error) => {
     console.error(`日记切换失败: ${error.stack}`);
-    alert(`操作失败：${error.message}`);
+    swalMsg.fire({
+        text: `操作失败：${error.message}`
+    });
 };
 
 const _handleDeleteSuccess = (deletedId) => {
@@ -59,7 +76,9 @@ const _handleDeleteSuccess = (deletedId) => {
 
 
     // 3. 显示操作反馈      这其实应该是第五步，但发现实际上要用户点击这个alert之后，才会开始删除卡片、月份，这会导致无法正确删除月份。
-    alert('日记已永久删除');
+    swalMsg.fire({
+        text: "日记已永久删除"
+    });
 
 
     // 4. 移除被删卡片（带动画）
@@ -266,7 +285,9 @@ window.writeDiary = async function() {
         return result;
 
     } catch (error) {
-        alert(`保存失败：${error.message}`);
+        swalMsg.fire({
+            text: `保存失败：${error.message}`
+        });
         return { status: "Error", message: error.message };
     }
 };
@@ -316,7 +337,9 @@ window.setWritePage = async function(userId, diaryId, cardOwner, mode) {
 
     } catch (error) {
         console.error('日记加载失败:', error);
-        alert('无法加载日记内容');
+        swalMsg.fire({
+            text: '无法加载日记内容'
+        });
     }
 };
 
@@ -349,7 +372,9 @@ window.switchDiary = async function(target) {
 
     } catch (error) {
         console.error('日记切换失败:', error);
-        alert(`操作失败: ${error.message}`);
+        swalMsg.fire({
+            text: `操作失败: ${error.message}`
+        });
         return false;
     }
 };
@@ -374,7 +399,9 @@ document.getElementById('diary-card-list').addEventListener('click', async (even
     } catch (error) {
         const handleSwitchError = (error) => {
             console.error('切换失败:', error);
-            alert(`操作出错: ${error.message}`);
+            swalMsg.fire({
+                text: `操作出错: ${error.message}`
+            });
         };
     }
 });
@@ -474,7 +501,9 @@ document.getElementById('newMenuButton').addEventListener('click', async () => {
 
     } catch (error) {
         console.error('打开空白日记失败:', error);
-        alert(`操作失败: ${error.message}`);
+        swalMsg.fire({
+            text: `操作失败: ${error.message}`
+        });
         return false;
     }
 
@@ -498,8 +527,16 @@ document.getElementById('saveMenuButton').addEventListener('click', async () => 
                 if (diaryCards[i].dataset.createdDate == selectedDate && diaryCards[i].getAttribute("owner") == "self") {
                     isDiaryIdMatched = true;
                     if(selectedDate != writePage.dataset.createdDate){
-                        if(!confirm("在"+writePage.dataset.createdDate+"已有一篇日记，是否确认覆盖保存？")){
-                            return 0;//取消保存
+                        // 位于检查日记是否存在的逻辑块中
+                        const overwriteResult = await swalMsg.fire({
+                            text: `在 ${writePage.dataset.createdDate} 已有一篇日记，是否确认覆盖保存？`,
+                            showCancelButton: true,
+                            confirmButtonText: "确定",
+                        });
+
+                        if (!overwriteResult.isConfirmed) {
+                            Swal.close();
+                            return;
                         }
                     }
                     break; // 找到匹配的日记卡片后，退出循环
@@ -519,13 +556,17 @@ document.getElementById('saveMenuButton').addEventListener('click', async () => 
 
             // 如果是新建日记，添加到左侧列表
 
-            alert('保存成功！');
+            swalMsg.fire({
+                text: '保存成功！'
+            });
         } else {
             throw new Error(result.message || '保存失败');
         }
     } catch (error) {
         console.error('保存失败:', error);
-        alert(`保存失败: ${error.message}`);
+        swalMsg.fire({
+            text: `保存失败: ${error.message}`
+        });
     } finally {
         saveBtn.classList.remove('loading-spinner');
         saveBtn.disabled = false;
@@ -539,24 +580,32 @@ document.getElementById('deleteMenuButton').addEventListener('click', async () =
 
         // 权限验证
         if (ownerType !== 'self') {
-            alert('无权限删除他人日记');
+            swalMsg.fire({
+                text: '无权限删除他人日记'
+            });
             return;
         }
 
-        // 二次确认
-        const confirmDelete = confirm('确定要永久删除这篇日记吗？此操作不可撤销！');
-        if (!confirmDelete) return;
+        const result = await swalMsg.fire({
+            text: '确定要永久删除这篇日记吗？此操作不可撤销！',
+            showCancelButton: true,
+            confirmButtonText: "确定",
+        });
+        
+        if (!result.isConfirmed) return;
 
         // 执行删除
-        const result = await aardio.deleteDiary(currentUserId, currentDiaryId);
-        if (result !== "Success") throw new Error('删除操作未成功');
+        const delResult = await aardio.deleteDiary(currentUserId, currentDiaryId);
+        if (delResult !== "Success") throw new Error('删除操作未成功');
 
         // 删除成功处理
         _handleDeleteSuccess(currentDiaryId);
         
     } catch (error) {
         console.error('删除失败:', error);
-        alert(`删除失败: ${error.message}`);
+        swalMsg.fire({
+            text: `删除失败: ${error.message}`
+        });
     }
 });
 
@@ -964,7 +1013,9 @@ document.getElementById('upload-btn').addEventListener('click', async () => {   
         aardio.uploadImage();
     }
     else{
-        alert("因为服务器成本过高，\n图片功能仅对pro用户开放");
+        swalMsg.fire({
+            text: "因为服务器成本过高，\n图片功能仅对pro用户开放"
+        });
     }
 });
 
@@ -1058,7 +1109,7 @@ function setPairPage(configName) {
 
 // 预定义的页面配置库
 PAGE_CONFIGS = {
-    // 未匹配初始界面
+    // 未匹配初始
     unpair: {
         logoClass: "unpair-logo-img",
         title: "平行空间",
@@ -1078,12 +1129,12 @@ PAGE_CONFIGS = {
                 text: "定向开启", 
                 className: "direct-btn",
                 icon: '<span class="Ionicon-xl"></span>',
-                action: () => switchPage('directInput')
+                action: () => setPairPage('directPair')
             }
         ]
     },
 
-    // 虫洞界面
+    // 虫洞介绍页
     wormhole: {
         logoClass: "wormhole-logo",
         title: "随机匹配",
@@ -1100,28 +1151,72 @@ PAGE_CONFIGS = {
                 text: "加入这个「涡旋」",
                 className: "join-wormhole-btn",
                 icon: '<span class="Ionicon-xl"></span>',
-                action: () => alert('施工中……')
+                action: () => {
+                    swalMsg.fire({
+                        text: "施工中…"
+                    });
+                }
             }
         ]
     },
 
-    // 定向页面
-    directInput: {
-        logoClass: "code-input-logo",
-        title: "输入虫洞密码",
+    // 虫洞匹配中
+    paring: {
+        logoClass: "wormhole-logo",
+        title: "随机匹配",
         showBack: true,
-        showInput: true,
-        paragraphs: ["请输入对方的6位配对码"],
+        backAction: () => setPairPage('unpair'),
+        showInput: false,
+        paragraphs: [
+            "已经进入「涡旋」，等待匹配...",
+            '「涡旋」会随着吸入世界的增加而变的越来越不稳定。当它的能量达到极值时，便会炸裂。此时，被它吸入的世界们便会「随机配对」',
+            `下次「涡旋」炸裂时间为：<br />${new Date().getHours() < 20 ? '今晚' : '明晚'}20:00`
+        ],
         buttons: [
             {
-                text: "确认连接",
-                className: "confirm-btn",
-                action: null//validatePairCode
+                text: "断开连接",
+                className: "full-color-btn",
+                action: () => null
             }
         ]
     },
 
-    // 配对成功页
+    // 定向请求页
+    directPair: {
+        logoClass: "unpair-logo-img",
+        title: "平行空间",
+        showBack: true,
+        backAction: () => setPairPage('unpair'),
+        showInput: true,
+        paragraphs: ["定向开启"],
+        buttons: [
+            {
+                text: "发出配对请求",
+                className: "send-direct-btn",
+                action: () => sendDirec()
+            }
+        ]
+    },
+
+    // 定向待回应
+    directSended: {
+        logoClass: "unpair-logo-img",
+        title: "平行空间",
+        showBack: false,
+        showInput: true,
+        paragraphs: ["已单向开启虫洞，正在等待对方开启……",
+                     "为了防止单向骚扰，「定向开启」只有在双方都发起请求之后才能配对成功。在配对成功之前我们不会向另一方发出通知。请主动联系对方，让他也跟你定向开启。成功后我们会发送你配对成功的通知。"
+        ],
+        buttons: [
+            {
+                text: "停止我的请求",
+                className: "full-color-btn",
+                action: () => unpair()  
+            }
+        ]
+    },
+
+    // 已有配对页
     paired: {
         logoClass: "pair-logo-img",
         title: "平行空间",
@@ -1134,7 +1229,7 @@ PAGE_CONFIGS = {
         buttons: [
             {
                 text: "关闭虫洞",
-                className: "close-pair-btn",
+                className: "full-color-btn",
                 action: () => unpair()
             }
         ]
@@ -1144,11 +1239,62 @@ PAGE_CONFIGS = {
 setPairPage('unpair');
 
 function unpair(){
-    if(confirm("你确定要关闭「虫洞」吗？")){
-        if(confirm("你真的要关闭「虫洞」吗？！")){
+
+    swalMsg.fire({
+        text: "你确定要关闭「虫洞」吗？",
+        confirmButtonText: "确定",
+        showCancelButton: true
+    }).then((result) => {
+        if( result.isConfirmed ){
             aardio.unpair();
-            alert("「虫洞」已关闭！")
+            swalMsg.fire({
+                text: "「虫洞」已关闭！"
+            });
             location.reload();
         }
-    }
+    });
+
 }
+
+const swalMsg = Swal.mixin({
+    title: "你的日记",
+    text: "",
+    showConfirmButton: true,
+    confirmButtonText: '好的',
+    showCancelButton: false,
+    cancelButtonText: '取消',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    customClass: {
+        title: "left-align",
+        htmlContainer: "left-align",
+        actions: "right-align-item",
+        confirmButton: "niji-style-button",
+        cancelButton: "niji-style-button"
+    }
+});
+
+/* 一个Swal的使用模板。 总之，这玩意儿让Alert和Confirm不那么省地方了……
+Swal.fire({
+    title: "你的日记",
+    text: "虫洞已经开启，让「她的名字」出现在「你的日记」吧!但是我必须要测试如果这段话长一点会怎样",
+    showConfirmButton: true,
+    confirmButtonText: '确定',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    customClass: {
+        title: "left-align",
+        htmlContainer: "left-align",
+        actions: "right-align-item",
+        confirmButton: "niji-style-button"
+    }
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Your file has been deleted.",
+      icon: "success"
+    });
+  }
+});
+*/

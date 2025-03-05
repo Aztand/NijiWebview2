@@ -20,7 +20,8 @@
     --color-xx-light-gray: #fefefe;
     --color-self: var(--color-primary-boy);
     --color-paired: var(--color-primary-girl);
-    
+    --color-button-green: #077F76;
+
     /* 间距 (1rem=16px) */
     --space-xxs: 0.25rem;  /* 4px */
     --space-xs: 0.5rem;    /* 8px */
@@ -86,6 +87,28 @@ body {
 #right-diary {
     display: grid;
     grid-template-columns: 25% 75%;
+}
+
+/* 自定义的Swal对话框属性 */
+
+.left-align {
+    text-align: left;
+}
+
+.right-align-item {
+    justify-content: flex-end !important; /* 右对齐 */
+    gap: 10px; /* 控制按钮间距 */
+    width: 100%;
+    padding-right: 5%;
+}
+
+.niji-style-button {
+    background: none;
+    color: var(--color-button-green);
+}
+
+.niji-style-button:hover {
+    cursor: pointer;
 }
 
 /* ===== 工具类 ===== */
@@ -925,6 +948,30 @@ body {
     display: block;
 }
 
+input.pair-input {
+    position: absolute;
+    bottom: 20vh;
+    width: 640px;
+    height: 64px;
+    border: none;
+    border-bottom: solid;
+    border-color: var(--color-self);
+    text-align: center;
+    font-size: 24px;
+    font-family: '等线';
+    outline: none;
+    color: var(--color-self);
+    background: none;
+}
+
+input.pair-input::placeholder {
+    color: var(--color-self);
+}
+
+.send-direct-btn {
+    padding: 0!important;
+}
+
 .pair-buttons button:active{
     border: inset;
 }
@@ -935,12 +982,12 @@ span.Ionicon-xl {
     display: inline-block;
 }
 
-.close-pair-btn {
+.full-color-btn {
     border: none!important;
     background-color: var(--color-self)!important;
     padding: 0!important;
     color: white!important;
 }
-.close-pair-btn:hover {
+.full-color-btn:hover {
     box-shadow: 0px 4px 8px var(--color-shadow-light)!important;
 }

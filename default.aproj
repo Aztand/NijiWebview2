@@ -28,6 +28,8 @@
 			<file name="write.svg" path="res\web\write.svg" comment="res\web\write.svg"/>
 			<file name="Ionicons.ttf" path="res\web\Ionicons.ttf" comment="res\web\Ionicons.ttf"/>
 			<file name="wormhole.svg" path="res\web\wormhole.svg" comment="res\web\wormhole.svg"/>
+			<file name="sweetalert2.all.min.js" path="res\web\sweetalert2.all.min.js" comment="res\web\sweetalert2.all.min.js"/>
+			<file name="sweetalert2.min.css" path="res\web\sweetalert2.min.css" comment="res\web\sweetalert2.min.css"/>
 		</folder>
 	</folder>
 	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">
