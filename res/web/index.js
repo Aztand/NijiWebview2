@@ -779,7 +779,10 @@ window.setPairSpan = function( role, pairname ){
 }
 
 window.setAvatar = function(avatarPath){
-    document.getElementById("avatar-img").setAttribute("src",avatarPath);
+    var elements = document.getElementsByClassName("avatar-img");
+    Array.from(elements).forEach(function(element) {
+      element.setAttribute("src", avatarPath);
+    });    
 }
 
 // 所有的选项列表（默认情况下）
@@ -1083,6 +1086,17 @@ function setPairPage(configName) {
     const logo = container.querySelector('.pair-logo');
     logo.className = `pair-logo ${config.logoClass || ''}`;
 
+    //处理未求名时特殊Logo样式
+    const unknowContainer = container.querySelector('.unknow-name-container');
+    if(config.unknowName){
+        logo.classList.toggle("hidden",true);
+        unknowContainer.classList.toggle('hidden',false);
+    }
+    else{
+        logo.classList.toggle("hidden",false);
+        unknowContainer.classList.toggle('hidden',true);
+    }
+
     // 设置标题
     container.querySelector('#pair-title').textContent = config.title;
 
@@ -1232,11 +1246,11 @@ PAGE_CONFIGS = {
 
     // 虫洞未求名
     unknowName: {
-        logoClass: "unknow-name",
+        unknowName: true,
         paragraphs: [
             "第1天",
-            "祝贺！已与来自「时空」另一边的<span class = 'card-paired'>Ta</span>配对。",
-            "你们现在可以看到对方的<i>最新的三篇</i>日记了。<br />以后，每过一天你们都可以多看到一篇对方以前的日记，以及所有新增的日记。",
+            "祝贺！已与来自「时空涡旋」另一边的<span class = 'card-paired'>Ta</span>配对。",
+            "你们现在可以看到对方的<b>最新的三篇</b>日记了。<br />以后，每过一天你们都可以多看到一篇对方以前的日记，以及所有新增的日记。",
             "如果你想知道对方的名字，可以发出「求名」请求。「求名」通过后可以看到彼此所有的日记",
             "如果你不想继续配对，随时可以终止。"
         ],
@@ -1309,6 +1323,19 @@ async function sendDirec(){
     }
 }
 
+function refresh(){
+    // 获取页面上所有的input元素
+    var inputs = document.querySelectorAll('input');
+
+    // 遍历每个input元素
+    inputs.forEach(function(input) {
+        // 设置input的defaultValue属性为当前的value
+        input.defaultValue = input.value;
+    });
+
+    location.reload();
+}
+
 function unpair( refresh ){
 
     swalMsg.fire({
@@ -1321,11 +1348,10 @@ function unpair( refresh ){
             swalMsg.fire({
                 text: "「虫洞」已关闭！"
             });
+            setPairPage('unpair')
             if(refresh){
+                document.innerHTML = "";
                 location.reload();
-            }
-            else{
-                setPairPage('unpair')
             }
         }
     });

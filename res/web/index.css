@@ -903,14 +903,41 @@ body {
     background-image: var(--img-pair);
 }
 
+.unknow-name-container {
+    position: absolute;
+    top: 20vh;
+    display: flex;
+}
+
+.unknow-name-container img{
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+}
+
+.pair-logo-small {
+    width: 64px;
+    height: 64px;
+    margin: 32 64px;
+    background-image: var(--img-pair);
+    background-size: 100%;
+}
+
+.unpair-name-pairAvatar {
+    height: 128px;
+    width: 128px;
+    background-color: var(--color-paired);
+    border-radius: 50%;
+}
+
 .wormhole-logo {
-    background-image: var(--img-wormhole)!important;
-    background-size: cover!important;
-    width: 15vw!important;
-    height: 15vw!important;
-    margin-bottom: 10vh!important;
-    margin-top: -10vh!important;
-    animation: rotate 5s linear infinite!important; /* 旋转动画，5秒转一圈，无限循环 */
+    background-image: var(--img-wormhole) !important;
+    background-size: cover !important;
+    width: 15vw !important;
+    height: 15vw !important;
+    margin-bottom: 10vh !important;
+    margin-top: -10vh !important;
+    animation: rotate 5s linear infinite !important; /* 旋转动画，5秒转一圈，无限循环 */
   }
 
   @keyframes rotate {
@@ -923,7 +950,7 @@ body {
   }
 
 #pair-title {
-    font-size: 64!important;
+    font-size: 64 !important;
     margin: 0;
 }
 
@@ -949,6 +976,10 @@ body {
     display: block;
 }
 
+.know-name-btn {
+    padding-bottom: 0 !important;
+}
+
 input.pair-input {
     position: absolute;
     bottom: 20vh;
@@ -970,7 +1001,7 @@ input.pair-input::placeholder {
 }
 
 .send-direct-btn {
-    padding: 0!important;
+    padding: 0 !important;
 }
 
 .pair-buttons button:active{
@@ -978,17 +1009,17 @@ input.pair-input::placeholder {
 }
 
 span.Ionicon-xl {
-    font-size: var(--text-xl)!important;
+    font-size: var(--text-xl) !important;
     transform: translateY(7px);
     display: inline-block;
 }
 
 .full-color-btn {
-    border: none!important;
-    background-color: var(--color-self)!important;
-    padding: 0!important;
-    color: white!important;
+    border: none !important;
+    background-color: var(--color-self) !important;
+    padding: 0 !important;
+    color: white !important;
 }
 .full-color-btn:hover {
-    box-shadow: 0px 4px 8px var(--color-shadow-light)!important;
+    box-shadow: 0px 4px 8px var(--color-shadow-light) !important;
 }
