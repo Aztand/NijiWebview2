@@ -595,8 +595,10 @@ document.getElementById('deleteMenuButton').addEventListener('click', async () =
         if (!result.isConfirmed) return;
 
         // 执行删除
-        const delResult = await aardio.deleteDiary(currentUserId, currentDiaryId);
-        if (delResult !== "Success") throw new Error('删除操作未成功');
+        if(currentDiaryId){
+            const delResult = await aardio.deleteDiary(currentUserId, currentDiaryId);
+            if (delResult !== "Success") throw new Error('删除操作未成功');
+        }
 
         // 删除成功处理
         _handleDeleteSuccess(currentDiaryId);
