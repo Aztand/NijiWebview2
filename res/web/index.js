@@ -647,7 +647,23 @@ function insertTabAtCursor(areaId) {    //Tab缩进代码
     var back = (textArea.value).substring(textArea.selectionEnd, textArea.value.length);
     
     textArea.value = front + "    " + back;
-    cursorPos = cursorPos + 8;
+    cursorPos = cursorPos + 4;
+    textArea.selectionStart = cursorPos;
+    textArea.selectionEnd = cursorPos;
+    textArea.focus();
+    textArea.scrollTop = scrollPos;
+}
+
+function insertPrivateAtCursor(areaId) {    //Tab缩进代码
+    var textArea = document.getElementById(areaId);
+    var scrollPos = textArea.scrollTop;
+    var cursorPos = textArea.selectionStart;
+
+    var front = (textArea.value).substring(0, textArea.selectionStart);
+    var back = (textArea.value).substring(textArea.selectionEnd, textArea.value.length);
+    
+    textArea.value = front + '[隐私区域开始]\n        \n[隐私区域结束]' + back;
+    cursorPos = cursorPos + 17;
     textArea.selectionStart = cursorPos;
     textArea.selectionEnd = cursorPos;
     textArea.focus();
@@ -701,6 +717,9 @@ function handleSpecialKeys(e) {
             if(!document.getElementById('saveMenuButton').hasAttribute('hidden')){
                 document.getElementById('saveMenuButton').click();
             }
+        } else if (e.keyCode === 80){   //Ctrl+P
+            e.preventDefault();
+            insertPrivateAtCursor('diary-input');
         }
     }
 }

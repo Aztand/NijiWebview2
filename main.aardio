@@ -13,6 +13,9 @@ import process.ffmpeg;
 import qrencode.bitmap;
 import gdip.graphics;
 import gdip.bitmap;
+import crypt.bin;
+import crypt.aes;
+import preg;
 /*
 import debug;
 import debug.log;
@@ -39,6 +42,7 @@ wb = web.view(mainForm,{
 loginGo = "";
 token = "";
 uploadIP = "";
+userID = "";
 useMarkdown = false;
 
 if(table.count(cfg.config) > 1){
@@ -90,7 +94,7 @@ uploadServer.run( {
 			response.headers["Expires"] = "0";
 			
 			fileData = request.postFileData()
-			//console.open()
+
 			if(fileData){
 				
 				var outputDir = io.joinpath(NijiDocPath, "upload_temp");
@@ -313,6 +317,11 @@ v2sync = function(){
     		images_ts = 0
     );
     isMember = diaryResponse["user_config"]["is_member"];
+		
+	//aes.setKeyParamMode(2/*_CRYPT_MODE_ECB*/);
+	//aes.setInitVector(null); // ECB模式必须禁用IV
+	//aes.setPaddingMode(1/*_CRYPT_PADDING_PKCS7*/); // 显式指定PKCS7填充
+	
     uploadTmpTable = {};	//清空上传图片相关的缓存
 	uploadTmpNum = 1;
 	//因为图片下载可以开启多线程后台，所以直接先开始检测下载再处理日记卡片、日记列表。
@@ -386,6 +395,9 @@ v2sync = function(){
 	}
 		
 	userID = diaryResponse["user_config"]["userid"];	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
+		// 加密参数配置
+	aes.setPassword( tostring(userID) ); // 128位密钥（16字符）
+	
 	wb.invoke('setUserId' , userID);	//html方面全局变量，主要用于新建空白日记以及图片索引。匹配对象的id在下面设置。
 	
 	//为html传输看图端口
@@ -493,10 +505,7 @@ wb.external = {
 			wb.doScript('document.getElementById("wrong-tip").hidden = false;');
 		}
 		else{
-			/*用于在开发阶段获取自己的token
-			console.log(loginResponse.token)
-			//*/
-			
+
 			loginGo = 1;
 			http.addHeaders = {
 				["auth"] = "token " ++ loginResponse.token;
@@ -530,9 +539,12 @@ wb.external = {
 	
 
 	writeDiary = function(dateText,titleText,contentText){
+		
+		encryptedContent = encryptDiary2AES( contentText )
+		
 		saveResponse = http.api("https://nideriji.cn/api/write/").post(
 			title = titleText,
-			content = contentText,
+			content = encryptedContent,
 			date = dateText
 		);
 		
@@ -555,6 +567,29 @@ wb.external = {
 		}
 	}
 	
+	
+	getDiary = function(ownerID,diaryID){
+		getAllResponse = http.api("https://nideriji.cn/api/diary/all_by_ids/" ++ ownerID ++ "/").post(
+			diary_ids = diaryID
+		);
+		if(getAllResponse["diaries"][1]){
+			http.api("https://nideriji.cn/api/update_read_mark/" ++ diaryID ++ "/").get();
+			returnJson = getAllResponse["diaries"][1];
+			if(ownerID == userID){	
+				returnJson["content"] = decryptDiary2AES( returnJson["content"] );
+			}
+			else {
+				returnJson["content"] = showPairPrivacy( returnJson["content"] ); 
+			}
+			
+			return web.json.stringify(returnJson,true);
+		}
+		else {
+			return "error";
+		} 
+		
+	}
+	
 	deleteDiary = function(userID,diaryID){
 		delResponse = http.api("https://nideriji.cn/api/diary/delete/"++ diaryID ++ "/").get();
 		if(delResponse["error"] != null ? delResponse["error"] == 0 : false/* 若不存在delR则直接报错 */){
@@ -564,20 +599,7 @@ wb.external = {
 			return "error"; 
 		}
 	}
-	
-	getDiary = function(ownerID,diaryID){
-		getAllResponse = http.api("https://nideriji.cn/api/diary/all_by_ids/" ++ ownerID ++ "/").post(
-			diary_ids = diaryID
-		);
-		if(getAllResponse["diaries"][1]){
-			http.api("https://nideriji.cn/api/update_read_mark/" ++ diaryID ++ "/").get();
-			return web.json.stringify(getAllResponse["diaries"][1],true);
-		}
-		else {
-			return "error";
-		} 
-		
-	}
+
 	
 	uploadImage = function(/* 自动读取UploadTmpTable以及upload_temp下文件，所以无需参数 */){
 		
@@ -707,6 +729,59 @@ mainForm.onClose = function(hwnd,message,wParam,lParam){
     }
 }
 
+// 创建AES实例
+aes = crypt.aes();
+
+function encryptDiary2AES(diaryContent){
+    // 匹配隐私区域（兼容任意空白格式）
+
+    var regex = preg(
+        "\[隐私区域开始\]([\s\S]+?)\[隐私区域结束\]",
+        "g"
+    );
+
+
+    return regex.replace(diaryContent, function(match, plaintext){
+		aes.setPassword(tostring(userID))
+    	// AES加密（需要预先初始化aes对象）
+    	var ciphertext = aes.encrypt(match);
+            	
+    	// 16进制编码
+    	var b64 = crypt.bin.encodeBase64(ciphertext)
+    	// 构建加密块（紧凑格式）
+    	return "[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败][图64337454]" ++ b64 ++ "[以上是隐私日记，请不要编辑密文]"	;            
+
+    });
+}
+
+function decryptDiary2AES(cryptContent){
+    // 精确匹配完整标签（包含标点）
+    var regex = preg(
+        "\[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败\]\[图64337454\]\s*([\s\S]+?)\s*\[以上是隐私日记，请不要编辑密文\]",
+        "g"
+    );
+	
+    return regex.replace(cryptContent, function(match, ciphertext){
+
+		aes.setPassword(tostring(userID))
+		var unb64 = crypt.bin.decodeBase64(match);
+		var plaintext = aes.decrypt(unb64);
+		return "[隐私区域开始]" + plaintext + "[隐私区域结束]";
+
+    });
+}
+
+function showPairPrivacy(cryptContent){
+    var regex = preg(
+        "\[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败\]\[图64337454\]\s*([\s\S]+?)\s*\[以上是隐私日记，请不要编辑密文\]",
+        "g"
+    );
+	
+    return regex.replace(cryptContent, function(match, ciphertext){
+		return '\n【对方在这里写了一些隐私内容】\n';
+
+    });
+}
 
 wb.go("/res/web/login.html");
 wb.focus();
