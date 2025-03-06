@@ -749,7 +749,7 @@ function encryptDiary2AES(diaryContent){
     	// 16进制编码
     	var b64 = crypt.bin.encodeBase64(ciphertext)
     	// 构建加密块（紧凑格式）
-    	return "[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败][图64337454]" ++ b64 ++ "[以上是隐私日记，请不要编辑密文]"	;            
+    	return "[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败]" ++ b64 ++ "[以上是隐私日记，请不要编辑密文]"	;            
 
     });
 }
@@ -757,7 +757,7 @@ function encryptDiary2AES(diaryContent){
 function decryptDiary2AES(cryptContent){
     // 精确匹配完整标签（包含标点）
     var regex = preg(
-        "\[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败\]\[图64337454\]\s*([\s\S]+?)\s*\[以上是隐私日记，请不要编辑密文\]",
+        "\[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败\]([\s\S]+?)\s*\[以上是隐私日记，请不要编辑密文\]",
         "g"
     );
 	
@@ -773,7 +773,7 @@ function decryptDiary2AES(cryptContent){
 
 function showPairPrivacy(cryptContent){
     var regex = preg(
-        "\[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败\]\[图64337454\]\s*([\s\S]+?)\s*\[以上是隐私日记，请不要编辑密文\]",
+        "\[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败\]([\s\S]+?)\s*\[以上是隐私日记，请不要编辑密文\]",
         "g"
     );
 	

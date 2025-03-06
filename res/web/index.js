@@ -755,6 +755,7 @@ let pairedId = "";
 let pairedName = "";
 let pairedGenderHan = "";
 let useMarkdown = false;
+let closeUpgrade = false;
 let isMember = false;
 
 window.setPairedGender = function(e){
@@ -1475,4 +1476,12 @@ markdownCheckbox.addEventListener('change', function() {
     aardio.remMarkdown(this.checked);
     previewDiv.innerHTML = convertContentToPreview(textarea.value);
     hljs.highlightAll();
+});
+
+const closeUpgradeCheckbox = document.getElementById('upgrade-checkbox');
+// 添加事件监听器，当checkbox的状态改变时触发
+markdownCheckbox.addEventListener('change', function() {
+    // 更新变量useMarkdown为checkbox的当前状态
+    closeUpgrade = this.checked;
+    aardio.setUpgrade(this.checked);
 });
