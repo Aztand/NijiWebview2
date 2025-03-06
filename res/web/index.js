@@ -677,30 +677,44 @@ function insertTextAtCursor(areaId, text) {     //快捷键插入日期时间代
   
 function handleSpecialKeys(e) {
     if (e.ctrlKey) {
-      if (e.keyCode === 68) { // Shift+D
-        e.preventDefault(); // Prevent default Shift+D behavior
-        var date = new Date();
-        var dateString = date.getFullYear() + "/" +
-                         ("0" + (date.getMonth() + 1)).slice(-2) + "/" +
-                         ("0" + date.getDate()).slice(-2) + " [" +
-                         ("0" + date.getHours()).slice(-2) + ":" +
-                         ("0" + date.getMinutes()).slice(-2) + ":" +
-                         ("0" + date.getSeconds()).slice(-2) + "]";
-        insertTextAtCursor('diary-input', dateString);
-      } else if (e.keyCode === 84) { // Shift+T
-        e.preventDefault(); // Prevent default Shift+T behavior
-        var time = new Date();
-        var timeString = "[" +
-                         ("0" + time.getHours()).slice(-2) + ":" +
-                         ("0" + time.getMinutes()).slice(-2) + ":" +
-                         ("0" + time.getSeconds()).slice(-2) + "]";
-        insertTextAtCursor('diary-input', timeString);
-      }
+        if (e.keyCode === 68) { // Ctrl+D
+            e.preventDefault(); // Prevent default Shift+D behavior
+            var date = new Date();
+            var dateString = date.getFullYear() + "/" +
+                            ("0" + (date.getMonth() + 1)).slice(-2) + "/" +
+                            ("0" + date.getDate()).slice(-2) + " [" +
+                            ("0" + date.getHours()).slice(-2) + ":" +
+                            ("0" + date.getMinutes()).slice(-2) + ":" +
+                            ("0" + date.getSeconds()).slice(-2) + "]";
+            insertTextAtCursor('diary-input', dateString);
+        } else if (e.keyCode === 84) { // Ctrl+T
+            e.preventDefault(); // Prevent default Shift+T behavior
+            var time = new Date();
+            var timeString = "[" +
+                            ("0" + time.getHours()).slice(-2) + ":" +
+                            ("0" + time.getMinutes()).slice(-2) + ":" +
+                            ("0" + time.getSeconds()).slice(-2) + "]";
+            insertTextAtCursor('diary-input', timeString);
+        } else if (e.keyCode === 83 ){  // Ctrl+S
+            if(!document.getElementById('saveMenuButton').hasAttribute('hidden')){
+                document.getElementById('saveMenuButton').click();
+            }
+        }
     }
 }
-  
+
+function windowSpecialKeys(e) {
+    if (e.ctrlKey) {
+        if (e.keyCode === 77 ) {// Ctrl+M
+            e.preventDefault();
+            markdownCheckbox.click();
+        }
+    }
+}
+
 // 绑定事件监听器到textarea
 diaryInput.addEventListener('keydown', handleSpecialKeys);
+window.addEventListener('keydown', windowSpecialKeys);
 
 function ToggleHotkeyTipsShow() {
     // 选择所有具有'.Hotkey-tips'类的元素
@@ -719,6 +733,7 @@ let uploadPort = "";
 let pairedId = "";
 let pairedName = "";
 let pairedGenderHan = "";
+let useMarkdown = false;
 let isMember = false;
 
 window.setPairedGender = function(e){
@@ -821,18 +836,26 @@ function convertContentToPreview(content) {
 
     const userId = document.getElementById('write-page').dataset.currentUserId;
 
-    // 解析 Markdown
-    // transformedContent = md.render(content);
-    transformedContent = content;
-    // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
-    transformedContent = transformedContent.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
-    // 处理图片标签
-    transformedContent = transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
-        `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
-            style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
-    );
+    if( !useMarkdown ){ //优先渲染你记标准格式
+        transformedContent = content;
+        // 使用正则表达式匹配包含 [hh:mm:ss] 的整行，不检查时间的合法性
+        transformedContent = transformedContent.replace(/^(.*?)\[([0-9]{2}):([0-9]{2}):([0-9]{2})\](.*?)$/gm, '<span class="timetag-line"><span class="time-icon">🕘</span> $1$2:$3:$4$5</span>');
+        // 处理图片标签
+        transformedContent = transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
+            `<img src="http://127.0.0.1:${port}/${userId}/${p1}.jpg" 
+                style="max-width: 80%; margin: 5px 0;" title = "图${p1}" loading = "lazy" alt="图${p1}不存在，或者您的pro已过期">`
+        );
+        return transformedContent;
+    }
+    else{
+        transformedContent = content;
+        transformedContent = transformedContent.replace(/\[图(\d+)\]/g, (match, p1) => 
+            `![图${p1}不存在，或者您的pro已过期](http://127.0.0.1:${port}/${userId}/${p1}.jpg "图${p1}")`
+        );
+        transformedContent = md.render(transformedContent);
+        return transformedContent;
+    }
 
-    return transformedContent;
 }
 
 function formatTimeAgo(ts) {                    //ts为秒级readmark时间戳
@@ -1024,16 +1047,38 @@ document.getElementById('upload-btn').addEventListener('click', async () => {   
 
 
 //自动重载加载失败的图片—————————————————————START—————————————————————————————————————————————————
+// 使用 WeakMap 存储图片的重试次数（避免内存泄漏）
+const retryCountMap = new WeakMap();
+
 function handleImageError(img) {
-    const src = img.src;
-    img.src = ''; // 清空src，触发重新加载
-    img.src = src;
+    const currentCount = retryCountMap.get(img) || 0;
+    
+    if (currentCount < 3) {
+        retryCountMap.set(img, currentCount + 1);
+        
+        // 使用 setTimeout 延迟重试
+        setTimeout(() => {
+            // 确保图片仍然在文档中
+            if (document.body.contains(img)) {
+                const src = img.src;
+                img.src = '';
+                img.src = src;
+            }
+        }, 3000); // 5秒间隔
+    } else {
+        // 超过最大重试次数则移除监听器
+        img.removeEventListener('error', handleImageError);
+    }
 }
 
 // 为所有图片添加错误事件监听器
 function addErrorListeners() {
     const images = document.querySelectorAll('img');
     images.forEach(img => {
+        // 初始化重试计数器
+        if (!retryCountMap.has(img)) {
+            retryCountMap.set(img, 0);
+        }
         img.addEventListener('error', () => handleImageError(img));
     });
 }
@@ -1043,6 +1088,8 @@ const observer = new MutationObserver((mutations) => {
     mutations.forEach(mutation => {
         mutation.addedNodes.forEach(node => {
             if (node.tagName === 'IMG') {
+                // 初始化新图片的重试计数器
+                retryCountMap.set(node, 0);
                 node.addEventListener('error', () => handleImageError(node));
             }
         });
@@ -1248,7 +1295,7 @@ PAGE_CONFIGS = {
     unknowName: {
         unknowName: true,
         paragraphs: [
-            "第1天",
+            "第0天",
             "祝贺！已与来自「时空涡旋」另一边的<span class = 'card-paired'>Ta</span>配对。",
             "你们现在可以看到对方的<b>最新的三篇</b>日记了。<br />以后，每过一天你们都可以多看到一篇对方以前的日记，以及所有新增的日记。",
             "如果你想知道对方的名字，可以发出「求名」请求。「求名」通过后可以看到彼此所有的日记",
@@ -1259,6 +1306,30 @@ PAGE_CONFIGS = {
                 text: "「你的名字」是？",
                 className: "know-name-btn",
                 action: () => knowYourName()
+            },
+            {
+                text: "终止配对",
+                className: "full-color-btn",
+                action: () => unpair( true )
+            }
+        ]
+    },
+
+    // 虫洞未求名
+    askingName: {
+        unknowName: true,
+        paragraphs: [
+            "第0天",
+            "祝贺！已与来自「时空涡旋」另一边的<span class = 'card-paired'>Ta</span>配对。",
+            "你们现在可以看到对方的<b>最新的三篇</b>日记了。<br />以后，每过一天你们都可以多看到一篇对方以前的日记，以及所有新增的日记。",
+            "如果你想知道对方的名字，可以发出「求名」请求。「求名」通过后可以看到彼此所有的日记",
+            "如果你不想继续配对，随时可以终止。"
+        ],
+        buttons: [
+            {
+                text: "已发出「求名」请求",
+                className: "asking-name-btn",
+                action: () => null
             },
             {
                 text: "终止配对",
@@ -1305,7 +1376,7 @@ async function sendDirec(){
             title: "配对成功",
             text: "虫洞已经开启，让「她的名字」出现在「你的日记」吧！"
         }).then((result) => {
-            location.reload();
+            refresh();
         });
     }
     else if(pairResult == 'waiting'){
@@ -1324,14 +1395,7 @@ async function sendDirec(){
 }
 
 function refresh(){
-    // 获取页面上所有的input元素
-    var inputs = document.querySelectorAll('input');
-
-    // 遍历每个input元素
-    inputs.forEach(function(input) {
-        // 设置input的defaultValue属性为当前的value
-        input.defaultValue = input.value;
-    });
+    document.write("刷新中……若刷新失败请您手动刷新");//清空页面，防止刷新失败
 
     location.reload();
 }
@@ -1350,8 +1414,7 @@ function unpair( refresh ){
             });
             setPairPage('unpair')
             if(refresh){
-                document.innerHTML = "";
-                location.reload();
+                refresh();
             }
         }
     });
@@ -1376,27 +1439,19 @@ const swalMsg = Swal.mixin({
     }
 });
 
-/* 一个Swal的使用模板。 总之，这玩意儿让Alert和Confirm不那么省地方了……
-Swal.fire({
-    title: "你的日记",
-    text: "虫洞已经开启，让「她的名字」出现在「你的日记」吧!但是我必须要测试如果这段话长一点会怎样",
-    showConfirmButton: true,
-    confirmButtonText: '确定',
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    customClass: {
-        title: "left-align",
-        htmlContainer: "left-align",
-        actions: "right-align-item",
-        confirmButton: "niji-style-button"
-    }
-}).then((result) => {
-  if (result.isConfirmed) {
-    Swal.fire({
-      title: "Deleted!",
-      text: "Your file has been deleted.",
-      icon: "success"
-    });
-  }
+//————————————————设置界面相关
+
+function toggleSettings() {
+    const overlay = document.getElementById('settingsOverlay');
+    overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+}
+
+const markdownCheckbox = document.getElementById('markdown-checkbox');
+// 添加事件监听器，当checkbox的状态改变时触发
+markdownCheckbox.addEventListener('change', function() {
+    // 更新变量useMarkdown为checkbox的当前状态
+    useMarkdown = this.checked;
+    aardio.remMarkdown(this.checked);
+    previewDiv.innerHTML = convertContentToPreview(textarea.value);
+    hljs.highlightAll();
 });
-*/

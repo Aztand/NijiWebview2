@@ -50,6 +50,7 @@
     --img-treehole: url("treehole.png");
     --img-write: url("write.svg");
     --img-pic: url("pic.svg");
+    --img-settings: url("settings.svg");
     --img-new: url("new.svg");
     --img-save: url("save.svg");
     --img-delete: url("delete.svg");
@@ -75,7 +76,7 @@ body {
     white-space: pre-wrap;  /* 允许代码自动换行 */
     word-wrap: break-word;  /* 兼容旧浏览器 */
     overflow-wrap: break-word; /* 现代浏览器换行 */
-    overflow-y: auto;        /* 启用垂直滚动 */
+    overflow-y: auto;/* 启用垂直滚动 */
     overflow-x: hidden;      /* 禁用横向滚动 */
 }
 
@@ -109,6 +110,108 @@ body {
 
 .niji-style-button:hover {
     cursor: pointer;
+}
+
+/* ===== 设置界面 ===== */
+/* 遮罩层 */
+.settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 设置窗口 */
+.settings-window {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* 设置项样式 */
+.setting-item {
+    display: flex;
+    margin: 15px 0;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+select, input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+}
+
+/* 开关样式 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #333;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+
+/* 关闭按钮 */
+.close-btn {
+    float: right;
+    cursor: pointer;
+    padding: 5px;
+    margin: -10px -10px 0 0;
 }
 
 /* ===== 工具类 ===== */
@@ -174,6 +277,23 @@ body {
     background-image: var(--img-pair);
     background-size: 90% 100%;
     margin-top: 20%;
+}
+
+#settings-logo {
+    background-image: var(--img-settings);
+    position: fixed;
+    left: 0.5vw;
+    bottom: 1vh;
+    margin-top: 0 !important;
+    transform: none !important;
+    z-index: 1000;
+    width: 64px;
+    height: 64px;
+    margin-left: 0;
+    background-size: 80% !important;
+    background-position: center;
+    padding: 0 !important;
+    border-radius: 12px;
 }
 
 .seperate-line {
@@ -387,6 +507,11 @@ body {
 
     /* 滚动条 */
     overflow-y: auto;
+}
+
+#preview-content p img{
+    max-width: 80%; 
+    margin: 5px 0;
 }
 
 /* 补充盒模型设置 */
@@ -978,6 +1103,13 @@ body {
 
 .know-name-btn {
     padding-bottom: 0 !important;
+}
+
+.asking-name-btn {
+    padding-bottom: 0 !important;
+    border: none !important;
+    color: white !important;
+    background-color: var(--color-shadow-light) !important;
 }
 
 input.pair-input {

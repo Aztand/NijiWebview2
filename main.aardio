@@ -27,7 +27,8 @@ port={cls="static";text="close";left=56;top=936;right=120;bottom=961;hide=1;noti
 /*}}*/
 
 win.ui.minmax(mainForm,1024, 768);   // 限制宽高调整
-
+cfgPath = io.appData("/nideriji");
+cfg = fsys.config(cfgPath)	//创建config对象
 http = web.rest.jsonLiteClient();
 wb = web.view(mainForm,{
         startArguments = {
@@ -38,6 +39,17 @@ wb = web.view(mainForm,{
 loginGo = "";
 token = "";
 uploadIP = "";
+useMarkdown = false;
+
+if(table.count(cfg.config) > 1){
+	if(cfg.config.useMarkdown){
+		useMarkdown = true;
+	}
+}
+else {
+	cfg.config.useMarkdown = false;
+}
+
 isMember = false;
 
 NijiDocPath = io.getSpecial(0x05/*即文档文件夹*/) + "\你的日记\";
@@ -252,6 +264,47 @@ addPairedCard = function(tableIndex){
 	});
 }
 
+
+function getWormholeStatus(uc) {	//获取虫洞状态
+	// 定向已连接（最高优先级）
+	if (uc["paired"] && !uc["random_paired"]) {
+    	if (!uc["pair_requested"] && !uc["pair_requested_opposite"]) {
+        	return "paired";
+    	}
+    	// 随机已求名和随机求名中可以合并，因为它们的返回值都是"paired"
+    	if (uc["pair_requested"] && uc["pair_requested_opposite"]) {
+        	return "paired";
+    	}
+	}
+	
+	// 定向待回应和随机求名中可以合并，因为它们都涉及"pair_requested"
+	if (uc["pair_requested"] && !uc["random_paired"]) {
+    	if (!uc["paired"]) {
+        	return "directSended";
+    	}
+    	// 如果定向待回应，则不可能同时是"paired"，因此不需要检查
+	}
+	
+	// 随机未求名和随机求名中可以合并，因为它们都涉及"random_paired"和"paired"
+	if (uc["random_paired"] && uc["paired"]) {
+    	if (!uc["pair_requested"]) {
+        	return "unknowName";
+    	}
+    	if (uc["pair_requested"] && !uc["pair_requested_opposite"]) {
+        	return "askingName";
+    	}
+	}
+	
+	// 加入虫洞
+	if (uc["random_pair_joined"] && !uc["random_paired"] && !uc["paired"]) {
+    	return "pairing";
+	}
+	
+	// 无虫洞（最低优先级）
+	return "unpair";
+
+}
+
 v2sync = function(){
 	diaryResponse = http.api("https://nideriji.cn/api/v2/sync/").post(
     		user_config_ts = 0,
@@ -259,7 +312,6 @@ v2sync = function(){
     		readmark_ts = 0,
     		images_ts = 0
     );
-    console.log( getWormholeStatus(diaryResponse["user_config"]) );
     isMember = diaryResponse["user_config"]["is_member"];
     uploadTmpTable = {};	//清空上传图片相关的缓存
 	uploadTmpNum = 1;
@@ -401,7 +453,19 @@ v2sync = function(){
 			jDate = time(diaryResponse["diaries_paired"][j]["createddate"],"%Y-%m-%d");	
 		}
 		
+		if(pairedConfig["paired_time"]){
+			var deltaDay = time(pairedConfig["paired_time"]).diffday(time.now()) + 1;
+			wb.invoke("PAGE_CONFIGS['askingName']['paragraphs'][0] = '第" ++ deltaDay ++ "天");
+			wb.invoke("PAGE_CONFIGS['unknowName']['paragraphs'][0] = '第" ++ deltaDay ++ "天");
+		}
+		
 	}
+	
+	if(useMarkdown){
+		wb.invoke("markdownCheckbox.click");	
+	}
+	
+	wb.invoke('setPairPage',getWormholeStatus(diaryResponse["user_config"]));
 	
 	while(i <= iLen && iLen){
 		addSelfCard(i);
@@ -443,6 +507,12 @@ wb.external = {
     		}
 		}	
 	};	
+	
+	remMarkdown = function( checked ){
+		useMarkdown = checked;
+		cfg.config.useMarkdown = checked;
+	}
+	
 	
 	logout = function(){
 		loginGo = 2
@@ -629,55 +699,6 @@ loginIntvalID = mainForm.setInterval(
 	},200
 )
 
-function getWormholeStatus(uc) {
-    // 定向已连接（最高优先级）
-    if (uc["paired"] && 
-        !uc["random_paired"] && 
-        !uc["pair_requested"] && 
-        !uc["pair_requested_opposite"]) {
-        return "定向已连接";
-    }
-    
-    // 定向待回应
-    if (uc["pair_requested"] && 
-        !uc["random_paired"] && 
-        !uc["paired"]) {
-        return "定向待回应";
-    }
-    
-    // 随机已求名
-    if (uc["random_paired"] && 
-        uc["pair_requested"] && 
-        uc["pair_requested_opposite"] && 
-        uc["paired"]) {
-        return "随机已求名";
-    }
-    
-    // 随机求名中
-    if (uc["random_paired"] && 
-        uc["pair_requested"] && 
-        !uc["pair_requested_opposite"] && 
-        uc["paired"]) {
-        return "随机求名中";
-    }
-    
-    // 随机未求名
-    if (uc["random_paired"] && 
-        !uc["pair_requested"] && 
-        uc["paired"]) {
-        return "随机未求名";
-    }
-    
-    // 加入虫洞
-    if (uc["random_pair_joined"] && 
-        !uc["random_paired"] && 
-        !uc["paired"]) {
-        return "加入虫洞";
-    }
-    
-    // 无虫洞（最低优先级）
-    return "无虫洞";
-}
 
 mainForm.onClose = function(hwnd,message,wParam,lParam){
     if(wb.xcall('hasUnsavedChanges')){
@@ -692,8 +713,6 @@ wb.focus();
 mainForm.show();
 
 //自动登录组件
-cfgPath = io.appData("/nideriji");
-cfg = fsys.config(cfgPath)	//创建config对象
 
 if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token是字段名。空的config文件count为1
 	if(cfg.token.token != ""){
@@ -712,6 +731,7 @@ if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token
 		}
 	}
 }
+
 
 //*
 versionObj = fsys.version.getInfo(io._exepath);		//版本更新相关
