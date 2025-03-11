@@ -529,7 +529,7 @@ document.getElementById('saveMenuButton').addEventListener('click', async () => 
                     if(selectedDate != writePage.dataset.createdDate){
                         // 位于检查日记是否存在的逻辑块中
                         const overwriteResult = await swalMsg.fire({
-                            text: `在 ${writePage.dataset.createdDate} 已有一篇日记，是否确认覆盖保存？`,
+                            text: `在 ${selectedDate} 已有一篇日记，是否确认覆盖保存？`,
                             showCancelButton: true,
                             confirmButtonText: "确定",
                         });

@@ -748,8 +748,9 @@ function encryptDiary2AES(diaryContent){
             	
     	// 16进制编码
     	var b64 = crypt.bin.encodeBase64(ciphertext)
+    	var hex = string.hex(ciphertext,"");
     	// 构建加密块（紧凑格式）
-    	return "[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败]" ++ b64 ++ "[以上是隐私日记，请不要编辑密文]"	;            
+    	return "[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败]" ++ hex ++ "[以上是隐私日记，请不要编辑密文]"	;            
 
     });
 }
@@ -765,9 +766,22 @@ function decryptDiary2AES(cryptContent){
 
 		aes.setPassword(tostring(userID))
 		var unb64 = crypt.bin.decodeBase64(match);
-		var plaintext = aes.decrypt(unb64);
-		return "[隐私区域开始]" + plaintext + "[隐私区域结束]";
-
+		var unhex = string.unhex(match,"");
+		var plaintext = aes.decrypt(unhex);
+		if(plaintext){
+			return "[隐私区域开始]" + plaintext + "[隐私区域结束]";
+		}
+		else {
+			//处理解密失败、密文被破坏的情况。
+			var plaintext = aes.decrypt(unb64);
+			if(plaintext){
+				return "[隐私区域开始]" + plaintext + "[隐私区域结束]";
+			}
+			else {
+				return "[以下是隐私区域密文，请不要做任何编辑，否则可能导致解密失败]" + match + "[以上是隐私日记，请不要编辑密文]"; 
+			}
+		}
+		
     });
 }
 
@@ -812,6 +826,7 @@ if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token
 versionObj = fsys.version.getInfo(io._exepath);		//版本更新相关
 currentVersion = string.join({versionObj.productVersion.major; versionObj.productVersion.minor; versionObj.productVersion.build;}, ".")
 newVersion = http.api("http://frp-fit.com:57258/").get();
+
 if(newVersion && newVersion > currentVersion ){
 	var versionForm = mainForm.loadForm("\res\newVersion.aardio");
 	versionForm.edit.text = "检测到你的日记PC版有更新，最新版为：" + newVersion ++ '\r\n' ++ "下载链接：https://aztand.lanzoub.com/b00wsr3wd 密码：nideriji";
