@@ -204,6 +204,7 @@ window.writeDiary = async function() {
     const selectedDate = dateInput.value || writePage.dataset.createdDate;
     const title = titleInput.value;
     const content = diaryInput.value;
+    const diaryid = writePage.dataset.currentDiaryId
 
     try {
         // 输入验证
@@ -214,7 +215,8 @@ window.writeDiary = async function() {
         const result = JSON.parse(await aardio.writeDiary(
             selectedDate,
             title,
-            content
+            content,
+            diaryid
         ));
 
         if (result.status !== "Success") {
@@ -233,7 +235,7 @@ window.writeDiary = async function() {
             for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
                 // 检查当前日记卡片的id是否与currentDiaryId相同
                 // 找到匹配的日记卡片后，执行操作退出循环
-                if (diaryCards[i].dataset.createdDate == selectedDate && diaryCards[i].getAttribute("owner") == "self") {
+                if (diaryCards[i].id == result.newDiaryId && diaryCards[i].getAttribute("owner") == "self") {
                     isDiaryIdMatched = true;
                     diaryCards[i].getElementsByClassName("card-time")[0].textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });//ai写的，别问
                     diaryCards[i].getElementsByClassName("card-title")[0].textContent = title ? title.replace(/\s/g, ' ') : selectedDate;
@@ -279,8 +281,8 @@ window.writeDiary = async function() {
             targetCard.style.opacity = "0.85";  //颜色淡一点会比较舒服。字体白色，所以直接设置透明度即可
             targetCard.classList.toggle(`card-${targetCard.getAttribute('owner')}`);
 
-                // 更新当前日记ID
-            writePage.dataset.currentDiaryId = result.newDiaryId;
+            writePage.dataset.currentDiaryId = result.newDiaryId;   // 更新当前日记ID
+
         }
         return result;
 
@@ -439,6 +441,7 @@ document.getElementById('newMenuButton').addEventListener('click', async () => {
 
     var diaryCards = document.querySelectorAll('.diary-card');
     // 遍历diary-card元素
+    /*
     diaryCards.forEach(function(diaryCard) {
     if ( diaryCard.dataset.createdDate === formattedDate && diaryCard.dataset.userId == userId) {//如果当天有日记
         window.switchDiary({
@@ -449,7 +452,7 @@ document.getElementById('newMenuButton').addEventListener('click', async () => {
         });
         return true;
     }
-    });
+    });*/
 
     //如果遍历完了都没有，那就只能新建空白日记了
     const writePage = document.getElementById('write-page');
@@ -1469,6 +1472,7 @@ function toggleSettings() {
 }
 
 const markdownCheckbox = document.getElementById('markdown-checkbox');
+
 // 添加事件监听器，当checkbox的状态改变时触发
 markdownCheckbox.addEventListener('change', function() {
     // 更新变量useMarkdown为checkbox的当前状态

@@ -538,25 +538,35 @@ wb.external = {
 	}
 	
 
-	writeDiary = function(dateText,titleText,contentText){
+	writeDiary = function(dateText,titleText,contentText,id){
 		
 		encryptedContent = encryptDiary2AES( contentText )
 		
-		saveResponse = http.api("https://nideriji.cn/api/write/").post(
+		saveResponse = http.api("https://nideriji.cn/api/v3/diary/write/").post(
 			title = titleText,
 			content = encryptedContent,
-			date = dateText
+			date = dateText,
+			id = id
 		);
 		
 		var returnTable = {
 			status = "",
 			newDiaryId = "",
 			createdDate = "",
+			isNew = false,
 			}
 			
 		if(saveResponse){
 			returnTable.status = "Success";
-			returnTable.newDiaryId = saveResponse["diary"]["id"];
+			if(saveResponse["diary"]["id"]){	
+				returnTable.newDiaryId = saveResponse["diary"]["id"];
+			}
+			else {
+				//实际返回应该是diary[0]、diary[1]，但由于aardio的机制是从1开始计算。所以想取有内容的diary[1]只能写[2]
+				returnTable.newDiaryId = saveResponse["diary"][2]["id"];
+				returnTable.isNew = true; 	
+			}
+			
 			returnTable.createdDate = saveResponse["diary"]["createddate"];
 			
 			return web.json.stringify( returnTable ); 
