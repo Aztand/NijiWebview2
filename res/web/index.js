@@ -204,7 +204,8 @@ window.writeDiary = async function() {
     const selectedDate = dateInput.value || writePage.dataset.createdDate;
     const title = titleInput.value;
     const content = diaryInput.value;
-    const diaryid = writePage.dataset.currentDiaryId
+    //如果日期没有变动，直接取。如果日期发生偏移，则考虑是否是用户希望跨日期保存。此时设为空避免向后端发送diaryid导致意料外情况。
+    const diaryid = selectedDate == writePage.dataset.createdDate ? writePage.dataset.currentDiaryId : null;
 
     try {
         // 输入验证
@@ -226,16 +227,16 @@ window.writeDiary = async function() {
         // 更新界面状态
         writePage.dataset.title = title;
         writePage.dataset.content = content;
-        writePage.dataset.date = selectedDate; // 记录当前日期
+        writePage.dataset.createdDate = selectedDate; // 记录当前日期
 
         //更新日记卡片简介——————————————————————————————————————————————
         //确认当前日记存在卡片。如果是新建的日记则不用处理
         var isDiaryIdMatched = false;
         var diaryCards = document.querySelectorAll('#diary-card-list .diary-card'); // 获取所有的日记卡片
             for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
-                // 检查当前日记卡片的id是否与currentDiaryId相同
+                // 检查当前日记卡片的id是否与currentDiaryId相同、并且日期没有变化。如果日期变化，可能是用户希望跨天保存。
                 // 找到匹配的日记卡片后，执行操作退出循环
-                if (diaryCards[i].id == result.newDiaryId && diaryCards[i].getAttribute("owner") == "self") {
+                if (diaryCards[i].id == result.newDiaryId && diaryCards[i].dataset.createdDate == selectedDate && diaryCards[i].getAttribute("owner") == "self") {
                     isDiaryIdMatched = true;
                     diaryCards[i].getElementsByClassName("card-time")[0].textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });//ai写的，别问
                     diaryCards[i].getElementsByClassName("card-title")[0].textContent = title ? title.replace(/\s/g, ' ') : selectedDate;
@@ -399,7 +400,7 @@ document.getElementById('diary-card-list').addEventListener('click', async (even
     try {
         await window.switchDiary(diaryInfo);
     } catch (error) {
-        const handleSwitchError = (error) => {
+        (error) => {
             console.error('切换失败:', error);
             swalMsg.fire({
                 text: `操作出错: ${error.message}`
@@ -524,6 +525,10 @@ document.getElementById('saveMenuButton').addEventListener('click', async () => 
         saveBtn.disabled = true; // 防止重复点击
 
         var diaryCards = document.querySelectorAll('#diary-card-list .diary-card'); // 获取所有的日记卡片
+        /*
+            实际上，这是用于检测是否有selecteddate相同日期的现存日记，询问用户覆盖保存。
+            但自从你记3.7更新单日多篇日记后，已无需考虑这个问题。如果用户没有精准选中打开的某篇日记并进行编辑保存，则认为是需要新建一篇日记。
+
             var isDiaryIdMatched = false;                                               // 初始化一个标志变量，用于表示是否找到匹配的日记卡片
             for (var i = 0; i < diaryCards.length; i++) {                               // 遍历所有日记卡片
                 // 检查当前日记卡片的id是否与currentDiaryId相同
@@ -545,6 +550,7 @@ document.getElementById('saveMenuButton').addEventListener('click', async () => 
                     break; // 找到匹配的日记卡片后，退出循环
                 }
             }//此代码块用于检查是否是卡片列表不存在的新建日记
+        */
 
         // 执行保存
         const result = await window.writeDiary();
