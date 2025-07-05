@@ -1,0 +1,128 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>你的日记</title>
+    <script src="sweetalert2.all.min.js"></script>
+    <style>
+        body{
+            background-color: #ffffff;
+        }
+        h2 {
+            padding: 24px 30px 0;
+            font: 30px "Noto Sans SC";
+            font-weight: bolder;
+            color: #545454;
+        }
+        #content {
+            color: #545454;
+            font: 18px "Noto Sans SC";
+            padding: 18px 28.8px 5.4px;
+        }
+        #button-container{
+            margin: 20px 0px 0px;
+            padding: 0px 25.6px 0px 0px;
+        }
+        button{
+            color: #077F76;
+            font: 16px Arial;
+            margin: 5px;
+            padding: 10px 17.6px;
+            border: none;
+        }
+        .left-align {
+            text-align: left;
+        }
+
+        .right-align-item {
+            justify-content: flex-end !important; /* 右对齐 */
+            gap: 10px; /* 控制按钮间距 */
+            width: 100%;
+            padding-right: 5%;
+        }
+
+        .niji-style-button {
+            background: none;
+        }
+
+        .niji-style-button:hover {
+            cursor: pointer;
+        }
+
+        #confirm{
+            position: absolute;
+            bottom: 10vh;
+            right: 20vw;
+        }
+        #cancel{
+            position: absolute;
+            bottom: 10vh;
+            right: 10vw;
+        }
+    </style>
+</head>
+<body >
+    <div>
+        <h2 class = "left-align">你的日记</h2>
+        <div id = "content" class = "left-align">0.2.5.2
+修复了覆盖保存时出现日期提示错误的bug。
+修改了隐藏空间的加密编码。旧版本的加密内容在新版本中仍可解密。
+优化了设置按钮的大小布局
+优化了“保存中”的图标样式
+
+0.2.5.1
+改变了隐私空间的标签规则。不再使用“不存在的图片”。
+
+0.2.5
+隐私空间是只有自己在电脑版可以看到的内容。
+可以通过Ctrl+P快速插入隐私空间标签，也可以手动输入。
+在手机端查看会看到加密内容，请不要修改加密内容，以免日后解密失败，日记丢失。</div>
+        <div id = "button-container" class = "right-align-item">
+            <button id = "confirm" class = "niji-style-button">确定</button>
+            <button id = "cancel" class = "niji-style-button">取消</button>
+        </div>
+    </div>
+
+
+    <script>
+    const swalMsg = Swal.mixin({
+        title: "你的日记",
+        text: "",
+        showConfirmButton: true,
+        confirmButtonText: '好的',
+        showCancelButton: false,
+        cancelButtonText: '取消',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        customClass: {
+            title: "left-align",
+            htmlContainer: "left-align",
+            actions: "right-align-item",
+            confirmButton: "niji-style-button",
+            cancelButton: "niji-style-button"
+        }
+    });
+/*
+    swalMsg.fire({
+        text: "这是一篇更新内容",
+        confirmButtonText: "确定",
+        showCancelButton: true
+    }).then((result) => {
+        if( result.isConfirmed ){
+            aardio.unpair();
+            swalMsg.fire({
+                text: "「虫洞」已关闭！"
+            });
+            setPairPage('unpair')
+            if(refresh){
+                refresh();
+            }
+        }
+    });
+/**/
+    document.getElementsByTagName("body")[0].addEventListener('mousedown',async (event) => {
+                if(event.target.tagName != "DIV")
+                    aardio.hitCaption();
+            });
+    </script>
+</body>
+</html>

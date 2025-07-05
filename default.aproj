@@ -32,6 +32,7 @@
 			<file name="sweetalert2.min.css" path="res\web\sweetalert2.min.css" comment="res\web\sweetalert2.min.css"/>
 			<file name="settings.svg" path="res\web\settings.svg" comment="res\web\settings.svg"/>
 			<file name="loading.svg" path="res\web\loading.svg" comment="res\web\loading.svg"/>
+			<file name="notification.html" path="res\web\notification.html" comment="res\web\notification.html"/>
 		</folder>
 	</folder>
 	<folder name="窗体文件" path="dlg" comment="目录" embed="true" local="false" ignored="false">
