@@ -30,7 +30,7 @@ port={cls="static";text="close";left=56;top=936;right=120;bottom=961;hide=1;noti
 /*}}*/
 
 win.ui.minmax(mainForm,1024, 768);   // 限制宽高调整
-cfgPath = io.appData("/nideriji");
+cfgPath = io.appData("/nideriji/");
 cfg = fsys.config(cfgPath)	//创建config对象
 http = web.rest.jsonLiteClient();
 wb = web.view(mainForm,{
@@ -72,8 +72,14 @@ thread.invoke(function(NijiDocPath,mainForm){	//看图服务器。
 			response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
 			response.headers["Pragma"] = "no-cache";
 			response.headers["Expires"] = "0";
-			
-	   		response.loadcode( request.path );	
+			if(io.exist(request.path)){				//将本用户与匹配对象目录区分，如是匹配对象图片，从隐藏文件夹访问。
+	   			response.loadcode( request.path );	
+			}
+			else{
+				response.contentType = "image/jpeg";
+				response.write(string.load( io.joinpath(io.appData("/nideriji/"),request.path) ) );
+				//直接response.loadcode和fileObj.getAll都失败了，aar坑真多啊……
+			}
 
 	    }
 	);
@@ -316,8 +322,33 @@ v2sync = function(){
     		readmark_ts = 0,
     		images_ts = 0
     );
+    userID = diaryResponse["user_config"]["userid"];	
     isMember = diaryResponse["user_config"]["is_member"];
-		
+	
+	//以下检测本次与上次是否同一匹配对象，以清除旧对象信息
+	lastPairId = string.load( io.joinpath(cfgPath,userID) );
+	pairedID = diaryResponse["user_config"]["paired"] ? diaryResponse["user_config"]["paired_user_config"]["userid"] : "";
+	
+	if(lastPairId){
+		if(lastPairId != pairedID){
+			fsys.remove( io.joinpath(cfgPath,lastPairId) );	//告别前任，删除前任的图片缓存。
+			pairFileObj = io.file( io.joinpath(cfgPath,userID) , "w+");	//迎来后任
+			pairFileObj.write(pairedID);
+			pairFileObj.close();
+		}
+		else{
+			//匹配的人没变。我留这个else其实只是好玩。没有实际意义。	
+		}
+	}
+	else {
+		if(pairedID){
+			pairFileObj = io.file( io.joinpath(cfgPath,userID) , "w+");	
+			pairFileObj.write(pairedID);
+			pairFileObj.close();
+		}
+		//两者皆空当然没必要写啦	
+	}
+	
 	//aes.setKeyParamMode(2/*_CRYPT_MODE_ECB*/);
 	//aes.setInitVector(null); // ECB模式必须禁用IV
 	//aes.setPaddingMode(1/*_CRYPT_PADDING_PKCS7*/); // 显式指定PKCS7填充
@@ -365,7 +396,7 @@ v2sync = function(){
 		
 		if( diaryResponse["user_config"]["paired"] ){//下载对面图像。
 			thread.invoke(
-				function( diaryResponse,NijiDocPath,token ){
+				function( diaryResponse,cfgPath,token ){
 					import web.rest.jsonLiteClient;
 					http = web.rest.client();
 					http.addHeaders = {
@@ -379,22 +410,22 @@ v2sync = function(){
 						picTotal = picTable[table.len(picTable)].image_id;//通过最后一张图id判断图片总数。
 						
 						for(i=picTotal;1;-1){
-							if(!io.exist(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg")){
+							if(!io.exist(cfgPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg")){
 								picApi = http.api("https://f.nideriji.cn/api/image/" ++ pairedConfig.userid ++ "/" ++ i ++ "/");
 								pic = picApi.get();
 								if( pic ){//防止该图不存在，为空编号
-									string.save(NijiDocPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg", pic )
+									string.save(cfgPath ++ pairedConfig.userid ++ "\" ++ i ++ ".jpg", pic )
 								}
 							}	
 						}
 					}
 					
-				},diaryResponse,NijiDocPath,token
+				},diaryResponse,cfgPath,token
 			);
 		}
 	}
 		
-	userID = diaryResponse["user_config"]["userid"];	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
+	//因为添加日记卡片可能需要几秒钟，所以可以把快的小属性都先设置好。
 		// 加密参数配置
 	aes.setPassword( tostring(userID) ); // 128位密钥（16字符）
 	
