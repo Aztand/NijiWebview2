@@ -1,18 +1,29 @@
 import win.ui;
 import win.clip;
 import web.view;
+import win.ui.shadow;
+import process
 /*DSG{{*/
-var winform = win.form(text="更新提示";right=641;bottom=403;border="none";mode="popup")
+var winform = win.form(text="更新提示";right=641;bottom=403;border="none";composited=1;edge=1;max=false;mode="popup";title=false;topmost=1)
 winform.add()
 /*}}*/
 
+win.ui.shadow( winform,70,9,5,5); 
 wb = web.view(winform);
 wb.external = { 
     hitCaption = function(){
     	winform.hitCaption();
     };
+    
+    closeWindow = function(){
+    	winform.close()
+    }
+    openDownloadPage = function() {
+    	process.explore("https://nijiweb.cn/pc/");
+    }
 }
-wb.go("/res/web/notification.html")	
+wb.go("https://nijiweb.cn/pc/notification.html")	
+winform.show();
 /*
 winform.button2.oncommand = function(id,event){
 	winform.close()
@@ -24,6 +35,5 @@ winform.button.oncommand = function(id,event){
 }
 */
 
-winform.show();
 win.loopMessage();
 return winform;

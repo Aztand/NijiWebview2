@@ -1,5 +1,8 @@
 import win.ui;
-import web.view;
+
+if(!_WIN10_LATER) import web.view.7; //兼容 Win7 以及之后版本，不支持新版 WebView2 的功能。 
+else import web.view;//支持 Win10 以及之后版本，与web.view.7二选一，同时import会导致故障。  
+
 import web.rest.jsonLiteClient;
 import web.json;
 import wsock.tcp.asynHttpServer;
@@ -870,7 +873,6 @@ newVersion = http.api("https://nijiweb.cn/pc/version.html").get();
 
 if(newVersion && newVersion > currentVersion ){
 	var versionForm = mainForm.loadForm("\res\newVersion.aardio");
-	//versionForm.edit.text = "检测到你的日记PC版有更新，最新版为：" + newVersion ++ '\r\n' ++ "下载链接：https://aztand.lanzoub.com/b00wsr3wd 密码：nideriji";
 	versionForm.show();
 }
 //*/

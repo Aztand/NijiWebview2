@@ -2,7 +2,9 @@
 <head>
     <meta charset="utf-8">
     <title>你的日记</title>
-    <script src="sweetalert2.all.min.js"></script>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <style>
         body{
             background-color: #ffffff;
@@ -17,6 +19,9 @@
             color: #545454;
             font: 18px "Noto Sans SC";
             padding: 18px 28.8px 5.4px;
+            white-space: break-spaces;
+            max-height: 50vh;
+            overflow-y: auto;
         }
         #button-container{
             margin: 20px 0px 0px;
@@ -61,68 +66,76 @@
     </style>
 </head>
 <body >
-    <div>
-        <h2 class = "left-align">你的日记</h2>
-        <div id = "content" class = "left-align">0.2.5.2
-修复了覆盖保存时出现日期提示错误的bug。
-修改了隐藏空间的加密编码。旧版本的加密内容在新版本中仍可解密。
-优化了设置按钮的大小布局
-优化了“保存中”的图标样式
 
-0.2.5.1
-改变了隐私空间的标签规则。不再使用“不存在的图片”。
+            <h2 class = "left-align">你的日记</h2>
+            <div id = "content" class = "left-align">
+0.2.8 隐私升级 Win7兼容
 
-0.2.5
-隐私空间是只有自己在电脑版可以看到的内容。
-可以通过Ctrl+P快速插入隐私空间标签，也可以手动输入。
-在手机端查看会看到加密内容，请不要修改加密内容，以免日后解密失败，日记丢失。</div>
-        <div id = "button-container" class = "right-align-item">
-            <button id = "confirm" class = "niji-style-button">确定</button>
-            <button id = "cancel" class = "niji-style-button">取消</button>
-        </div>
-    </div>
+改善了对匹配对象的隐私保护。
+将win7兼容功能合并至主版本。
+改善了版本更新提示对话框样式。
+将软件下载地址移至网页端，将来会比蓝奏网盘更方便。
+
+0.2.7 修复恶性bug
+
+修复了一些恶性bug。所以这个没有太多新功能的版本也进行了推送。
+现在不再询问是否对已有日记的日期进行覆盖保存。会自动在目标日期创建新日记
+            </div>
+            <div id = "button-container" class = "right-align-item">
+                <button id = "confirm" class = "niji-style-button" onclick="aardio.openDownloadPage();">新版下载页面</button>
+                <button id = "cancel" class = "niji-style-button" onclick="aardio.closeWindow();">关闭</button>
+            </div>
+
 
 
     <script>
-    const swalMsg = Swal.mixin({
-        title: "你的日记",
-        text: "",
-        showConfirmButton: true,
-        confirmButtonText: '好的',
-        showCancelButton: false,
-        cancelButtonText: '取消',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        customClass: {
-            title: "left-align",
-            htmlContainer: "left-align",
-            actions: "right-align-item",
-            confirmButton: "niji-style-button",
-            cancelButton: "niji-style-button"
-        }
-    });
-/*
-    swalMsg.fire({
-        text: "这是一篇更新内容",
-        confirmButtonText: "确定",
-        showCancelButton: true
-    }).then((result) => {
-        if( result.isConfirmed ){
-            aardio.unpair();
-            swalMsg.fire({
-                text: "「虫洞」已关闭！"
-            });
-            setPairPage('unpair')
-            if(refresh){
-                refresh();
+        const title = document.getElementsByTagName('h2')[0];
+        const content = document.getElementById('content');
+        const confirmButton = document.getElementById('confirm');
+        const cancelButton = document.getElementById('cancel');
+        /*
+        const swalMsg = Swal.mixin({
+            title: "你的日记",
+            text: "",
+            showConfirmButton: true,
+            confirmButtonText: '好的',
+            showCancelButton: false,
+            cancelButtonText: '取消',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            customClass: {
+                title: "left-align",
+                htmlContainer: "left-align",
+                actions: "right-align-item",
+                confirmButton: "niji-style-button",
+                cancelButton: "niji-style-button"
             }
-        }
-    });
-/**/
-    document.getElementsByTagName("body")[0].addEventListener('mousedown',async (event) => {
-                if(event.target.tagName != "DIV")
-                    aardio.hitCaption();
-            });
+        });
+
+
+        
+        swalMsg.fire({
+            text: "这是一篇更新内容",
+            confirmButtonText: "确定",
+            showCancelButton: true
+        }).then((result) => {
+            if( result.isConfirmed ){
+                aardio.unpair();
+                swalMsg.fire({
+                    text: "「虫洞」已关闭！"
+                });
+                setPairPage('unpair')
+                if(refresh){
+                    refresh();
+                }
+            }
+        });
+        /**/
+
+        document.getElementsByTagName("body")[0].addEventListener('mousedown',async (event) => {
+                    if(event.target.id != "content" && event.target.tagName != "BUTTON")
+                        aardio.hitCaption();
+                });
     </script>
 </body>
 </html>
