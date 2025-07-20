@@ -3,7 +3,7 @@ import win.ui;
 if(!_WIN10_LATER) import web.view.7; //兼容 Win7 以及之后版本，不支持新版 WebView2 的功能。 
 else import web.view;//支持 Win10 以及之后版本，与web.view.7二选一，同时import会导致故障。  
 
-import web.rest.jsonLiteClient;
+import web.rest.client;
 import web.json;
 import wsock.tcp.asynHttpServer;
 import console;
@@ -19,12 +19,14 @@ import gdip.bitmap;
 import crypt.bin;
 import crypt.aes;
 import preg;
+
 /*
 import debug;
 import debug.log;
 debug.log.setPath("/.config/log.txt");
 debug.log.checkSize(0x20000); //设置日志大小
 */
+
 /*DSG{{*/
 mainForm = win.form(text="你的日记";right=1480;bottom=1001;edge=1;maximize=1)
 mainForm.add(
@@ -33,9 +35,10 @@ port={cls="static";text="close";left=56;top=936;right=120;bottom=961;hide=1;noti
 /*}}*/
 
 win.ui.minmax(mainForm,1024, 768);   // 限制宽高调整
+
 cfgPath = io.appData("/nideriji/");
 cfg = fsys.config(cfgPath)	//创建config对象
-http = web.rest.jsonLiteClient();
+http = web.rest.client();
 wb = web.view(mainForm,{
         startArguments = {
             allowFileAccessFromFiles = true;    // 允许访问本地文件
@@ -319,12 +322,12 @@ function getWormholeStatus(uc) {	//获取虫洞状态
 }
 
 v2sync = function(){
-	diaryResponse = http.api("https://nideriji.cn/api/v2/sync/").post(
+	diaryResponse = secureJson(http.api("https://nideriji.cn/api/v2/sync/").post(
     		user_config_ts = 0,
     		diaries_ts = 0,
     		readmark_ts = 0,
     		images_ts = 0
-    );
+    ));
     userID = diaryResponse["user_config"]["userid"];	
     isMember = diaryResponse["user_config"]["is_member"];
 	
@@ -364,7 +367,7 @@ v2sync = function(){
 		
 		thread.invoke( 		//为自己下图
 			function( diaryResponse,NijiDocPath,token,wb ){
-				import web.rest.jsonLiteClient;
+				import web.rest.client;
 				http = web.rest.client();
 				http.addHeaders = {
 					["auth"] = "token " ++ token;
@@ -400,7 +403,7 @@ v2sync = function(){
 		if( diaryResponse["user_config"]["paired"] ){//下载对面图像。
 			thread.invoke(
 				function( diaryResponse,cfgPath,token ){
-					import web.rest.jsonLiteClient;
+					import web.rest.client;
 					http = web.rest.client();
 					http.addHeaders = {
 						["auth"] = "token " ++ token;
@@ -526,10 +529,10 @@ v2sync = function(){
 
 wb.external = {
 	login = function(email,password,remPw){
-		loginResponse = http.api("https://nideriji.cn/api/login/").post(
+		loginResponse = web.json.parse(http.api("https://nideriji.cn/api/login/").post(
 			email = email,
 			password = password
-		);
+		));
 		token = loginResponse.token;
 		
 		if(!loginResponse){
@@ -576,12 +579,12 @@ wb.external = {
 		
 		encryptedContent = encryptDiary2AES( contentText )
 		
-		saveResponse = http.api("https://nideriji.cn/api/v3/diary/write/").post(
+		saveResponse = web.json.parse(http.api("https://nideriji.cn/api/v3/diary/write/").post(
 			title = titleText,
 			content = encryptedContent,
 			date = dateText,
 			id = id
-		);
+		));
 		
 		var returnTable = {
 			status = "",
@@ -613,9 +616,9 @@ wb.external = {
 	
 	
 	getDiary = function(ownerID,diaryID){
-		getAllResponse = http.api("https://nideriji.cn/api/diary/all_by_ids/" ++ ownerID ++ "/").post(
+		getAllResponse = web.json.parse(http.api("https://nideriji.cn/api/diary/all_by_ids/" ++ ownerID ++ "/").post(
 			diary_ids = diaryID
-		);
+		));
 		if(getAllResponse["diaries"][1]){
 			http.api("https://nideriji.cn/api/update_read_mark/" ++ diaryID ++ "/").get();
 			returnJson = getAllResponse["diaries"][1];
@@ -635,7 +638,7 @@ wb.external = {
 	}
 	
 	deleteDiary = function(userID,diaryID){
-		delResponse = http.api("https://nideriji.cn/api/diary/delete/"++ diaryID ++ "/").get();
+		delResponse = web.json.parse(http.api("https://nideriji.cn/api/diary/delete/"++ diaryID ++ "/").get());
 		if(delResponse["error"] != null ? delResponse["error"] == 0 : false/* 若不存在delR则直接报错 */){
 			return "Success"; 	
 		}
@@ -653,7 +656,7 @@ wb.external = {
 		}
 		
 		for(k,v in uploadTmpTable){
-			uploadApi = http.api("https://f.nideriji.cn/api/upload_image/");
+			uploadApi = web.json.parse(http.api("https://f.nideriji.cn/api/upload_image/"));
 			uploadResponse = uploadApi.sendMultipartForm( { 
 				image = "@" + NijiDocPath + "\upload_temp\" + v + ".jpg";
 			});
@@ -686,7 +689,7 @@ wb.external = {
 	}
 	
 	unpair = function(){
-		var unpairResp = http.api("https://nideriji.cn/api/unpair/").get();
+		var unpairResp = web.json.parse(http.api("https://nideriji.cn/api/unpair/").get());
 		if(unpairResp["error"] != null){
 			if(unpairResp["error"] == 0 ){
 				return "success"; 	
@@ -696,7 +699,7 @@ wb.external = {
 	}
 	
 	joinRandomPair = function(){
-		var joinResp = http.api("https://nideriji.cn/api/join_random_pair/").get();
+		var joinResp = web.json.parse(http.api("https://nideriji.cn/api/join_random_pair/").get());
 		if(joinResp["error"] != null){
 			if(joinResp["error"] == 0 ){
 				return "success"; 	
@@ -706,7 +709,7 @@ wb.external = {
 	}
 	
 	cancelRandomPair = function(){
-		var cancelResp = http.api("https://nideriji.cn/api/cancel_random_pair/").get();
+		var cancelResp = web.json.parse(http.api("https://nideriji.cn/api/cancel_random_pair/").get());
 		if(cancelResp["error"] != null){
 			if(cancelResp["error"] == 0 ){
 				return "success"; 	
@@ -716,7 +719,7 @@ wb.external = {
 	}
 	
 	knowYourName = function(){
-		var knowResp = http.api("https://nideriji.cn/api/know_your_name/").get();
+		var knowResp = web.json.parse(http.api("https://nideriji.cn/api/know_your_name/").get());
 		if(knowResp["error"] != null){
 			if(knowResp["error"] == 0 ){
 				return "success"; 	
@@ -727,9 +730,9 @@ wb.external = {
 	
 	
 	directPair = function(targetEmail){
-		var dircResp = http.api("https://nideriji.cn/api/pair/").post(
+		var dircResp = web.json.parse(http.api("https://nideriji.cn/api/pair/").post(
 			target_email = targetEmail
-		)
+		));
 		if(dircResp["error"] != null){
 			if(dircResp["error"] == 0 ){
 				if(dircResp["paired"]){
@@ -771,6 +774,23 @@ mainForm.onClose = function(hwnd,message,wParam,lParam){
     	if(!mainForm.msgboxTest("当前日记有未保存内容，是否确认关闭窗口？"))
     		return "不关不关就不关";    
     }
+}
+
+secureJson = function(str) {
+	/*	
+		这是一种极其逆天的解决方法。因为开发者的愚蠢，没有找到正确方法进行正则匹配非法unicode代理对
+		所以我选择把临近diary略缩右引号emoji常用的高代理对都用写死的方法删掉了。这个对照列表可能不全
+		需要之后添加其他高代理对，或者找到更好的解决方案。无所谓了！反正迟早要迁移走放弃aar项目。
+	*/
+	i = /*\\ud83c\"*/
+	j = /*\\ud83d\"*/
+	k = /*\\ud83e\"*/
+	l = /*\"*/
+	str = string.replace(str,i,l);
+	str = string.replace(str,j,l);
+	str = string.replace(str,k,l);
+    str = web.json.parse(str);
+    return str;
 }
 
 // 创建AES实例
@@ -854,7 +874,8 @@ if(table.count(cfg.token) == 2){			//第一个token是文件名，第二个token
 			["auth"] = "token " + cfg.token.token ;
 			["user-agent"] = "OhApp/3.6.12 Platform/Android";
 		}
-		testToken = http.api("https://nideriji.cn/api/v2/sync/").post();
+		
+		testToken = secureJson( http.api("https://nideriji.cn/api/v2/sync/").post() );
 		if(testToken){
 			loginGo = 1;	
 		}
