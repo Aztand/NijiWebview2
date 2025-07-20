@@ -26,7 +26,6 @@ import debug.log;
 debug.log.setPath("/.config/log.txt");
 debug.log.checkSize(0x20000); //设置日志大小
 */
-
 /*DSG{{*/
 mainForm = win.form(text="你的日记";right=1480;bottom=1001;edge=1;maximize=1)
 mainForm.add(
@@ -154,6 +153,7 @@ uploadIP = uploadServer.getUrl( , true);
 _,uploadPort = uploadServer.getLocalIp();	//快传二维码
 QRcodeURL = uploadIP + "/mobileUpload/";
 QRobj = qrencode.bitmap( QRcodeURL );
+io.createDir( io.joinpath(NijiDocPath,"upload_temp") )
 QRobj.copyBitmap( 512 ).save( io.joinpath(NijiDocPath,"upload_temp","QRcode.jpg") , 512 )
 
 
