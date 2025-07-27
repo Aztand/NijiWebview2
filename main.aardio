@@ -656,10 +656,10 @@ wb.external = {
 		}
 		
 		for(k,v in uploadTmpTable){
-			uploadApi = web.json.parse(http.api("https://f.nideriji.cn/api/upload_image/"));
-			uploadResponse = uploadApi.sendMultipartForm( { 
+			uploadApi = http.api("https://f.nideriji.cn/api/upload_image/");
+			uploadResponse = web.json.parse(uploadApi.sendMultipartForm( { 
 				image = "@" + NijiDocPath + "\upload_temp\" + v + ".jpg";
-			});
+			}));
 			if(uploadResponse["error"] != null){
 				if(uploadResponse["error"] == 0){
 					newPicId = uploadResponse["image_id"];
