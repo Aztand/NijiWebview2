@@ -19,6 +19,7 @@ import gdip.bitmap;
 import crypt.bin;
 import crypt.aes;
 import preg;
+import fsys.remove;
 
 /*
 import debug;
